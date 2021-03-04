@@ -1,0 +1,6 @@
+
+(coqide:16438): Gtk-WARNING **: 14:51:10.417: Drawing a gadget with negative dimensions. Did you forget to allocate a size? (node header owner GtkNotebook)
+
+(coqide:16438): Gtk-WARNING **: 14:51:10.417: Drawing a gadget with negative dimensions. Did you forget to allocate a size? (node tabs owner GtkNotebook)
+
+(coqide:16438): Gtk-WARNING **: 14:51:10.418: Drawing a gadget with negative dimensions. Did you forget to allocate a size? (node tab owner GtkNotebook)
