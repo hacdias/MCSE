@@ -1,3 +1,5 @@
+Require Import Arith.
+
 Inductive tree : Set :=
   | leaf : tree
   | node : tree -> nat -> tree -> tree.
@@ -27,7 +29,6 @@ Fixpoint bst (T : tree) : Prop :=
       bst r
   end.
 
-
 (* Define a function insert that takes a binary search tree and a natural number
 and inserts the number in the right place in the tree. *)
 
@@ -40,12 +41,20 @@ bst t -> bst (insert n t) (for all t:tree, n:nat).
 it into a binary search tree. Hint: you can define two auxiliary functions,
 one that stores the elements of a tree in a list and one that builds a binary
 search tree from the elements of a list.*)
+Definition sort (t: tree) : tree := (* TODO *) t.
 
 (*Prove that the result of the sort function is always a binary search tree. *)
 
-(*Given the predicate occurs expressing that an element belongs to a tree, prove
-that the sorted version of a tree contains the same elements as the original
-one, i.e. prove:
-“occurs n t <-> occurs n (sort t)” (for all n:nat, t:tree)*)
+(*Given the predicate occurs expressing that an element belongs to a tree *)
+Fixpoint occurs (n: nat) (t: tree) : Prop :=
+  match t with
+  | leaf => False
+  | node l v r =>
+      if v =? n then True
+      else (occurs n l) \/ (occurs n r)
+  end.
+
+(* prove that the sorted version of a tree contains the same elements as the
+original one, i.e. prove: “occurs n t <-> occurs n (sort t)” (for all n:nat, t:tree) *)
 
 (* PART 2 *)
