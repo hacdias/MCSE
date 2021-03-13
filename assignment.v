@@ -86,11 +86,7 @@ Fixpoint occurs (n: nat) (t: tree) : Prop :=
 Lemma sorted_occurs : forall (t: tree) (n: nat), occurs n t <-> occurs n (sort t).
 Proof.
 intros.
-induction t.
-- simpl.
-  reflexivity.
-- simpl.
-  reflexivity.
+induction t; simpl; reflexivity.
 Qed.
 
 (* PART 2 *)
