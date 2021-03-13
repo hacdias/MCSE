@@ -45,6 +45,11 @@ Fixpoint insert (n: nat) (t: tree) : tree :=
       end
  end.
 
+(* Maybe well need to prove sth like: 
+Lemma bst_left : forall (l r: tree) (v: nat), bst (node l v r) -> bst l.
+Lemma bst_right : forall (l r: tree) (v: nat), bst (node l v r) -> bst r.
+*)
+
 Lemma insert_correct: forall (t:tree) (n:nat), bst t -> bst (insert n t).
 Proof.
 intros.
