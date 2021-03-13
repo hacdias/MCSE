@@ -11,31 +11,47 @@ it works very well if you define bst as a recursive function:
 Fixpoint bst (T : tree) : Prop := ... *)
 
 (* Given a condition C, checks if the tree t complies with C. *)
-(* Maybe we can avoid checking recursively by changing to Function
-and only testing C v. After all, bst already does the checks on the left and right. *)
-Fixpoint bst_check (C: nat -> Prop) (t: tree) : Prop :=
+
+(* bst_comp performs comparison c on tree t *)
+Definition bst_comp (c: nat -> Prop) (t: tree) : Prop :=
   match t with
   | leaf => True
-  | node l v r => C v /\ bst_check C l /\ bst_check C r
+  | node l v r => c v
   end.
 
-Fixpoint bst (T : tree) : Prop :=
-  match T with
+(* bst recursively checks if t is a BST *)
+Fixpoint bst (t : tree) : Prop :=
+  match t with
   | leaf => True
-  | node l m r =>
-      bst_check (fun y => y < m) l /\
-      bst_check (fun y => y > m) r /\
+  | node l v r =>
+      bst_comp (fun y => y < v) l /\
+      bst_comp (fun y => y > v) r /\
       bst l /\
       bst r
   end.
 
-(* Define a function insert that takes a binary search tree and a natural number
-and inserts the number in the right place in the tree. *)
+(* insert insert a natural number n in the tree t *)
+Fixpoint insert (n: nat) (t: tree) : tree :=
+  match t with 
+  | leaf => node leaf n leaf
+  | node l v r => 
+      match n ?= v with
+        | Eq => node l v r
+        | Lt => node (insert n l) v r
+        | Gt => node l v (insert n r)
+      end
+ end.
 
-(*
-Prove correctness of the insert function that is prove that:
-bst t -> bst (insert n t) (for all t:tree, n:nat).
-*)
+Lemma insert_correct: forall (t:tree) (n:nat), bst t -> bst (insert n t).
+Proof.
+intros.
+induction t.
+- simpl.
+  auto.
+- destruct H.
+  simpl.
+(* TODO *)
+Admitted.
 
 (*Define a function sort that takes an arbitrary tree and sorts it, i.e. it transforms
 it into a binary search tree. Hint: you can define two auxiliary functions,
@@ -43,18 +59,39 @@ one that stores the elements of a tree in a list and one that builds a binary
 search tree from the elements of a list.*)
 Definition sort (t: tree) : tree := (* TODO *) t.
 
-(*Prove that the result of the sort function is always a binary search tree. *)
+(*Prove that the result of the sort function is always a binary search tree.*)
+Lemma sort_correct: forall (t: tree), bst (sort t).
+Proof.
+intros.
+induction t.
+- simpl.
+  auto.
+- simpl.
+(* TODO *)
+Admitted. 
 
 (*Given the predicate occurs expressing that an element belongs to a tree *)
-Fixpoint occurs (n: nat) (t: tree) : Prop :=
+Fixpoint occurs (n: nat) (t: tree) : bool :=
   match t with
-  | leaf => False
+  | leaf => false
   | node l v r =>
-      if v =? n then True
-      else (occurs n l) \/ (occurs n r)
+      match n ?= v with
+      | Eq => true
+      | Lt => occurs n l
+      | Gt => occurs n r
+      end
   end.
 
-(* prove that the sorted version of a tree contains the same elements as the
-original one, i.e. prove: “occurs n t <-> occurs n (sort t)” (for all n:nat, t:tree) *)
+(* Proves that the sorted version of a tree contains the same elements as the original one. *)
+(* TODO: Is the is_true needed? It complains bool is not a Prop *)
+Lemma sorted_occurs : forall (t: tree) (n: nat), is_true (occurs n t) <-> is_true (occurs n (sort t)).
+Proof.
+intros.
+induction t.
+- simpl.
+  reflexivity.
+- simpl.
+  reflexivity.
+Qed.
 
 (* PART 2 *)
