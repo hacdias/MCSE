@@ -71,20 +71,19 @@ induction t.
 Admitted. 
 
 (*Given the predicate occurs expressing that an element belongs to a tree *)
-Fixpoint occurs (n: nat) (t: tree) : bool :=
+Fixpoint occurs (n: nat) (t: tree) : Prop :=
   match t with
-  | leaf => false
+  | leaf => False
   | node l v r =>
       match n ?= v with
-      | Eq => true
+      | Eq => True
       | Lt => occurs n l
       | Gt => occurs n r
       end
   end.
 
 (* Proves that the sorted version of a tree contains the same elements as the original one. *)
-(* TODO: Is the is_true needed? It complains bool is not a Prop *)
-Lemma sorted_occurs : forall (t: tree) (n: nat), is_true (occurs n t) <-> is_true (occurs n (sort t)).
+Lemma sorted_occurs : forall (t: tree) (n: nat), occurs n t <-> occurs n (sort t).
 Proof.
 intros.
 induction t.
