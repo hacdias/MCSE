@@ -10,13 +10,16 @@ introduction to binary search trees). Experience of the past has shown that
 it works very well if you define bst as a recursive function:
 Fixpoint bst (T : tree) : Prop := ... *)
 
-(* Given a condition C, checks if the tree t complies with C. *)
-
-(* bst_comp performs comparison c on tree t *)
-Definition bst_comp (c: nat -> Prop) (t: tree) : Prop :=
+Definition bst_lt (t: tree) (n: nat) : Prop :=
   match t with
   | leaf => True
-  | node l v r => c v
+  | node l v r => v < n
+  end.
+
+Definition bst_gt (t: tree) (n: nat) : Prop :=
+  match t with
+  | leaf => True
+  | node l v r => v > n
   end.
 
 (* bst recursively checks if t is a BST *)
@@ -24,8 +27,8 @@ Fixpoint bst (t : tree) : Prop :=
   match t with
   | leaf => True
   | node l v r =>
-      bst_comp (fun y => y < v) l /\
-      bst_comp (fun y => y > v) r /\
+      bst_lt l v /\
+      bst_lt r v /\
       bst l /\
       bst r
   end.
@@ -48,8 +51,7 @@ intros.
 induction t.
 - simpl.
   auto.
-- destruct H.
-  simpl.
+-
 (* TODO *)
 Admitted.
 
@@ -62,11 +64,6 @@ Definition sort (t: tree) : tree := (* TODO *) t.
 (*Prove that the result of the sort function is always a binary search tree.*)
 Lemma sort_correct: forall (t: tree), bst (sort t).
 Proof.
-intros.
-induction t.
-- simpl.
-  auto.
-- simpl.
 (* TODO *)
 Admitted. 
 
@@ -85,8 +82,7 @@ Fixpoint occurs (n: nat) (t: tree) : Prop :=
 (* Proves that the sorted version of a tree contains the same elements as the original one. *)
 Lemma sorted_occurs : forall (t: tree) (n: nat), occurs n t <-> occurs n (sort t).
 Proof.
-intros.
-induction t; simpl; reflexivity.
-Qed.
+(* TODO *)
+Admitted.
 
 (* PART 2 *)
