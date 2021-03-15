@@ -1,3 +1,8 @@
+(* Authors:
+ * R.E.L. van Dijk (0963283)
+ * H. Dias ()
+*)
+
 (* Mutual authentication example
  * Compared to Scenario from MutualAuthentication-4.pi we fix the protocol by adding the identities of the intended recipient in the signed messages: 
  *  A->B: {|pkA,A|}_sk(CA), {|B,na,nb,text2|}_skA
