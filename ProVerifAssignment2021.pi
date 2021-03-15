@@ -3,6 +3,17 @@
  * H. Dias ()
 *)
 
+(* Definitions:
+ * B = Base Station
+ * S = Server
+ * D = Devices
+ * pkS = Public key Server
+ * KBD = Private key between B and D
+ * KBS = Private key between B and s
+ * N_D = Nonce of D
+ * C = Connection
+*)
+
 (* Mutual authentication example
  * Compared to Scenario from MutualAuthentication-4.pi we fix the protocol by adding the identities of the intended recipient in the signed messages: 
  *  A->B: {|pkA,A|}_sk(CA), {|B,na,nb,text2|}_skA
