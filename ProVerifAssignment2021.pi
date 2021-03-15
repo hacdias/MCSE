@@ -1,0 +1,68 @@
+(* Mutual authentication example
+ * Compared to Scenario from MutualAuthentication-4.pi we fix the protocol by adding the identities of the intended recipient in the signed messages: 
+ *  A->B: {|pkA,A|}_sk(CA), {|B,na,nb,text2|}_skA
+ *  B->A: {|pkB,B|}_sk(CA), {|A,na,text3|}_skB
+ * With this protocol the checks succeed again and we now have a very general scenario (with an internal attacker model).
+*)
+
+free c. 		(* channel *)
+free Spy,CA.		(* identifiers *)
+free text1,text2,text3. (* publicly known messages *)
+
+fun sign/2.
+fun pk/1.
+private fun sk/1.
+reduc check(sign(x,sk(y)),pk(y))=x.
+
+(* queries *)
+query evinj:end2(x,y,z) ==> evinj:begin2(x,y,z).
+query evinj:end(x,y,z) ==> evinj:begin(x,y,z).
+(* query attacker:flagFinishA.  (* -- Test query to confirm A can complete *)
+(* query attacker:flagFinishB.  (* -- Test query to confirm B can complete *)
+
+let initiatorB =			(* Initiator of an arbitrary session *)
+  in( c, B );					(* Let the attacker decide who initiates the session, call them B. *)
+  in( c, A );					(* and also whom B talks to in this session, call them A *)
+  if A <> B then 				(* But let's not talk to ourselfs *)	
+    in( c, certB ); 				(* Get my key certificate *)
+    let (=pk(B),=B) = check(certB, pk(CA)) in	(* check I grabbed the right thing *)
+
+    new nb; out(c,(B,nb,text1));		(* B->A: nb, text1 *)
+    in(c,(x,y));				(* A->B: {|pkA,A|}_sk(CA), {|B,na,nb,text2|}_skA *) 
+    let (pka,=A) = check(x,pk(CA)) in		(* Learn pka by checking A's key certificate *)
+      let (=B,na,=nb,=text2) = check(y,pka) in	(* Check B,nb and learn na from part signed by A *)
+       (if A<>Spy then if B<> Spy then 		(* Check neither of us is the Spy if so: *)
+	  event end(A,B,nb))			(* Consider A authenticated *)
+        | event begin2(B,A,na);			(* Ready to authenticate to A *)
+        out(c,(certB, sign((A,na,text3),sk(B)))); (* B->A: {|pkB,B|}_sk(CA), {|A,na,text3|}_skB *)
+        new flagFinishB; out(c, flagFinishB).	(* End of process B *)
+
+let responderA = 			(* Responder in an arbitrary session *) 
+  in( c, A );					(* Let the attacker decide who this responder is, call them A. *)
+  in( c, certA ); 				(* Get my key certificate *)
+  let (pka,=A) = check( certA, pk(CA)) in	(* check I grabbed the right thing *)
+    in(c, (B,nb,=text1)); 			(* B->A: nb, text1 *)
+    if A <> B then 				(* Let's not talk to ourselfs *)	
+      event begin(A,B,nb);			(* Ready to authenticate to B *)
+      new na;					
+      out(c,(certA,sign((B,na,nb,text2),sk(A)))); (* A->B: {|pkA,A|}_sk(CA), {|B,na,nb,text2|}_skA *)
+      in(c,(x,y));				(* B->A: {|pkB,B|}_sk(CA), {|A,na,text3|}_skB *)
+        let (pkb,=B) = check(x,pk(CA)) in	(* Learn pkb by checking B's key certificate *)
+        let (=A,=na,=text3) = check(y,pkb) in	(* check A,na in part signed by B *)
+        (if A<>Spy then if B<> Spy then 	(* Check neither of us is the Spy if so: *)
+          event end2(B,A,na))			(* Consider B authenticated *)
+        | new flagFinishA; out(c, flagFinishA).	(* End of process A *)
+
+let Compromised =			
+  out( c, sk( Spy ) ).			(* Give secret key Spy to the attacker *)
+
+let pCA =				(* Creates and certifies keys of agents *)
+  out( c, sign( (pk(Spy),Spy), sk(CA) ) )	(* Publish certificate for spy. *)
+  |
+  ! new agent;					(* Create the agent *) 
+  out( c, sign( (pk(agent),agent), sk(CA) ) ).	(* Publish certificate introducing both the agent and their pk. *)
+
+process
+  !responderA | !initiatorB | Compromised | pCA 
+
+
