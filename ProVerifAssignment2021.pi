@@ -14,6 +14,15 @@
  * C = Connection
 *)
 
+(* Protocol:
+ * D begin Connect(D, N_D, S)
+ * D->B: D,S,{N_D}_KBD
+ * B->D: {N_D,pkS,{K,D,N_D}_KBS}_KBD
+ * D->S: {K,D,N_D}_KBS 
+ * S->D: {N_D,C}_pkS
+ * S end Connect(D, N_D, S)
+*)
+
 (* Mutual authentication example
  * Compared to Scenario from MutualAuthentication-4.pi we fix the protocol by adding the identities of the intended recipient in the signed messages: 
  *  A->B: {|pkA,A|}_sk(CA), {|B,na,nb,text2|}_skA
