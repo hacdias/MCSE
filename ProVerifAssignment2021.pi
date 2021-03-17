@@ -1,93 +1,68 @@
 (* Authors:
  * R.E.L. van Dijk (0963283)
  * H.A. Coelho Dias (1531484)
-*)
+ *)
 
 (* Definitions:
  * B = Base Station
  * S = Server
  * D = Devices
- * pkS = Public key Server
- * KBD = Private key between B and D
- * KBS = Private key between B and s
- * N_D = Nonce of D
- * C = Connection
-*)
+ * kBD = Symmetric key between B and D
+ * n = Nonce
+ * c = Secure connection
+ *)
 
 (* Protocol:
- * D begin Connect(D, N_D, S)
- * D->B: D,S,{N_D}_KBD
- * B->D: {N_D,pkS,{K,D,N_D}_KBS}_KBD
- * D->S: {K,D,N_D}_KBS 
- * S->D: {N_D,C}_pkS
- * S end Connect(D, N_D, S)
-*)
+ * D begin Connect(D, n, S)
+ * D -> B: D, S, {S, n}_kBD         (maybe add pwd here)
+ * B -> S: {|D, S, n|}_pk(S)
+ * S -> B: {|D, n, c|}_pk(B)
+ * B -> D: {S, n, c}_kBD
+ * D -> S: n    (via c)
+ * S end Connect(D, n, S)
+ *)
 
-(* Mutual authentication example
- * Compared to Scenario from MutualAuthentication-4.pi we fix the protocol by adding the identities of the intended recipient in the signed messages: 
- *  A->B: {|pkA,A|}_sk(CA), {|B,na,nb,text2|}_skA
- *  B->A: {|pkB,B|}_sk(CA), {|A,na,text3|}_skB
- * With this protocol the checks succeed again and we now have a very general scenario (with an internal attacker model).
-*)
+free net.
+free Spy, B, D, S.
 
-free c. 		(* channel *)
-free Spy,CA.		(* identifiers *)
-free text1,text2,text3. (* publicly known messages *)
+private free kBD.
 
-fun sign/2.
-fun pk/1.
-private fun sk/1.
-reduc check(sign(x,sk(y)),pk(y))=x.
+fun pk/1.                                         (* Get public key *)
+private fun sk/1.                                 (* Get secret key *)
+fun sencrypt/2.                                   (* Symmetric encryption *)
+reduc sdecrypt(sencrypt(m, k), k) = m.            (* Symmetric decryption *)
+fun encrypt/2.                                    (* Assymetric encryption *)
+reduc decrypt(encrypt(m, pk(a)), sk(a)) = m.      (* Assymetric decryption *)
 
-(* queries *)
-query evinj:end2(x,y,z) ==> evinj:begin2(x,y,z).
-query evinj:end(x,y,z) ==> evinj:begin(x,y,z).
-(* query attacker:flagFinishA.  (* -- Test query to confirm A can complete *)
-(* query attacker:flagFinishB.  (* -- Test query to confirm B can complete *)
+query attacker:c.                                 (* Can external attacker get c? *)
+query evinj:end(x,y,z) ==> evinj:start(x,y,z).    (* Verify authenticity via events *)
 
-let initiatorB =			(* Initiator of an arbitrary session *)
-  in( c, B );					(* Let the attacker decide who initiates the session, call them B. *)
-  in( c, A );					(* and also whom B talks to in this session, call them A *)
-  if A <> B then 				(* But let's not talk to ourselfs *)	
-    in( c, certB ); 				(* Get my key certificate *)
-    let (=pk(B),=B) = check(certB, pk(CA)) in	(* check I grabbed the right thing *)
+let device =
+  new n;
+  event start(D, n, S);
+  out(net, (D, S, sencrypt((S, n), kBD)));        (* D -> B: D, S, {S, n}_kBD *)
+  in(net, m);
+  let (=n, D, c) = sdecrypt(m, kBD) in            (* B -> D: {S, n, c}_kBD *)
+    out(c, n).                                    (* D -> S: n    (via c) *)
 
-    new nb; out(c,(B,nb,text1));		(* B->A: nb, text1 *)
-    in(c,(x,y));				(* A->B: {|pkA,A|}_sk(CA), {|B,na,nb,text2|}_skA *) 
-    let (pka,=A) = check(x,pk(CA)) in		(* Learn pka by checking A's key certificate *)
-      let (=B,na,=nb,=text2) = check(y,pka) in	(* Check B,nb and learn na from part signed by A *)
-       (if A<>Spy then if B<> Spy then 		(* Check neither of us is the Spy if so: *)
-	  event end(A,B,nb))			(* Consider A authenticated *)
-        | event begin2(B,A,na);			(* Ready to authenticate to A *)
-        out(c,(certB, sign((A,na,text3),sk(B)))); (* B->A: {|pkB,B|}_sk(CA), {|A,na,text3|}_skB *)
-        new flagFinishB; out(c, flagFinishB).	(* End of process B *)
+let server =
+  in(net, m);
+  let (D, S, n) = decrypt(m, sk(S)) in            (* B -> S: {|D, S, n|}_pk(S) *)
+    new c;
+    out(net, encrypt((D, n, c), pk(B)));          (* S -> B: {|D, n, c|}_pk(B) *)
+    in(c, =n);
+    event end(D, n, S).
 
-let responderA = 			(* Responder in an arbitrary session *) 
-  in( c, A );					(* Let the attacker decide who this responder is, call them A. *)
-  in( c, certA ); 				(* Get my key certificate *)
-  let (pka,=A) = check( certA, pk(CA)) in	(* check I grabbed the right thing *)
-    in(c, (B,nb,=text1)); 			(* B->A: nb, text1 *)
-    if A <> B then 				(* Let's not talk to ourselfs *)	
-      event begin(A,B,nb);			(* Ready to authenticate to B *)
-      new na;					
-      out(c,(certA,sign((B,na,nb,text2),sk(A)))); (* A->B: {|pkA,A|}_sk(CA), {|B,na,nb,text2|}_skA *)
-      in(c,(x,y));				(* B->A: {|pkB,B|}_sk(CA), {|A,na,text3|}_skB *)
-        let (pkb,=B) = check(x,pk(CA)) in	(* Learn pkb by checking B's key certificate *)
-        let (=A,=na,=text3) = check(y,pkb) in	(* check A,na in part signed by B *)
-        (if A<>Spy then if B<> Spy then 	(* Check neither of us is the Spy if so: *)
-          event end2(B,A,na))			(* Consider B authenticated *)
-        | new flagFinishA; out(c, flagFinishA).	(* End of process A *)
+let base =
+  in(net, (D, S, nenc));
+  let (=S, n) = sdecrypt(nenc, kBD) in            (* D -> B: D, S, {S, n}_kBD *)
+    out(net, encrypt((D, S, n), pk(S)));          (* B -> S: {|D, S, n|}_pk(S) *)
+    in(net, m);                                   (* S -> B: {|D, n, c|}_pk(B) *)
+    let (=D, =n, c) = decrypt(m, sk(B)) in        (* B -> D: {S, n, c}_kBD *)
+      out(net, sencrypt((S, n, c), kBD)).         (* D -> S: n    (via c) *)
 
-let Compromised =			
-  out( c, sk( Spy ) ).			(* Give secret key Spy to the attacker *)
-
-let pCA =				(* Creates and certifies keys of agents *)
-  out( c, sign( (pk(Spy),Spy), sk(CA) ) )	(* Publish certificate for spy. *)
-  |
-  ! new agent;					(* Create the agent *) 
-  out( c, sign( (pk(agent),agent), sk(CA) ) ).	(* Publish certificate introducing both the agent and their pk. *)
+let compromised =
+  out(net, sk(Spy)).                              (* Give secret key Spy to the attacker *)
 
 process
-  !responderA | !initiatorB | Compromised | pCA 
-
-
+  !server | !device | !base | compromised
