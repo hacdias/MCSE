@@ -4,22 +4,22 @@ Inductive tree : Set :=
   | leaf : tree
   | node : tree -> nat -> tree -> tree.
 
-(* Define a predicate bst on tree to express that a tree is sorted, i.e. it is a binary
-search tree (see http://en.wikipedia.org/wiki/Binary_search_tree for
-introduction to binary search trees). Experience of the past has shown that
-it works very well if you define bst as a recursive function:
-Fixpoint bst (T : tree) : Prop := ... *)
-
-Definition bst_lt (t: tree) (n: nat) : Prop :=
+Fixpoint bst_lt (t: tree) (n: nat) : Prop :=
   match t with
   | leaf => True
-  | node l v r => v < n
+  | node l v r =>
+      v < n /\
+      bst_lt l n /\
+      bst_lt r n
   end.
 
-Definition bst_gt (t: tree) (n: nat) : Prop :=
+Fixpoint bst_gt (t: tree) (n: nat) : Prop :=
   match t with
   | leaf => True
-  | node l v r => v > n
+  | node l v r =>
+      v > n /\
+      bst_gt l n /\
+      bst_gt r n
   end.
 
 (* bst recursively checks if t is a BST *)
@@ -28,7 +28,7 @@ Fixpoint bst (t : tree) : Prop :=
   | leaf => True
   | node l v r =>
       bst_lt l v /\
-      bst_lt r v /\
+      bst_gt r v /\
       bst l /\
       bst r
   end.
@@ -45,10 +45,19 @@ Fixpoint insert (n: nat) (t: tree) : tree :=
       end
  end.
 
-(* Maybe well need to prove sth like: 
 Lemma bst_left : forall (l r: tree) (v: nat), bst (node l v r) -> bst l.
+Proof.
+intros.
+inversion H.
+intuition.
+Qed.
+
 Lemma bst_right : forall (l r: tree) (v: nat), bst (node l v r) -> bst r.
-*)
+Proof.
+intros.
+inversion H.
+intuition.
+Qed.
 
 Lemma insert_correct: forall (t:tree) (n:nat), bst t -> bst (insert n t).
 Proof.
@@ -56,7 +65,10 @@ intros.
 induction t.
 - simpl.
   auto.
--
+- rewrite <- (bst_right ) in IHt1. simpl.
+  destruct (n ?= n0).
+  + assumption.
+  + rewrite <- IHt1.
 (* TODO *)
 Admitted.
 
