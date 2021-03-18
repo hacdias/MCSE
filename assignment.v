@@ -115,3 +115,37 @@ Proof.
 Admitted.
 
 (* PART 2 *)
+
+(*Define a function treeMin that will return the value of the minimal node in a
+tree. You may want to use Coq.Arith.Min for the minimum function. Note
+that every function in Coq needs to be total and you will need to decide what
+this function should return applied on an empty tree. To do this, use the
+option type. Check the definition of option by doing Print option. *)
+Fixpoint treeMin (t: tree): option nat := (* TODO *) None.
+
+(*
+• 
+• Given the predicate occurs expressing that an element belongs to a tree,
+prove correctness of the treeMin function, i.e. prove that:
+– the minimal element belongs to the tree and
+– that the values in all nodes are greater or equal than the minimal value. *)
+
+(* Define a function leftmost that given a tree will return a value of its leftmost
+node. *)
+Fixpoint leftmost (t: tree): option nat := (* TODO *) None.
+
+(* the minimal element of a BST is its leftmost node *)
+Lemma leftmost_is_min_bst: forall (t: tree), bst t -> treeMin t = leftmost t.
+Proof.
+  (* TODO *)
+Admitted.
+
+(* search searches a BST t and checks if the number occurs in the tree, leveraging
+the fact that t is a bst *)
+Fixpoint search (n: nat) (t: tree): Prop := (* TODO *) False.
+
+(* proving that search is correct for bsts *)
+Lemma search_eq_occurs: forall (t: tree) (n: nat), bst t -> (occurs n t <-> search n t).
+Proof.
+  (* TODO *)
+Admitted.
