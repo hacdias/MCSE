@@ -116,22 +116,27 @@ Admitted.
 
 (* PART 2 *)
 
-(*Define a function treeMin that will return the value of the minimal node in a
-tree. You may want to use Coq.Arith.Min for the minimum function. Note
-that every function in Coq needs to be total and you will need to decide what
-this function should return applied on an empty tree. To do this, use the
-option type. Check the definition of option by doing Print option. *)
-Fixpoint treeMin (t: tree): option nat := (* TODO *) None.
+(* treeMin returns the minimal node value in a tree *)
+Fixpoint treeMin (t: tree): option nat :=
+  match t with
+  | leaf => None
+  | node l v r => match (treeMin l), (treeMin r) with
+    | None, None => Some v
+    | Some n, None => Some (min v n)
+    | None, Some n => Some (min v n)
+    | Some n, Some m => Some (min v (min n m))
+    end
+  end.
 
-(*
-• 
-• Given the predicate occurs expressing that an element belongs to a tree,
+(* Given the predicate occurs expressing that an element belongs to a tree,
 prove correctness of the treeMin function, i.e. prove that:
 – the minimal element belongs to the tree and
-– that the values in all nodes are greater or equal than the minimal value. 
-
-Lemma treeMin_correct: forall (t: tree), 
-  treeMin t <> None -> occurs (treeMin t) t /\ tree_forall (fun y => y <= (treeMin t)) t. *)
+– that the values in all nodes are greater or equal than the minimal value.  *)
+Lemma treeMin_correct: forall (t: tree) (n: nat), 
+  treeMin t = Some n -> occurs n t /\ tree_forall (fun y => y <= n) t.
+Proof.
+  (* TODO *)
+Admitted.
 
 (* Define a function leftmost that given a tree will return a value of its leftmost
 node. *)
