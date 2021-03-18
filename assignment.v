@@ -128,7 +128,10 @@ Fixpoint treeMin (t: tree): option nat := (* TODO *) None.
 • Given the predicate occurs expressing that an element belongs to a tree,
 prove correctness of the treeMin function, i.e. prove that:
 – the minimal element belongs to the tree and
-– that the values in all nodes are greater or equal than the minimal value. *)
+– that the values in all nodes are greater or equal than the minimal value. 
+
+Lemma treeMin_correct: forall (t: tree), 
+  treeMin t <> None -> occurs (treeMin t) t /\ tree_forall (fun y => y <= (treeMin t)) t. *)
 
 (* Define a function leftmost that given a tree will return a value of its leftmost
 node. *)
