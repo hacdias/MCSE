@@ -88,8 +88,8 @@ Fixpoint list_to_bst (l: list nat) : tree :=
   end.
 
 (* Sort takes an arbitrary tree and transforms it into a bst. *)
-Function sort (t: tree) : tree := list_to_bst (tree_to_list t).
-
+Definition sort (t: tree) : tree := list_to_bst (tree_to_list t).
+ 
 (* Proving that list_to_bst always yields a bst. *)
 Lemma list_to_bst_correct: forall (l: list nat), bst (list_to_bst l).
 Proof.
@@ -100,11 +100,17 @@ Qed.
 
 (* Proving that sort always yields a bst. *)
 Lemma sort_correct: forall (t: tree), bst (sort t).
+
+(* HGComment: this Lemma should be a direct consequence of 
+   list_to_bst_correct.
+
+   Henrique: I simplified it so it looks like a direct consequence. Not sure if it's
+  hwat you meant.
+*)
+
 Proof.
-  intros.
-  induction t; simpl; auto.
-  unfold sort.
-  apply (list_to_bst_correct (tree_to_list (node t1 n t2))).
+  intros; unfold sort.
+  apply (list_to_bst_correct (tree_to_list t)).
 Qed. 
 
 (* Check if n occurrs in tree t. *)
