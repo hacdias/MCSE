@@ -4,22 +4,13 @@ Inductive tree : Set :=
   | leaf : tree
   | node : tree -> nat -> tree -> tree.
 
-Fixpoint bst_lt (t: tree) (n: nat) : Prop :=
+Fixpoint tree_forall (c: nat -> Prop) (t: tree) : Prop :=
   match t with
   | leaf => True
   | node l v r =>
-      v < n /\
-      bst_lt l n /\
-      bst_lt r n
-  end.
-
-Fixpoint bst_gt (t: tree) (n: nat) : Prop :=
-  match t with
-  | leaf => True
-  | node l v r =>
-      v > n /\
-      bst_gt l n /\
-      bst_gt r n
+      c v /\
+      tree_forall c l /\
+      tree_forall c r
   end.
 
 (* bst recursively checks if t is a BST *)
@@ -27,8 +18,8 @@ Fixpoint bst (t : tree) : Prop :=
   match t with
   | leaf => True
   | node l v r =>
-      bst_lt l v /\
-      bst_gt r v /\
+      tree_forall (fun y => y < v) l /\
+      tree_forall (fun y => y > v) r /\
       bst l /\
       bst r
   end.
@@ -45,6 +36,7 @@ Fixpoint insert (n: nat) (t: tree) : tree :=
       end
  end.
 
+(* Probably not needed? 
 Lemma bst_left : forall (l r: tree) (v: nat), bst (node l v r) -> bst l.
 Proof.
 intros.
@@ -57,20 +49,36 @@ Proof.
 intros.
 inversion H.
 intuition.
-Qed.
+Qed. *)
 
-Lemma insert_correct: forall (t:tree) (n:nat), bst t -> bst (insert n t).
+Lemma insert_tree_forall: forall (c: nat -> Prop) (t: tree) (v: nat),
+  tree_forall c t -> c v -> tree_forall c (insert v t).
 Proof.
 intros.
 induction t.
 - simpl.
   auto.
-- rewrite <- (bst_right ) in IHt1. simpl.
-  destruct (n ?= n0).
+- inversion H.
+  simpl.
+  destruct (v ?= n); simpl; split; auto; split; intuition.
+Qed.
+
+(* TODO: investigate if can be simplified *)
+Lemma insert_correct: forall (t:tree) (n:nat), bst t -> bst (insert n t).
+Proof.
+intros.
+induction t; simpl.
+- auto.
+- inversion H.
+  destruct H1.
+  destruct H2.
+  destruct (n ?= n0) eqn:eq.
   + assumption.
-  + rewrite <- IHt1.
-(* TODO *)
-Admitted.
+  + apply nat_compare_lt in eq; simpl; split; auto.
+    apply (insert_tree_forall (fun y : nat => y < n0) t1 n) in H0; auto.
+  + apply nat_compare_gt in eq; simpl; split; auto.
+    apply (insert_tree_forall (fun y : nat => y > n0) t2 n) in H1; auto.
+Qed.
 
 (*Define a function sort that takes an arbitrary tree and sorts it, i.e. it transforms
 it into a binary search tree. Hint: you can define two auxiliary functions,
