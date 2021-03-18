@@ -4,7 +4,7 @@
  *)
 
 (* Definitions:
- * Spy = Compromised agent
+ * Spy = Compromised agent/device
  * B = Base Station
  * S = Server
  * D = Devices
