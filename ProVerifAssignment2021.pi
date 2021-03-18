@@ -4,6 +4,7 @@
  *)
 
 (* Definitions:
+ * Spy = Compromised agent
  * B = Base Station
  * S = Server
  * D = Devices
@@ -34,6 +35,7 @@ reduc sdecrypt(sencrypt(m, k), k) = m.            (* Symmetric decryption *)
 fun encrypt/2.                                    (* Assymetric encryption *)
 reduc decrypt(encrypt(m, pk(a)), sk(a)) = m.      (* Assymetric decryption *)
 
+(* queries *)
 query attacker:c.                                 (* Can external attacker get c? *)
 query evinj:end(x,y,z) ==> evinj:start(x,y,z).    (* Verify authenticity via events *)
 
@@ -48,7 +50,7 @@ let device =
 let server =
   in(net, m);
   let (D, S, n) = decrypt(m, sk(S)) in            (* B -> S: {|D, S, n|}_pk(S) *)
-    new c;
+    new c;                                        (* New secure connection *)
     out(net, encrypt((D, n, c), pk(B)));          (* S -> B: {|D, n, c|}_pk(B) *)
     in(c, =n);
     event end(D, n, S).
