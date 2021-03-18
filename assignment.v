@@ -36,21 +36,6 @@ Fixpoint insert (n: nat) (t: tree) : tree :=
       end
  end.
 
-(* Probably not needed? 
-Lemma bst_left : forall (l r: tree) (v: nat), bst (node l v r) -> bst l.
-Proof.
-intros.
-inversion H.
-intuition.
-Qed.
-
-Lemma bst_right : forall (l r: tree) (v: nat), bst (node l v r) -> bst r.
-Proof.
-intros.
-inversion H.
-intuition.
-Qed. *)
-
 Lemma insert_tree_forall: forall (c: nat -> Prop) (t: tree) (v: nat),
   tree_forall c t -> c v -> tree_forall c (insert v t).
 Proof.
@@ -75,16 +60,25 @@ induction t; simpl.
   destruct (n ?= n0) eqn:eq.
   + assumption.
   + apply nat_compare_lt in eq; simpl; split; auto.
-    apply (insert_tree_forall (fun y : nat => y < n0) t1 n) in H0; auto.
+    apply (insert_tree_forall (fun y => y < n0) t1 n) in H0; auto.
   + apply nat_compare_gt in eq; simpl; split; auto.
-    apply (insert_tree_forall (fun y : nat => y > n0) t2 n) in H1; auto.
+    apply (insert_tree_forall (fun y => y > n0) t2 n) in H1; auto.
 Qed.
 
-(*Define a function sort that takes an arbitrary tree and sorts it, i.e. it transforms
-it into a binary search tree. Hint: you can define two auxiliary functions,
-one that stores the elements of a tree in a list and one that builds a binary
-search tree from the elements of a list.*)
-Definition sort (t: tree) : tree := (* TODO *) t.
+Fixpoint tree_to_list (t: tree) : list nat :=
+  match t with
+  | leaf => nil
+  | node l v r => tree_to_list(l) ++ (v :: nil) ++ tree_to_list(r)
+  end.
+
+Fixpoint list_to_bst (l: list nat) : tree :=
+  match l with
+  | nil => leaf
+  | cons x xs => insert x (list_to_bst xs)
+  end.
+
+(* sort takes an arbitrary tree and transforms it into a bst *)
+Function sort (t: tree) : tree := list_to_bst (tree_to_list t).
 
 (*Prove that the result of the sort function is always a binary search tree.*)
 Lemma sort_correct: forall (t: tree), bst (sort t).
