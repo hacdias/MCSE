@@ -48,7 +48,6 @@ induction t.
   destruct (v ?= n); simpl; split; auto; split; intuition.
 Qed.
 
-(* TODO: investigate if can be simplified *)
 Lemma insert_correct: forall (t:tree) (n:nat), bst t -> bst (insert n t).
 Proof.
 intros.
@@ -80,11 +79,22 @@ Fixpoint list_to_bst (l: list nat) : tree :=
 (* sort takes an arbitrary tree and transforms it into a bst *)
 Function sort (t: tree) : tree := list_to_bst (tree_to_list t).
 
-(*Prove that the result of the sort function is always a binary search tree.*)
+(* proving that list_to_bst always yields a bst *)
+Lemma list_to_bst_correct: forall (l: list nat), bst (list_to_bst l).
+Proof.
+intros.
+induction l; simpl; auto.
+apply (insert_correct (list_to_bst l) a); auto.
+Qed.
+
+(* proving that sort always yields a bst *)
 Lemma sort_correct: forall (t: tree), bst (sort t).
 Proof.
-(* TODO *)
-Admitted. 
+intros.
+induction t; simpl; auto.
+unfold sort.
+apply (list_to_bst_correct (tree_to_list (node t1 n t2))).
+Qed. 
 
 (*Given the predicate occurs expressing that an element belongs to a tree *)
 Fixpoint occurs (n: nat) (t: tree) : Prop :=
