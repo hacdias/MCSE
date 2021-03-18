@@ -54,7 +54,7 @@ Proof.
     auto.
   - inversion H.
     simpl.
-    destruct (v ?= n); simpl; split; auto; split; intuition.
+    destruct (v ?= n); simpl; intuition.
 Qed.
 
 (* Prove that inserting in a bst produces a bst. *)
@@ -64,13 +64,12 @@ Proof.
   induction t; simpl.
   - auto.
   - inversion H.
-    destruct H1.
-    destruct H2.
+    destruct H1, H2.
     destruct (n ?= n0) eqn:eq.
     + assumption.
-    + apply nat_compare_lt in eq; simpl; split; auto.
+    + apply nat_compare_lt in eq; simpl; intuition.
       apply (insert_forall (fun y => y < n0) t1 n) in H0; auto.
-    + apply nat_compare_gt in eq; simpl; split; auto.
+    + apply nat_compare_gt in eq; simpl; intuition.
       apply (insert_forall (fun y => y > n0) t2 n) in H1; auto.
 Qed.
 
