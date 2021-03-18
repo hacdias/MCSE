@@ -1,9 +1,17 @@
 Require Import Arith.
 
+(*
+  match authors with
+    | Henrique Dias
+    | Venislav Varbanov
+  end.
+*)
+
 Inductive tree : Set :=
   | leaf : tree
   | node : tree -> nat -> tree -> tree.
 
+(* Apply condition c on all elements of tree t. *)
 Fixpoint tree_forall (c: nat -> Prop) (t: tree) : Prop :=
   match t with
   | leaf => True
@@ -13,7 +21,7 @@ Fixpoint tree_forall (c: nat -> Prop) (t: tree) : Prop :=
       tree_forall c r
   end.
 
-(* bst recursively checks if t is a BST *)
+(* Recursively check if tree t is a binary search tree. *)
 Fixpoint bst (t : tree) : Prop :=
   match t with
   | leaf => True
@@ -24,7 +32,7 @@ Fixpoint bst (t : tree) : Prop :=
       bst r
   end.
 
-(* insert insert a natural number n in the tree t *)
+(* Insert inserts a natural number n in the tree t. *)
 Fixpoint insert (n: nat) (t: tree) : tree :=
   match t with 
   | leaf => node leaf n leaf
@@ -36,7 +44,8 @@ Fixpoint insert (n: nat) (t: tree) : tree :=
       end
  end.
 
-Lemma insert_tree_forall: forall (c: nat -> Prop) (t: tree) (v: nat),
+(* Prove that tree_forall conditions are persisted when inserting. *)
+Lemma insert_forall: forall (c: nat -> Prop) (t: tree) (v: nat),
   tree_forall c t -> c v -> tree_forall c (insert v t).
 Proof.
   intros.
@@ -48,7 +57,8 @@ Proof.
     destruct (v ?= n); simpl; split; auto; split; intuition.
 Qed.
 
-Lemma insert_correct: forall (t:tree) (n:nat), bst t -> bst (insert n t).
+(* Prove that inserting in a bst produces a bst. *)
+Lemma insert_bst: forall (t:tree) (n:nat), bst t -> bst (insert n t).
 Proof.
   intros.
   induction t; simpl.
@@ -59,35 +69,37 @@ Proof.
     destruct (n ?= n0) eqn:eq.
     + assumption.
     + apply nat_compare_lt in eq; simpl; split; auto.
-      apply (insert_tree_forall (fun y => y < n0) t1 n) in H0; auto.
+      apply (insert_forall (fun y => y < n0) t1 n) in H0; auto.
     + apply nat_compare_gt in eq; simpl; split; auto.
-      apply (insert_tree_forall (fun y => y > n0) t2 n) in H1; auto.
+      apply (insert_forall (fun y => y > n0) t2 n) in H1; auto.
 Qed.
 
+(* Converts tree to list. *)
 Fixpoint tree_to_list (t: tree) : list nat :=
   match t with
   | leaf => nil
   | node l v r => tree_to_list(l) ++ (v :: nil) ++ tree_to_list(r)
   end.
 
+(* Convert list to bst. *)
 Fixpoint list_to_bst (l: list nat) : tree :=
   match l with
   | nil => leaf
   | cons x xs => insert x (list_to_bst xs)
   end.
 
-(* sort takes an arbitrary tree and transforms it into a bst *)
+(* Sort takes an arbitrary tree and transforms it into a bst. *)
 Function sort (t: tree) : tree := list_to_bst (tree_to_list t).
 
-(* proving that list_to_bst always yields a bst *)
+(* Proving that list_to_bst always yields a bst. *)
 Lemma list_to_bst_correct: forall (l: list nat), bst (list_to_bst l).
 Proof.
   intros.
   induction l; simpl; auto.
-  apply (insert_correct (list_to_bst l) a); auto.
+  apply (insert_bst (list_to_bst l) a); auto.
 Qed.
 
-(* proving that sort always yields a bst *)
+(* Proving that sort always yields a bst. *)
 Lemma sort_correct: forall (t: tree), bst (sort t).
 Proof.
   intros.
@@ -96,7 +108,7 @@ Proof.
   apply (list_to_bst_correct (tree_to_list (node t1 n t2))).
 Qed. 
 
-(*Given the predicate occurs expressing that an element belongs to a tree *)
+(* Check if n occurrs in tree t. *)
 Fixpoint occurs (n: nat) (t: tree) : Prop :=
   match t with
   | leaf => False
@@ -116,7 +128,7 @@ Admitted.
 
 (* PART 2 *)
 
-(* treeMin returns the minimal node value in a tree *)
+(* Returns the minimal node value in a tree t. *)
 Fixpoint treeMin (t: tree): option nat :=
   match t with
   | leaf => None
