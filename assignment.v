@@ -39,29 +39,29 @@ Fixpoint insert (n: nat) (t: tree) : tree :=
 Lemma insert_tree_forall: forall (c: nat -> Prop) (t: tree) (v: nat),
   tree_forall c t -> c v -> tree_forall c (insert v t).
 Proof.
-intros.
-induction t.
-- simpl.
-  auto.
-- inversion H.
-  simpl.
-  destruct (v ?= n); simpl; split; auto; split; intuition.
+  intros.
+  induction t.
+  - simpl.
+    auto.
+  - inversion H.
+    simpl.
+    destruct (v ?= n); simpl; split; auto; split; intuition.
 Qed.
 
 Lemma insert_correct: forall (t:tree) (n:nat), bst t -> bst (insert n t).
 Proof.
-intros.
-induction t; simpl.
-- auto.
-- inversion H.
-  destruct H1.
-  destruct H2.
-  destruct (n ?= n0) eqn:eq.
-  + assumption.
-  + apply nat_compare_lt in eq; simpl; split; auto.
-    apply (insert_tree_forall (fun y => y < n0) t1 n) in H0; auto.
-  + apply nat_compare_gt in eq; simpl; split; auto.
-    apply (insert_tree_forall (fun y => y > n0) t2 n) in H1; auto.
+  intros.
+  induction t; simpl.
+  - auto.
+  - inversion H.
+    destruct H1.
+    destruct H2.
+    destruct (n ?= n0) eqn:eq.
+    + assumption.
+    + apply nat_compare_lt in eq; simpl; split; auto.
+      apply (insert_tree_forall (fun y => y < n0) t1 n) in H0; auto.
+    + apply nat_compare_gt in eq; simpl; split; auto.
+      apply (insert_tree_forall (fun y => y > n0) t2 n) in H1; auto.
 Qed.
 
 Fixpoint tree_to_list (t: tree) : list nat :=
@@ -82,18 +82,18 @@ Function sort (t: tree) : tree := list_to_bst (tree_to_list t).
 (* proving that list_to_bst always yields a bst *)
 Lemma list_to_bst_correct: forall (l: list nat), bst (list_to_bst l).
 Proof.
-intros.
-induction l; simpl; auto.
-apply (insert_correct (list_to_bst l) a); auto.
+  intros.
+  induction l; simpl; auto.
+  apply (insert_correct (list_to_bst l) a); auto.
 Qed.
 
 (* proving that sort always yields a bst *)
 Lemma sort_correct: forall (t: tree), bst (sort t).
 Proof.
-intros.
-induction t; simpl; auto.
-unfold sort.
-apply (list_to_bst_correct (tree_to_list (node t1 n t2))).
+  intros.
+  induction t; simpl; auto.
+  unfold sort.
+  apply (list_to_bst_correct (tree_to_list (node t1 n t2))).
 Qed. 
 
 (*Given the predicate occurs expressing that an element belongs to a tree *)
@@ -111,7 +111,7 @@ Fixpoint occurs (n: nat) (t: tree) : Prop :=
 (* Proves that the sorted version of a tree contains the same elements as the original one. *)
 Lemma sorted_occurs : forall (t: tree) (n: nat), occurs n t <-> occurs n (sort t).
 Proof.
-(* TODO *)
+  (* TODO *)
 Admitted.
 
 (* PART 2 *)
