@@ -11,9 +11,9 @@
  * kBD = Symmetric key between B and D
  * pk(X) = Public key of X
  * n = Nonce
- * ok = Protocol message to indicate connection established
- * pwd = Device password to authenticate with the server
  * c = Secure connection
+ * pwd = Device password to authenticate with the server
+ * ok = Protocol message to indicate connection authenticated
  *)
 
 (* Protocol:
