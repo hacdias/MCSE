@@ -18,7 +18,7 @@
 
 (* Protocol:
  * D begin Connect(D, n, S)
- * D -> B: D, S, {S, n}_kBD         (maybe add pwd here)
+ * D -> B: D, S, {S, n}_kBD
  * B -> S: {|D, S, n|}_pk(S)
  * S -> B: {|D, n, c|}_pk(B)
  * B -> D: {S, n, c}_kBD
