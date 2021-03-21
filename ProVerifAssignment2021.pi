@@ -26,7 +26,7 @@
 
 (* Variable declarations: *)
 free net.                                         (* Public communication network *)
-free Spy, B, D.                                   (* See definitions *)
+free Spy, B.                                      (* See definitions *)
 private free kBD.                                 (* Assume kBD is privately shared *)
 
 (* Function declarations: *)
@@ -45,19 +45,18 @@ query evinj:end(x,y,z) ==> evinj:start(x,y,z).    (* Verify authenticity via eve
 (* Process declarations: *)
 let device =
   in(net, S);                                     (* Server can be compromised: let the attacker decide who the server is. *)
-
+  in(net, D);                                     (* Device can be compromised: let the attacker decide who the device is. *)
   new n;
   event start(D, n, S);                           (* Start of our protocol *)
   out(net, (D, S, sencrypt((S, n), kBD)));        (* D -> B: D, S, {S, n}_kBD *)
   in(net, m);                                     (* Receive encrypted message m *)
-  let (=n, D, c) = sdecrypt(m, kBD) in            (* B -> D: {S, n, c}_kBD *)
+  let (=n, =D, c) = sdecrypt(m, kBD) in           (* B -> D: {S, n, c}_kBD *)
     out(c, n).                                    (* D -> S: n    (via c) *)
 
 let server =
   in(net, S);                                     (* Server can be compromised: let the attacker decide who the server is. *)
-
   in(net, m);
-  let (D, =S, n) = decrypt(m, sk(S)) in            (* B -> S: {|D, S, n|}_pk(S) *)
+  let (D, =S, n) = decrypt(m, sk(S)) in           (* B -> S: {|D, S, n|}_pk(S) *)
     new c;                                        (* Fresh secure connection *)
     out(net, encrypt((D, n, c), pk(B)));          (* S -> B: {|D, n, c|}_pk(B) *)
     in(c, =n);                                    (* Check validity of incoming nonce n *)
@@ -65,7 +64,6 @@ let server =
 
 let base =
   in(net, S);                                     (* Server can be compromised: let the attacker decide who the server is. *)
-
   in(net, (D, =S, nenc));
   let (=S, n) = sdecrypt(nenc, kBD) in            (* D -> B: D, S, {S, n}_kBD *)
     out(net, encrypt((D, S, n), pk(S)));          (* B -> S: {|D, S, n|}_pk(S) *)
