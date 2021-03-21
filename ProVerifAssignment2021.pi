@@ -9,7 +9,7 @@
  * S = Server
  * D = Devices
  * kBD = Symmetric key between B and D
- * pk(X) = Public key of X 
+ * pk(X) = Public key of X
  * n = Nonce
  * c = Secure connection
  *)
@@ -26,13 +26,13 @@
 
 (* Variable declarations: *)
 free net.                                         (* Public communication network *)
-free Spy, B, D, S.                                (* See definitions *)
-
+free Spy, B, D.                                   (* See definitions *)
 private free kBD.                                 (* Assume kBD is privately shared *)
 
 (* Function declarations: *)
 fun pk/1.                                         (* Get public key *)
 private fun sk/1.                                 (* Get secret key *)
+reduc id(sk(A)) = A.                              (* Get the id that corresponds to a secret key. Useful for the attacker to "inject" the Spy *)
 fun sencrypt/2.                                   (* Symmetric encryption *)
 reduc sdecrypt(sencrypt(m, k), k) = m.            (* Symmetric decryption *)
 fun encrypt/2.                                    (* Assymetric encryption *)
@@ -44,6 +44,8 @@ query evinj:end(x,y,z) ==> evinj:start(x,y,z).    (* Verify authenticity via eve
 
 (* Process declarations: *)
 let device =
+  in(net, S);                                     (* Server can be compromised: let the attacker decide who the server is. *)
+
   new n;
   event start(D, n, S);                           (* Start of our protocol *)
   out(net, (D, S, sencrypt((S, n), kBD)));        (* D -> B: D, S, {S, n}_kBD *)
@@ -52,15 +54,19 @@ let device =
     out(c, n).                                    (* D -> S: n    (via c) *)
 
 let server =
+  in(net, S);                                     (* Server can be compromised: let the attacker decide who the server is. *)
+
   in(net, m);
-  let (D, S, n) = decrypt(m, sk(S)) in            (* B -> S: {|D, S, n|}_pk(S) *)
+  let (D, =S, n) = decrypt(m, sk(S)) in            (* B -> S: {|D, S, n|}_pk(S) *)
     new c;                                        (* Fresh secure connection *)
     out(net, encrypt((D, n, c), pk(B)));          (* S -> B: {|D, n, c|}_pk(B) *)
     in(c, =n);                                    (* Check validity of incoming nonce n *)
     event end(D, n, S).                           (* End of our protocol *)
 
 let base =
-  in(net, (D, S, nenc));
+  in(net, S);                                     (* Server can be compromised: let the attacker decide who the server is. *)
+
+  in(net, (D, =S, nenc));
   let (=S, n) = sdecrypt(nenc, kBD) in            (* D -> B: D, S, {S, n}_kBD *)
     out(net, encrypt((D, S, n), pk(S)));          (* B -> S: {|D, S, n|}_pk(S) *)
     in(net, m);                                   (* S -> B: {|D, n, c|}_pk(B) *)
