@@ -375,9 +375,15 @@ inversion H.
 auto.
 Qed.
 
-(* Define a function leftmost that given a tree will return a value of its leftmost
-node. *)
-Fixpoint leftmost (t: tree): option nat := (* TODO *) None.
+(* Returns a value of the leftmost node of a tree t. *)
+Fixpoint leftmost (t: tree): option nat :=
+  match t with
+  | leaf => None
+  | node l v r => match l with
+    | leaf => Some v
+    | node _ _ _ => leftmost l
+    end
+  end.
 
 (* the minimal element of a BST is its leftmost node *)
 Lemma leftmost_is_min_bst: forall (t: tree), bst t -> treeMin t = leftmost t.
@@ -385,9 +391,17 @@ Proof.
   (* TODO *)
 Admitted.
 
-(* search searches a BST t and checks if the number occurs in the tree, leveraging
-the fact that t is a bst *)
-Fixpoint search (n: nat) (t: tree): Prop := (* TODO *) False.
+(* Searches a bst t and checks if number n occurs in the tree, leveraging the fact that t is a bst. *)
+Fixpoint search (n: nat) (t: tree) : Prop :=
+  match t with
+  | leaf => False
+  | node l v r =>
+      match n ?= v with
+      | Eq => True
+      | Lt => search n l
+      | Gt => search n r
+      end
+  end.
 
 (* proving that search is correct for bsts *)
 Lemma search_eq_occurs: forall (t: tree) (n: nat), bst t -> (occurs n t <-> search n t).
