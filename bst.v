@@ -116,68 +116,67 @@ Fixpoint occurs (n: nat) (t: tree) : Prop :=
 
 Lemma occurs_insert : forall (t: tree) (n m: nat), m = n \/ occurs n t <-> occurs n (insert m t).
 Proof.
-intuition.
-- induction t; simpl; auto.
-  case (m?=n0) eqn:eq; simpl; auto.
-  apply nat_compare_eq in eq.
-  subst.
-  auto.
-- induction t; simpl; auto.
-  case (m?=n0) eqn:eq; simpl; auto; simpl in H0; intuition.
-- induction t; simpl; auto.
-  simpl in H.
   intuition.
-  simpl in H.
-  case (m?=n0) eqn:eq in H; simpl in H; intuition.
+  - induction t; simpl; auto.
+    case (m?=n0) eqn:eq; simpl; auto.
+    apply nat_compare_eq in eq.
+    subst.
+    auto.
+  - induction t; simpl; auto.
+    case (m?=n0) eqn:eq; simpl; auto; simpl in H0; intuition.
+  - induction t; simpl; auto.
+    simpl in H.
+    intuition.
+    simpl in H.
+    case (m?=n0) eqn:eq in H; simpl in H; intuition.
 Qed.
 
 
 Lemma occurs_tree_list : forall (t: tree) (n: nat), occurs n t <-> In n (tree_to_list t).
 Proof.
-intuition.
-- induction t; simpl; auto.
-  simpl in H.
   intuition.
-  apply in_or_app.
-  right.
-  left.
-  auto.
-- induction t; simpl; auto.
-  simpl in H.
-  apply in_app_or in H.
-  destruct H. 
-  + right; left; intuition.
-  + destruct H; auto.
+  - induction t; simpl; auto.
+    simpl in H.
+    intuition.
+    apply in_or_app.
+    right.
+    left.
+    auto.
+  - induction t; simpl; auto.
+    simpl in H.
+    apply in_app_or in H.
+    destruct H. 
+    + right; left; intuition.
+    + destruct H; auto.
 Qed.
 
 Lemma occurs_list_tree : forall (l: list nat) (n: nat), In n l <-> occurs n (list_to_bst l).
 Proof.
-intuition.
-- induction l; simpl; auto.
-  simpl in H.
-  apply occurs_insert.
   intuition.
-- induction l; simpl; auto.
-  apply occurs_insert in H.
-  intuition.
+  - induction l; simpl; auto.
+    simpl in H.
+    apply occurs_insert.
+    intuition.
+  - induction l; simpl; auto.
+    apply occurs_insert in H.
+    intuition.
 Qed.
 
 (* Proves that the sorted version of a tree contains the same elements as the original one. *)
 Lemma sorted_occurs : forall (t: tree) (n: nat), occurs n t <-> occurs n (sort t).
 Proof.
-intuition.
-- induction t; auto.
-  unfold sort.
-  apply occurs_list_tree.
-  apply occurs_tree_list.
-  auto.
-- induction t; auto.
-  unfold sort in H.
-  rewrite <- occurs_list_tree in H.
-  rewrite <- occurs_tree_list in H.
-  auto.
+  intuition.
+  - induction t; auto.
+    unfold sort.
+    apply occurs_list_tree.
+    apply occurs_tree_list.
+    auto.
+  - induction t; auto.
+    unfold sort in H.
+    rewrite <- occurs_list_tree in H.
+    rewrite <- occurs_tree_list in H.
+    auto.
 Qed.
-
 
 (* PART 2 *)
 
