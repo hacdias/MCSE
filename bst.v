@@ -192,12 +192,7 @@ Fixpoint treeMin (t: tree): option nat :=
     end
   end.
 
-(* Given the predicate occurs expressing that an element belongs to a tree,
-prove correctness of the treeMin function, i.e. prove that:
-– the minimal element belongs to the tree and
-– that the values in all nodes are greater or equal than the minimal value.  *)
-Lemma treeMin_correct1: forall (t: tree) (n: nat), 
-  treeMin t = Some n -> occurs n t.
+Lemma treeMin_occurs: forall (t: tree) (n: nat), treeMin t = Some n -> occurs n t.
 Proof.
 intros.
 
@@ -375,6 +370,20 @@ inversion H.
 auto.
 Qed.
 
+Lemma treeMin_is_min: forall (t: tree) (n: nat), treeMin t = Some n -> tree_forall (fun y => y <= n) t.
+Proof.
+  (* TODO *)
+Admitted.
+
+Lemma treeMin_correct: forall (t: tree) (n: nat), 
+  treeMin t = Some n -> occurs n t /\ tree_forall (fun y => y <= n) t.
+Proof.
+  intros.
+  split.
+  - apply treeMin_occurs; auto.
+  - apply treeMin_is_min; auto.
+Qed.
+
 (* Returns a value of the leftmost node of a tree t. *)
 Fixpoint leftmost (t: tree): option nat :=
   match t with
@@ -406,5 +415,10 @@ Fixpoint search (n: nat) (t: tree) : Prop :=
 (* proving that search is correct for bsts *)
 Lemma search_eq_occurs: forall (t: tree) (n: nat), bst t -> (occurs n t <-> search n t).
 Proof.
+intuition.
+- induction t; simpl; auto.
+  simpl in H0.
+  case (n ?= n0) eqn:eq; simpl; auto.
+  + intuition.
   (* TODO *)
 Admitted.
