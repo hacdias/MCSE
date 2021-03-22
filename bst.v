@@ -118,17 +118,17 @@ Lemma occurs_insert : forall (t: tree) (n m: nat), m = n \/ occurs n t <-> occur
 Proof.
   intuition.
   - induction t; simpl; auto.
-    case (m?=n0) eqn:eq; simpl; auto.
+    case (m ?= n0) eqn:eq; simpl; auto.
     apply nat_compare_eq in eq.
     subst.
     auto.
   - induction t; simpl; auto.
-    case (m?=n0) eqn:eq; simpl; auto; simpl in H0; intuition.
+    case (m ?= n0) eqn:eq; simpl; auto; simpl in H0; intuition.
   - induction t; simpl; auto.
     simpl in H.
     intuition.
     simpl in H.
-    case (m?=n0) eqn:eq in H; simpl in H; intuition.
+    case (m ?= n0) eqn:eq in H; simpl in H; intuition.
 Qed.
 
 
@@ -201,9 +201,9 @@ Proof.
   - simpl in H.
     case (treeMin t1) eqn:C1.
     + case (treeMin t2) eqn:C2.
-      case (n1?=n2) eqn:C3.
+      case (n1 ?= n2) eqn:C3.
       * apply nat_compare_eq in C3.
-        case (n0?=n1) eqn:C4.
+        case (n0 ?= n1) eqn:C4.
         { apply nat_compare_eq in C4.
           subst.
           right.
@@ -233,7 +233,7 @@ Proof.
           Nat.solve_min.
           Nat.solve_min. }
       * apply nat_compare_lt in C3.
-        case (n0?=n1) eqn:C4.
+        case (n0 ?= n1) eqn:C4.
         { apply nat_compare_eq in C4.
           subst.
           right.
@@ -261,7 +261,7 @@ Proof.
           Nat.solve_min.
           Nat.solve_min. }
       * apply nat_compare_gt in C3.
-        case (n0?=n2) eqn:C4.
+        case (n0 ?= n2) eqn:C4.
         { apply nat_compare_eq in C4.
           subst.
           right.
@@ -295,7 +295,7 @@ Proof.
           Nat.solve_min.
           symmetry.
           Nat.solve_min. }
-      * case (n0?=n1) eqn:C3.
+      * case (n0 ?= n1) eqn:C3.
         { apply nat_compare_eq in C3.
           subst.
           right.
@@ -319,7 +319,7 @@ Proof.
           symmetry.
           Nat.solve_min. }
     + case (treeMin t2) eqn:C2.
-      case (n0?=n1) eqn:C3.
+      case (n0 ?= n1) eqn:C3.
       * apply nat_compare_eq in C3.
         subst.
         right.
@@ -348,6 +348,8 @@ Qed.
 
 Lemma treeMin_is_min: forall (t: tree) (n: nat), treeMin t = Some n -> tree_forall (fun y => y <= n) t.
 Proof.
+  intros.
+  induction t; simpl; intuition.
   (* TODO *)
 Admitted.
 
