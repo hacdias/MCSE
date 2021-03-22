@@ -102,14 +102,6 @@ Qed.
 
 (* Proving that sort always yields a bst. *)
 Lemma sort_correct: forall (t: tree), bst (sort t).
-
-(* HGComment: this Lemma should be a direct consequence of 
-   list_to_bst_correct.
-
-   Henrique: I simplified it so it looks like a direct consequence. Not sure if it's
-  hwat you meant.
-*)
-
 Proof.
   intros; unfold sort.
   apply (list_to_bst_correct (tree_to_list t)).
@@ -122,169 +114,70 @@ Fixpoint occurs (n: nat) (t: tree) : Prop :=
   | node l v r => (v = n) \/ (occurs n l) \/ (occurs n r)
   end.
 
-Lemma insert_occurs : forall (t: tree) (n: nat) (m: nat), occurs n (insert m t) <-> n=m \/ occurs n t.
+Lemma occurs_insert : forall (t: tree) (n m: nat), m = n \/ occurs n t <-> occurs n (insert m t).
 Proof.
-intros.
-unfold iff.
-split.
-
-intros.
-induction t.
-simpl.
-simpl in H. 
 intuition.
-simpl.
-simpl in H.
-case (m?=n0) eqn:C1.
-apply nat_compare_eq in C1.
-intuition.
-simpl in H.
-intuition.
-simpl in H.
-intuition.
-
-intros.
-destruct H.
-induction t.
-simpl.
-intuition.
-simpl.
-case (m?=n0) eqn:C1.
-apply nat_compare_eq in C1.
-simpl.
-subst.
-intuition.
-simpl.
-intuition.
-simpl.
-intuition.
-
-
-induction t.
-simpl.
-intuition.
-simpl in H.
-intuition.
-simpl.
-case (m?=n0) eqn:C1.
-apply nat_compare_eq in C1.
-simpl.
-auto.
-simpl.
-left.
-auto.
-simpl.
-left.
-auto.
-
-simpl.
-case (m?=n0) eqn:C1.
-apply nat_compare_eq in C1.
-simpl.
-auto.
-simpl.
-right.
-left.
-auto.
-simpl.
-intuition.
-
-simpl.
-case (m?=n0) eqn:C1.
-apply nat_compare_eq in C1.
-simpl.
-auto.
-simpl.
-intuition.
-simpl.
-intuition.
+- induction t; simpl; auto.
+  case (m?=n0) eqn:eq; simpl; auto.
+  apply nat_compare_eq in eq.
+  subst.
+  auto.
+- induction t; simpl; auto.
+  case (m?=n0) eqn:eq; simpl; auto; simpl in H0; intuition.
+- induction t; simpl; auto.
+  simpl in H.
+  intuition.
+  simpl in H.
+  case (m?=n0) eqn:eq in H; simpl in H; intuition.
 Qed.
 
-Lemma list_occurs : forall (t: tree) (n: nat), occurs n t <-> In n (tree_to_list t).
+
+Lemma occurs_tree_list : forall (t: tree) (n: nat), occurs n t <-> In n (tree_to_list t).
 Proof.
-intros.
-unfold iff.
-split.
-
-intros.
-induction t.
-auto.
-simpl.
-simpl in H.
 intuition.
-apply in_or_app.
-right.
-left.
-auto.
-
-intros.
-induction t.
-auto.
-simpl.
-simpl in H.
-apply in_app_or in H.
-destruct H. 
-right.
-left.
-intuition.
-destruct H.
-auto.
-right.
-right.
-intuition.
+- induction t; simpl; auto.
+  simpl in H.
+  intuition.
+  apply in_or_app.
+  right.
+  left.
+  auto.
+- induction t; simpl; auto.
+  simpl in H.
+  apply in_app_or in H.
+  destruct H. 
+  + right; left; intuition.
+  + destruct H; auto.
 Qed.
 
-Lemma bst_occurs : forall (l: list nat) (n: nat), In n l <-> occurs n (list_to_bst l).
+Lemma occurs_list_tree : forall (l: list nat) (n: nat), In n l <-> occurs n (list_to_bst l).
 Proof.
-intros.
-unfold iff.
-split.
-
-intros.
-induction l.
-auto.
-simpl.
-simpl in H.
 intuition.
-apply insert_occurs.
-intuition.
-apply insert_occurs.
-intuition.
-
-intros.
-induction l.
-auto.
-simpl.
-simpl in H.
-apply insert_occurs in H.
-intuition.
+- induction l; simpl; auto.
+  simpl in H.
+  apply occurs_insert.
+  intuition.
+- induction l; simpl; auto.
+  apply occurs_insert in H.
+  intuition.
 Qed.
 
 (* Proves that the sorted version of a tree contains the same elements as the original one. *)
 Lemma sorted_occurs : forall (t: tree) (n: nat), occurs n t <-> occurs n (sort t).
 Proof.
-intros.
-unfold iff.
-split.
-
-intros.
-induction t.
-auto.
-unfold sort.
-apply bst_occurs.
-apply list_occurs.
-simpl.
-auto.
-
-intros.
-induction t.
-auto.
-unfold sort in H.
-apply bst_occurs in H.
-apply list_occurs in H.
-simpl.
-auto.
+intuition.
+- induction t; auto.
+  unfold sort.
+  apply occurs_list_tree.
+  apply occurs_tree_list.
+  auto.
+- induction t; auto.
+  unfold sort in H.
+  rewrite <- occurs_list_tree in H.
+  rewrite <- occurs_tree_list in H.
+  auto.
 Qed.
+
 
 (* PART 2 *)
 
