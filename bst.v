@@ -689,9 +689,401 @@ Fixpoint leftmost (t: tree): option nat :=
     end
   end.
 
+Lemma l1: forall (t: tree) (n: nat) (m: nat), occurs n t /\ tree_forall (fun y : nat => y < m) t -> n<m.
+Proof.
+intros.
+intuition.
+induction t.
+simpl in H0.
+intuition.
+simpl in H0,H1.
+intuition.
+lia.
+Qed.
+
+Lemma l2: forall (t: tree) (n: nat) (m: nat), occurs n t /\ tree_forall (fun y : nat => y > m) t -> n>m.
+Proof.
+intros.
+intuition.
+induction t.
+simpl in H0.
+intuition.
+simpl in H0,H1.
+intuition.
+lia.
+Qed.
+
 (* the minimal element of a BST is its leftmost node *)
 Lemma leftmost_is_min_bst: forall (t: tree), bst t -> treeMin t = leftmost t.
 Proof.
+intros.
+induction t.
+simpl.
+auto.
+simpl in H.
+intuition.
+simpl.
+case (treeMin t1) eqn:C1.
+case (treeMin t2) eqn:C2.
+case (t1) eqn:C3.
+simpl in C1.
+discriminate.
+simpl.
+case (t3) eqn:C4.
+simpl in H0,H1,H2.
+intuition.
+inversion H2.
+subst.
+apply treeMin_correct in C2.
+intuition.
+assert (C := conj H9 H).
+apply l2 in C.
+f_equal.
+lia.
+simpl.
+simpl in H0,C1,H2.
+intuition.
+case (t5) eqn:C5.
+simpl in C1.
+apply treeMin_correct in C2.
+intuition.
+assert (C := conj H8 H).
+apply l2 in C.
+f_equal.
+inversion H2.
+lia.
+simpl.
+case (t7) eqn:C6.
+case(match treeMin (node leaf n4 t8) with
+       | Some n =>
+           match treeMin t6 with
+           | Some m => Some (Init.Nat.min n3 (Init.Nat.min n m))
+           | None => Some (Init.Nat.min n3 n)
+           end
+       | None =>
+           match treeMin t6 with
+           | Some n => Some (Init.Nat.min n3 n)
+           | None => Some n3
+           end
+       end) eqn:C7.
+case (treeMin t4) eqn:C8.
+case (treeMin (node leaf n4 t8)) eqn:C9.
+case (treeMin t6) eqn:C10.
+
+apply treeMin_correct in C2.
+apply treeMin_correct in C8.
+apply treeMin_correct in C9.
+apply treeMin_correct in C10.
+intuition.
+assert (CC1 := conj H15 H).
+apply l2 in CC1.
+assert (CC2 := conj H13 H7).
+apply l1 in CC2.
+assert (CC3 := conj H8 H0).
+apply l1 in CC3.
+assert (CC4 := conj H11 H9).
+apply l1 in CC4.
+inversion C7.
+inversion C1.
+simpl in H2.
+inversion H2.
+f_equal.
+lia.
+
+apply treeMin_correct in C2.
+apply treeMin_correct in C8.
+apply treeMin_correct in C9.
+intuition.
+assert (CC1 := conj H13 H).
+apply l2 in CC1.
+assert (CC3 := conj H8 H0).
+apply l1 in CC3.
+assert (CC4 := conj H11 H7).
+apply l1 in CC4.
+inversion C7.
+inversion C1.
+simpl in H2.
+inversion H2.
+f_equal.
+lia.
+
+case(treeMin t6)eqn:C10.
+simpl in C9.
+case(treeMin t8)eqn:C11.
+discriminate.
+discriminate.
+simpl in C9.
+case(treeMin t8)eqn:C11.
+discriminate.
+discriminate.
+
+case (treeMin (node leaf n4 t8))eqn:C9.
+case (treeMin t6)eqn:C10.
+apply treeMin_correct in C2.
+apply treeMin_correct in C9.
+apply treeMin_correct in C10.
+intuition.
+assert (CC1 := conj H13 H).
+apply l2 in CC1.
+assert (CC3 := conj H8 H0).
+apply l1 in CC3.
+assert (CC4 := conj H11 H9).
+apply l1 in CC4.
+inversion C7.
+inversion C1.
+simpl in H2.
+inversion H2.
+f_equal.
+lia.
+
+apply treeMin_correct in C2.
+apply treeMin_correct in C9.
+intuition.
+assert (CC1 := conj H11 H).
+apply l2 in CC1.
+assert (CC3 := conj H8 H0).
+apply l1 in CC3.
+inversion C7.
+inversion C1.
+simpl in H2.
+inversion H2.
+f_equal.
+lia.
+
+case(treeMin t6)eqn:C10.
+simpl in C9.
+case(treeMin t8)eqn:C11.
+discriminate.
+discriminate.
+simpl in C9.
+case(treeMin t8)eqn:C11.
+discriminate.
+discriminate.
+
+case (treeMin t4) eqn:C8.
+case (treeMin (node leaf n4 t8)) eqn:C9.
+case (treeMin t6) eqn:C10.
+discriminate.
+discriminate.
+case (treeMin t6) eqn:C10.
+discriminate.
+discriminate.
+case (treeMin (node leaf n4 t8)) eqn:C9.
+case (treeMin t6) eqn:C10.
+discriminate.
+discriminate.
+case (treeMin t6) eqn:C10.
+discriminate.
+discriminate.
+
+simpl.
+simpl in H2,H0.
+intuition.
+case (match treeMin (node (node t9 n5 t10) n4 t8) with
+       | Some n =>
+           match treeMin t6 with
+           | Some m => Some (Init.Nat.min n3 (Init.Nat.min n m))
+           | None => Some (Init.Nat.min n3 n)
+           end
+       | None =>
+           match treeMin t6 with
+           | Some n => Some (Init.Nat.min n3 n)
+           | None => Some n3
+           end
+       end) eqn:C7.
+case (treeMin (node (node t9 n5 t10) n4 t8))eqn:C8.
+case (treeMin t4) eqn:C9.
+case (treeMin t6) eqn:C10.
+case (t9) eqn:C11.
+simpl in C8.
+case (match treeMin t9 with
+       | Some n =>
+           match treeMin t10 with
+           | Some m => Some (Init.Nat.min n5 (Init.Nat.min n m))
+           | None => Some (Init.Nat.min n5 n)
+           end
+       | None =>
+           match treeMin t10 with
+           | Some n => Some (Init.Nat.min n5 n)
+           | None => Some n5
+           end
+       end) eqn:C12.
+case (treeMin t9)eqn:C13.
+case (treeMin t10)eqn:C14.
+case (treeMin t8)eqn:C15.
+
+apply treeMin_occurs in C2.
+apply treeMin_occurs in C9.
+apply treeMin_occurs in C10.
+apply treeMin_occurs in C15.
+apply treeMin_occurs in C14.
+assert (CC1 := conj C2 H).
+apply l2 in CC1.
+assert (CC2 := conj C9 H7).
+apply l1 in CC2.
+assert (CC3 := conj C10 H9).
+apply l1 in CC3.
+assert (CC4 := conj C15 H11).
+apply l1 in CC4.
+assert (CC5 := conj C14 H13).
+apply l1 in CC5.
+inversion C8.
+inversion C7.
+inversion C1.
+inversion H2.
+inversion C12.
+f_equal.
+lia.
+
+apply treeMin_occurs in C2.
+apply treeMin_occurs in C9.
+apply treeMin_occurs in C10.
+apply treeMin_occurs in C14.
+assert (CC1 := conj C2 H).
+apply l2 in CC1.
+assert (CC2 := conj C9 H7).
+apply l1 in CC2.
+assert (CC3 := conj C10 H9).
+apply l1 in CC3.
+assert (CC5 := conj C14 H13).
+apply l1 in CC5.
+inversion C8.
+inversion C7.
+inversion C1.
+inversion H2.
+inversion C12.
+f_equal.
+lia.
+
+case (treeMin t8)eqn:C15.
+apply treeMin_occurs in C2.
+apply treeMin_occurs in C9.
+apply treeMin_occurs in C10.
+apply treeMin_occurs in C15.
+assert (CC1 := conj C2 H).
+apply l2 in CC1.
+assert (CC2 := conj C9 H7).
+apply l1 in CC2.
+assert (CC3 := conj C10 H9).
+apply l1 in CC3.
+assert (CC4 := conj C15 H11).
+apply l1 in CC4.
+inversion C8.
+inversion C7.
+inversion C1.
+inversion H2.
+inversion C12.
+f_equal.
+lia.
+
+apply treeMin_occurs in C2.
+apply treeMin_occurs in C9.
+apply treeMin_occurs in C10.
+assert (CC1 := conj C2 H).
+apply l2 in CC1.
+assert (CC2 := conj C9 H7).
+apply l1 in CC2.
+assert (CC3 := conj C10 H9).
+apply l1 in CC3.
+inversion C8.
+inversion C7.
+inversion C1.
+inversion H2.
+inversion C12.
+f_equal.
+lia.
+
+case (treeMin t10)eqn:C14.
+case (treeMin t8)eqn:C15.
+apply treeMin_occurs in C2.
+apply treeMin_occurs in C9.
+apply treeMin_occurs in C10.
+apply treeMin_occurs in C15.
+apply treeMin_occurs in C14.
+assert (CC1 := conj C2 H).
+apply l2 in CC1.
+assert (CC2 := conj C9 H7).
+apply l1 in CC2.
+assert (CC3 := conj C10 H9).
+apply l1 in CC3.
+assert (CC4 := conj C15 H11).
+apply l1 in CC4.
+assert (CC5 := conj C14 H13).
+apply l1 in CC5.
+inversion C8.
+inversion C7.
+inversion C1.
+inversion H2.
+inversion C12.
+f_equal.
+lia.
+
+apply treeMin_occurs in C2.
+apply treeMin_occurs in C9.
+apply treeMin_occurs in C10.
+apply treeMin_occurs in C14.
+assert (CC1 := conj C2 H).
+apply l2 in CC1.
+assert (CC2 := conj C9 H7).
+apply l1 in CC2.
+assert (CC3 := conj C10 H9).
+apply l1 in CC3.
+assert (CC5 := conj C14 H13).
+apply l1 in CC5.
+inversion C8.
+inversion C7.
+inversion C1.
+inversion H2.
+inversion C12.
+f_equal.
+lia.
+
+case (treeMin t8)eqn:C15.
+apply treeMin_occurs in C2.
+apply treeMin_occurs in C9.
+apply treeMin_occurs in C10.
+apply treeMin_occurs in C15.
+assert (CC1 := conj C2 H).
+apply l2 in CC1.
+assert (CC2 := conj C9 H7).
+apply l1 in CC2.
+assert (CC3 := conj C10 H9).
+apply l1 in CC3.
+assert (CC4 := conj C15 H11).
+apply l1 in CC4.
+inversion C8.
+inversion C7.
+inversion C1.
+inversion H2.
+inversion C12.
+f_equal.
+lia.
+
+apply treeMin_occurs in C2.
+apply treeMin_occurs in C9.
+apply treeMin_occurs in C10.
+assert (CC1 := conj C2 H).
+apply l2 in CC1.
+assert (CC2 := conj C9 H7).
+apply l1 in CC2.
+assert (CC3 := conj C10 H9).
+apply l1 in CC3.
+inversion C8.
+inversion C7.
+inversion C1.
+inversion H2.
+inversion C12.
+f_equal.
+lia.
+
+case (treeMin t9)eqn:C13.
+case (treeMin t10)eqn:C14.
+discriminate.
+discriminate.
+case (treeMin t10)eqn:C14.
+discriminate.
+discriminate.
+
   (* TODO *)
 Admitted.
 
@@ -707,13 +1099,57 @@ Fixpoint search (n: nat) (t: tree) : Prop :=
       end
   end.
 
+
 (* proving that search is correct for bsts *)
 Lemma search_eq_occurs: forall (t: tree) (n: nat), bst t -> (occurs n t <-> search n t).
 Proof.
 intuition.
-- induction t; simpl; auto.
-  simpl in H0.
-  case (n ?= n0) eqn:eq; simpl; auto.
-  + intuition.
-  (* TODO *)
-Admitted.
+induction t. 
+simpl. 
+auto. 
+simpl in H,H0.
+intuition.
+simpl.
+case (n ?= n0) eqn:C1.
+lia.
+apply nat_compare_lt in C1.
+lia.
+apply nat_compare_gt in C1.
+lia.
+simpl.
+case (n ?= n0) eqn:C1.
+lia.
+apply nat_compare_lt in C1.
+auto.
+apply nat_compare_gt in C1.
+assert (C := conj H0 H1).
+apply l1 in C.
+lia.
+simpl.
+case (n ?= n0) eqn:C1.
+auto.
+apply nat_compare_lt in C1.
+assert (C := conj H0 H).
+apply l2 in C.
+lia.
+auto.
+
+induction t. 
+simpl. 
+auto. 
+simpl in H,H0.
+simpl.
+intuition.
+case (n ?= n0) eqn:C1.
+apply nat_compare_eq in C1.
+left.
+auto.
+right.
+left.
+apply H3.
+auto.
+right.
+right.
+apply H5.
+auto.
+Qed.
