@@ -692,6 +692,22 @@ Fixpoint leftmost (t: tree): option nat :=
 (* the minimal element of a BST is its leftmost node *)
 Lemma leftmost_is_min_bst: forall (t: tree), bst t -> treeMin t = leftmost t.
 Proof.
+intros.
+induction t.
+simpl.
+auto.
+simpl in H.
+intuition.
+simpl.
+case (treeMin t1) eqn:C1.
+case (treeMin t2) eqn:C2.
+case (t1) eqn:C3.
+simpl in C1.
+discriminate.
+simpl.
+case (t3) eqn:C4.
+simpl in H0,H1,H2.
+intuition.
   (* TODO *)
 Admitted.
 
@@ -707,13 +723,80 @@ Fixpoint search (n: nat) (t: tree) : Prop :=
       end
   end.
 
+Lemma l1: forall (t: tree) (n: nat) (m: nat), occurs n t /\ tree_forall (fun y : nat => y < m) t -> n<m.
+Proof.
+intros.
+intuition.
+induction t.
+simpl in H0.
+intuition.
+simpl in H0,H1.
+intuition.
+lia.
+Qed.
+
+Lemma l2: forall (t: tree) (n: nat) (m: nat), occurs n t /\ tree_forall (fun y : nat => y > m) t -> n>m.
+Proof.
+intros.
+intuition.
+induction t.
+simpl in H0.
+intuition.
+simpl in H0,H1.
+intuition.
+lia.
+Qed.
+
 (* proving that search is correct for bsts *)
 Lemma search_eq_occurs: forall (t: tree) (n: nat), bst t -> (occurs n t <-> search n t).
 Proof.
 intuition.
-- induction t; simpl; auto.
-  simpl in H0.
-  case (n ?= n0) eqn:eq; simpl; auto.
-  + intuition.
-  (* TODO *)
-Admitted.
+induction t. 
+simpl. 
+auto. 
+simpl in H,H0.
+intuition.
+simpl.
+case (n ?= n0) eqn:C1.
+lia.
+apply nat_compare_lt in C1.
+lia.
+apply nat_compare_gt in C1.
+lia.
+simpl.
+case (n ?= n0) eqn:C1.
+lia.
+apply nat_compare_lt in C1.
+auto.
+apply nat_compare_gt in C1.
+assert (C := conj H0 H1).
+apply l1 in C.
+lia.
+simpl.
+case (n ?= n0) eqn:C1.
+auto.
+apply nat_compare_lt in C1.
+assert (C := conj H0 H).
+apply l2 in C.
+lia.
+auto.
+
+induction t. 
+simpl. 
+auto. 
+simpl in H,H0.
+simpl.
+intuition.
+case (n ?= n0) eqn:C1.
+apply nat_compare_eq in C1.
+left.
+auto.
+right.
+left.
+apply H3.
+auto.
+right.
+right.
+apply H5.
+auto.
+Qed.
