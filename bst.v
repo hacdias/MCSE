@@ -114,6 +114,7 @@ Fixpoint occurs (n: nat) (t: tree) : Prop :=
   | node l v r => (v = n) \/ (occurs n l) \/ (occurs n r)
   end.
 
+(* Proves that an element n still occurs in a tree after inserting an element and vice-versa. *)
 Lemma occurs_insert : forall (t: tree) (n m: nat), m = n \/ occurs n t <-> occurs n (insert m t).
 Proof.
   intuition.
@@ -131,7 +132,7 @@ Proof.
     case (m ?= n0) eqn:eq in H; simpl in H; intuition.
 Qed.
 
-
+(* Proves that an element n occurs in a tree and its list correspondence and vice-versa. *)
 Lemma occurs_tree_list : forall (t: tree) (n: nat), occurs n t <-> In n (tree_to_list t).
 Proof.
   intuition.
@@ -150,6 +151,7 @@ Proof.
     + destruct H; auto.
 Qed.
 
+(* Proves that an element that exists in a list l also exists in a tree built from l and vice-versa. *)
 Lemma occurs_list_tree : forall (l: list nat) (n: nat), In n l <-> occurs n (list_to_bst l).
 Proof.
   intuition.
@@ -192,6 +194,7 @@ Fixpoint treeMin (t: tree): option nat :=
     end
   end.
 
+(* Proves that the result of treeMin occurs in the tree. *)
 Lemma treeMin_occurs: forall (t: tree) (n: nat), treeMin t = Some n -> occurs n t.
 Proof.
   intros.
@@ -447,8 +450,7 @@ Proof.
     case (treeMin t1) eqn:C1.
     + case (treeMin t2) eqn:C2; simpl.
       * case (treeMin t1) eqn:C3.
-        case (treeMin t2) eqn:C4.
-        simpl.
+        case (treeMin t2) eqn:C4; simpl.
         case (Init.Nat.min n0 (Init.Nat.min n3 n4) ?= n) eqn:C5; auto.
         apply nat_compare_lt in C5; intuition.
         inversion C1.
@@ -456,7 +458,6 @@ Proof.
         inversion H.
         subst.
         lia.
-        simpl.
         case (Init.Nat.min n0 n3 ?= n) eqn:C5; auto.
         apply nat_compare_lt in C5.
         inversion C1.
@@ -501,6 +502,7 @@ Proof.
         lia.
 Qed.
 
+(* Proves that the result of treeMin in a tree is smaller than all elements of the tree. *) 
 Lemma treeMin_is_min: forall (t: tree) (n: nat), treeMin t = Some n -> tree_forall (fun y => n <= y) t.
 Proof.
   intros.
@@ -509,6 +511,7 @@ Proof.
   auto.
 Qed.
 
+(* Proves that the result of treeMin in a tree is smaller than all elements of the tree and an element of the tree. *)
 Lemma treeMin_correct: forall (t: tree) (n: nat), 
   treeMin t = Some n -> occurs n t /\ tree_forall (fun y => n <= y) t.
 Proof.
