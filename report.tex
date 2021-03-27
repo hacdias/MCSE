@@ -1,6 +1,7 @@
 \documentclass[a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
+\usepackage{enumitem}
 \lstset
 { %Formatting for code in appendix
     basicstyle=\footnotesize,
@@ -12,7 +13,7 @@
 %\title{Sorting of Binary Search Trees in Coq}
 
 \title{%
-  Sorting of Binary Search Trees in Coq \\
+  Binary Search Trees in Coq \\
   \large Proving with Computer Assistance Assignment}
     
 \author{Henrique Dias (1531484), Venislav Varbanov (XXXXXXX)}
@@ -35,6 +36,23 @@
 
 
 \section{Introduction}
+
+The goal of this assignment was to formally define trees and binary search trees (BSTs) of natural numbers, define some of its common operations, prove their correctness, and prove that the leftmost node of a BST is its minimal element.
+
+The implemented operations are:
+
+\begin{itemize}[noitemsep]
+    \item Sort: transforms a regular tree in a BST.
+    \item Occurs: checks if a certain number occurs in a tree.
+    \item Tree minimum: retrieves the minimum value stored in a tree.
+    \item Left most item: retrieves the left most node's value of a tree.
+    \item Insert: inserts a value in a BST.
+    \item Search: similar to occurs, but leverages the fact that the given tree is a BST.
+\end{itemize}
+
+\section{Sorting of BSTs}
+
+\section{Minimum of BSTs}
 
 \appendix
 
