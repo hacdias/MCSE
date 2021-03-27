@@ -657,28 +657,30 @@ Fixpoint leftmost (t: tree): option nat :=
     end
   end.
 
-Lemma l1: forall (t: tree) (n: nat) (m: nat), occurs n t /\ tree_forall (fun y : nat => y < m) t -> n<m.
+(* Prove that for all trees and two natural numbers n, m, if n occurs in the tree and all elements in the
+tree are smaller than m, then n is smaller than m. *)
+Lemma occurs_is_lt: forall (t: tree) (n m: nat), occurs n t /\ tree_forall (fun y : nat => y < m) t -> n < m.
 Proof.
-intros.
-intuition.
-induction t.
-simpl in H0.
-intuition.
-simpl in H0,H1.
-intuition.
-lia.
+  intuition.
+  induction t.
+  - simpl in H0.
+    intuition.
+  - simpl in H0,H1.
+    intuition.
+    lia.
 Qed.
 
-Lemma l2: forall (t: tree) (n: nat) (m: nat), occurs n t /\ tree_forall (fun y : nat => y > m) t -> n>m.
+(* Prove that for all trees and two natural numbers n, m, if n occurs in the tree and all elements in the
+tree are larger than m, then n is larger than m. *)
+Lemma occurs_is_gt: forall (t: tree) (n m: nat), occurs n t /\ tree_forall (fun y : nat => y > m) t -> n > m.
 Proof.
-intros.
-intuition.
-induction t.
-simpl in H0.
-intuition.
-simpl in H0,H1.
-intuition.
-lia.
+  intuition.
+  induction t.
+  - simpl in H0.
+    intuition.
+  - simpl in H0,H1.
+    intuition.
+    lia.
 Qed.
 
 (* the minimal element of a BST is its leftmost node *)
@@ -699,9 +701,9 @@ discriminate.
 apply treeMin_occurs in C1.
 apply treeMin_occurs in C2.
 assert (CC1 := conj C1 H0).
-apply l1 in CC1.
+apply occurs_is_lt in CC1.
 assert (CC2 := conj C2 H).
-apply l2 in CC2.
+apply occurs_is_gt in CC2.
 replace (Some (Init.Nat.min n (Init.Nat.min n0 n1))) with (Some n0).
 auto.
 f_equal.
@@ -711,7 +713,7 @@ simpl in C1.
 discriminate.
 apply treeMin_occurs in C1.
 assert (CC1 := conj C1 H0).
-apply l1 in CC1.
+apply occurs_is_lt in CC1.
 replace (Some (Init.Nat.min n n0)) with (Some n0).
 auto.
 f_equal.
@@ -720,7 +722,7 @@ case (treeMin t2) eqn:C2.
 case (t1) eqn:C3.
 apply treeMin_occurs in C2.
 assert (CC2 := conj C2 H).
-apply l2 in CC2.
+apply occurs_is_gt in CC2.
 f_equal.
 lia.
 simpl in C1.
@@ -755,28 +757,6 @@ Fixpoint search (n: nat) (t: tree) : Prop :=
       end
   end.
 
-Lemma search_lt_occurs: forall (t: tree) (n m: nat), occurs n t /\ tree_forall (fun y : nat => y < m) t -> n < m.
-Proof.
-  intuition.
-  induction t.
-  - simpl in H0.
-    intuition.
-  - simpl in H0,H1.
-    intuition.
-    lia.
-Qed.
-
-Lemma search_gt_occurs: forall (t: tree) (n m: nat), occurs n t /\ tree_forall (fun y : nat => y > m) t -> n > m.
-Proof.
-  intuition.
-  induction t.
-  - simpl in H0.
-    intuition.
-  - simpl in H0,H1.
-    intuition.
-    lia.
-Qed.
-
 (* Prove that search is correct for BSTs. *)
 Lemma search_eq_occurs: forall (t: tree) (n: nat), bst t -> (occurs n t <-> search n t).
 Proof.
@@ -792,11 +772,11 @@ Proof.
     + case (n ?= n0) eqn:C1; auto.
       apply nat_compare_gt in C1.
       assert (C := conj H0 H1).
-      apply search_lt_occurs in C; lia.
+      apply occurs_is_lt in C; lia.
     + case (n ?= n0) eqn:C1; auto.
       apply nat_compare_lt in C1.
       assert (C := conj H0 H).
-      apply search_gt_occurs in C; lia.
+      apply occurs_is_gt in C; lia.
   - induction t; simpl; auto. 
     simpl in H,H0.
     intuition.
