@@ -686,63 +686,59 @@ Qed.
 (* the minimal element of a BST is its leftmost node *)
 Lemma leftmost_is_min_bst: forall (t: tree), bst t -> treeMin t = leftmost t.
 Proof.
-intros.
-induction t.
-simpl.
-auto.
-simpl in H.
-intuition.
-simpl.
-case (treeMin t1) eqn:C1.
-case (treeMin t2) eqn:C2.
-case (t1) eqn:C3.
-simpl in C1.
-discriminate.
-apply treeMin_occurs in C1.
-apply treeMin_occurs in C2.
-assert (CC1 := conj C1 H0).
-apply occurs_is_lt in CC1.
-assert (CC2 := conj C2 H).
-apply occurs_is_gt in CC2.
-replace (Some (Init.Nat.min n (Init.Nat.min n0 n1))) with (Some n0).
-auto.
-f_equal.
-lia.
-case (t1) eqn:C3.
-simpl in C1.
-discriminate.
-apply treeMin_occurs in C1.
-assert (CC1 := conj C1 H0).
-apply occurs_is_lt in CC1.
-replace (Some (Init.Nat.min n n0)) with (Some n0).
-auto.
-f_equal.
-lia.
-case (treeMin t2) eqn:C2.
-case (t1) eqn:C3.
-apply treeMin_occurs in C2.
-assert (CC2 := conj C2 H).
-apply occurs_is_gt in CC2.
-f_equal.
-lia.
-simpl in C1.
-case (treeMin t3) eqn:C4.
-case (treeMin t4) eqn:C5.
-congruence.
-congruence.
-case (treeMin t4) eqn:C5.
-congruence.
-congruence.
-case (t1) eqn:C3.
-auto.
-simpl in C1.
-case (treeMin t3) eqn:C4.
-case (treeMin t4) eqn:C5.
-congruence.
-congruence.
-case (treeMin t4) eqn:C5.
-congruence.
-congruence.
+  intros.
+  induction t; simpl; auto.
+  simpl in H.
+  intuition.
+  case (treeMin t1) eqn:C1.
+  - case (treeMin t2) eqn:C2.
+    + case (t1) eqn:C3.
+        * simpl in C1.
+          discriminate.
+        * apply treeMin_occurs in C1.
+          apply treeMin_occurs in C2.
+          assert (CC1 := conj C1 H0).
+          apply occurs_is_lt in CC1.
+          assert (CC2 := conj C2 H).
+          apply occurs_is_gt in CC2.
+          replace (Some (Init.Nat.min n (Init.Nat.min n0 n1))) with (Some n0).
+          auto.
+          f_equal.
+          lia.
+    + case (t1) eqn:C3.
+        * simpl in C1.
+          discriminate.
+        * apply treeMin_occurs in C1.
+          assert (CC1 := conj C1 H0).
+          apply occurs_is_lt in CC1.
+          replace (Some (Init.Nat.min n n0)) with (Some n0).
+          auto.
+          f_equal.
+          lia.
+  - case (treeMin t2) eqn:C2.
+    + case (t1) eqn:C3.
+        * apply treeMin_occurs in C2.
+          assert (CC2 := conj C2 H).
+          apply occurs_is_gt in CC2.
+          f_equal.
+          lia.
+        * simpl in C1.
+          case (treeMin t3) eqn:C4.
+          case (treeMin t4) eqn:C5.
+          congruence.
+          congruence.
+          case (treeMin t4) eqn:C5.
+          congruence.
+          congruence.
+    + case (t1) eqn:C3; auto.
+      simpl in C1.
+      case (treeMin t3) eqn:C4.
+      case (treeMin t4) eqn:C5.
+      congruence.
+      congruence.
+      case (treeMin t4) eqn:C5.
+      congruence.
+      congruence.
 Qed.
 
 (* Searches a bst t and checks if number n occurs in the tree, leveraging the fact that t is a bst. *)
