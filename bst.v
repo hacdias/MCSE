@@ -212,15 +212,12 @@ Proof.
           inversion H.
           f_equal.
           symmetry.
-          apply Nat.min_l.
-          Nat.solve_min. }
+          lia. }
         { apply nat_compare_lt in C4.
           subst.
           left.
           inversion H.
-          symmetry.
-          apply Nat.min_l.
-          Nat.solve_min. }
+          lia. }
         { apply nat_compare_gt in C4.
           subst.
           right.
@@ -228,10 +225,7 @@ Proof.
           apply IHt2.
           inversion H.
           f_equal.
-          replace (Init.Nat.min n2 n2) with n2.
-          symmetry.
-          Nat.solve_min.
-          Nat.solve_min. }
+          lia. }
       * apply nat_compare_lt in C3.
         case (n0 ?= n1) eqn:C4.
         { apply nat_compare_eq in C4.
@@ -241,25 +235,18 @@ Proof.
           apply IHt1.
           inversion H.
           f_equal.
-          symmetry.
-          apply Nat.min_l.
-          Nat.solve_min. }
+          lia. }
         { apply nat_compare_lt in C4.
           left.
           inversion H.
-          symmetry.
-          apply Nat.min_l.
-          Nat.solve_min. }
+          lia. }
         { apply nat_compare_gt in C4.
           right.
           left.
           apply IHt1.
           inversion H.
           f_equal.
-          replace (Init.Nat.min n1 n2) with n1.
-          symmetry.
-          Nat.solve_min.
-          Nat.solve_min. }
+          lia. }
       * apply nat_compare_gt in C3.
         case (n0 ?= n2) eqn:C4.
         { apply nat_compare_eq in C4.
@@ -269,32 +256,18 @@ Proof.
           apply IHt2.
           inversion H.
           f_equal.
-          symmetry.
-          apply Nat.min_l.
-          replace (Init.Nat.min n1 n2) with n2.
-          auto.
-          symmetry.
-          Nat.solve_min. }
+          lia. }
         { apply nat_compare_lt in C4.
           left.
           inversion H.
-          symmetry.
-          apply Nat.min_l.
-          replace (Init.Nat.min n1 n2) with n2.
-          auto with arith.
-          symmetry.
-          Nat.solve_min. }
+          lia. }
         { apply nat_compare_gt in C4.
           right.
           right.
           apply IHt2.
           inversion H.
           f_equal.
-          replace (Init.Nat.min n1 n2) with n2.
-          symmetry.
-          Nat.solve_min.
-          symmetry.
-          Nat.solve_min. }
+          lia. }
       * case (n0 ?= n1) eqn:C3.
         { apply nat_compare_eq in C3.
           subst.
@@ -303,21 +276,18 @@ Proof.
           apply IHt1.
           inversion H.
           f_equal.
-          symmetry.
-          Nat.solve_min. }
+          lia. }
         { apply nat_compare_lt in C3.
           left.
           inversion H.
-          symmetry.
-          Nat.solve_min. }
+          lia. }
         { apply nat_compare_gt in C3.
           right.
           left.
           apply IHt1.
           inversion H.
           f_equal.
-          symmetry.
-          Nat.solve_min. }
+          lia. }
     + case (treeMin t2) eqn:C2.
       case (n0 ?= n1) eqn:C3.
       * apply nat_compare_eq in C3.
@@ -327,20 +297,18 @@ Proof.
         apply IHt2.
         inversion H.
         f_equal.
-        Nat.solve_min.
+        lia.
       * apply nat_compare_lt in C3.
         left.
         inversion H.
-        symmetry.
-        Nat.solve_min.
+        lia.
       * apply nat_compare_gt in C3.
         right.
         right.
         apply IHt2.
         inversion H.
         f_equal.
-        symmetry.
-        Nat.solve_min.
+        lia.
       * left.
         inversion H.
         auto.
