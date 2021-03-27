@@ -723,80 +723,53 @@ Fixpoint search (n: nat) (t: tree) : Prop :=
       end
   end.
 
-Lemma l1: forall (t: tree) (n: nat) (m: nat), occurs n t /\ tree_forall (fun y : nat => y < m) t -> n<m.
+Lemma search_lt_occurs: forall (t: tree) (n m: nat), occurs n t /\ tree_forall (fun y : nat => y < m) t -> n < m.
 Proof.
-intros.
-intuition.
-induction t.
-simpl in H0.
-intuition.
-simpl in H0,H1.
-intuition.
-lia.
+  intuition.
+  induction t.
+  - simpl in H0.
+    intuition.
+  - simpl in H0,H1.
+    intuition.
+    lia.
 Qed.
 
-Lemma l2: forall (t: tree) (n: nat) (m: nat), occurs n t /\ tree_forall (fun y : nat => y > m) t -> n>m.
+Lemma search_gt_occurs: forall (t: tree) (n m: nat), occurs n t /\ tree_forall (fun y : nat => y > m) t -> n > m.
 Proof.
-intros.
-intuition.
-induction t.
-simpl in H0.
-intuition.
-simpl in H0,H1.
-intuition.
-lia.
+  intuition.
+  induction t.
+  - simpl in H0.
+    intuition.
+  - simpl in H0,H1.
+    intuition.
+    lia.
 Qed.
 
-(* proving that search is correct for bsts *)
+(* Prove that search is correct for BSTs. *)
 Lemma search_eq_occurs: forall (t: tree) (n: nat), bst t -> (occurs n t <-> search n t).
 Proof.
-intuition.
-induction t. 
-simpl. 
-auto. 
-simpl in H,H0.
-intuition.
-simpl.
-case (n ?= n0) eqn:C1.
-lia.
-apply nat_compare_lt in C1.
-lia.
-apply nat_compare_gt in C1.
-lia.
-simpl.
-case (n ?= n0) eqn:C1.
-lia.
-apply nat_compare_lt in C1.
-auto.
-apply nat_compare_gt in C1.
-assert (C := conj H0 H1).
-apply l1 in C.
-lia.
-simpl.
-case (n ?= n0) eqn:C1.
-auto.
-apply nat_compare_lt in C1.
-assert (C := conj H0 H).
-apply l2 in C.
-lia.
-auto.
-
-induction t. 
-simpl. 
-auto. 
-simpl in H,H0.
-simpl.
-intuition.
-case (n ?= n0) eqn:C1.
-apply nat_compare_eq in C1.
-left.
-auto.
-right.
-left.
-apply H3.
-auto.
-right.
-right.
-apply H5.
-auto.
+  intuition.
+  induction t. 
+  - simpl. 
+    auto. 
+  - simpl in H,H0.
+    intuition; simpl.
+    + case (n ?= n0) eqn:C1; auto.
+      apply nat_compare_lt in C1; lia.
+      apply nat_compare_gt in C1; lia.
+    + case (n ?= n0) eqn:C1; auto.
+      apply nat_compare_gt in C1.
+      assert (C := conj H0 H1).
+      apply search_lt_occurs in C; lia.
+    + case (n ?= n0) eqn:C1; auto.
+      apply nat_compare_lt in C1.
+      assert (C := conj H0 H).
+      apply search_gt_occurs in C; lia.
+  - induction t; simpl; auto. 
+    simpl in H,H0.
+    intuition.
+    case (n ?= n0) eqn:C1; auto.
+    apply nat_compare_eq in C1.
+    left.
+    auto.
 Qed.
