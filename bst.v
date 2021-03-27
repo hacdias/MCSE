@@ -349,9 +349,7 @@ assert (n0 >= Init.Nat.min n0 (Init.Nat.min n1 n2)).
 Nat.solve_min.
 destruct H0.
 auto with arith.
-apply Nat.le_trans with (Init.Nat.min n0 (Init.Nat.min n1 n2)).
-auto with arith. 
-auto with arith.
+apply Nat.le_trans with (Init.Nat.min n0 (Init.Nat.min n1 n2)); lia.
 
 simpl in H.
 case (Init.Nat.min n0 n1 ?= n) eqn:C3.
@@ -364,9 +362,7 @@ assert (n0 >= Init.Nat.min n0 n1).
 Nat.solve_min.
 destruct H0.
 auto with arith.
-apply Nat.le_trans with (Init.Nat.min n0 n1).
-auto with arith. 
-auto with arith.
+apply Nat.le_trans with (Init.Nat.min n0 n1); lia.
 
 case (treeMin t2) eqn:C2.
 
@@ -381,9 +377,7 @@ assert (n0 >= Init.Nat.min n0 n1).
 Nat.solve_min.
 destruct H0.
 auto with arith.
-apply Nat.le_trans with (Init.Nat.min n0 n1).
-auto with arith. 
-auto with arith.
+apply Nat.le_trans with (Init.Nat.min n0 n1); lia.
 
 simpl in H.
 case (n0 ?= n) eqn:C3.
@@ -412,14 +406,10 @@ assert (n1 >= Init.Nat.min n0 (Init.Nat.min n1 n2)).
 case (n1 ?= n2) eqn:C5.
 
 apply nat_compare_eq in C5.
-replace (Init.Nat.min n1 n2) with (n1).
-Nat.solve_min.
-Nat.solve_min.
+replace (Init.Nat.min n1 n2) with (n1); lia.
 
 apply nat_compare_lt in C5.
-replace (Init.Nat.min n1 n2) with (n1).
-Nat.solve_min.
-Nat.solve_min.
+replace (Init.Nat.min n1 n2) with (n1); lia.
 
 apply nat_compare_gt in C5.
 replace (Init.Nat.min n1 n2) with (n2).
@@ -434,9 +424,7 @@ intuition.
 assert (n0>n2).
 destruct C6.
 auto with arith.
-apply Nat.le_trans with n1.
-auto with arith. 
-auto with arith.
+apply Nat.le_trans with n1; lia.
 symmetry.
 Nat.solve_min.
 symmetry.
@@ -548,86 +536,70 @@ simpl.
 auto.
 Qed.
 
+(* TOO: explain and give better name *)
 Lemma treeMin_correct3: forall (t: tree) (n: nat), 
   treeMin t = Some n -> helperGE (treeMin t) (Some n).
 Proof.
-intros.
-induction t.
-simpl.
-auto.
-simpl in H.
-case (treeMin t1) eqn:C1.
-case (treeMin t2) eqn:C2.
-simpl.
-case (treeMin t1) eqn:C3.
-case (treeMin t2) eqn:C4.
-simpl.
-case (Init.Nat.min n0 (Init.Nat.min n3 n4) ?= n) eqn:C5.
-auto.
-apply nat_compare_lt in C5.
-subst.
-inversion C1.
-inversion C2.
-inversion H.
-subst.
-lia.
-auto.
-simpl.
-case (Init.Nat.min n0 n3 ?= n) eqn:C5.
-auto.
-apply nat_compare_lt in C5.
-inversion C1.
-inversion C2.
-auto.
-
-case (treeMin t2) eqn:C4.
-inversion C1.
-inversion C2.
-simpl.
-case (treeMin t1) eqn:C3.
-case (treeMin t2) eqn:C4.
-inversion C1.
-inversion C2.
-inversion C1.
-subst.
-simpl.
-case (Init.Nat.min n0 n1 ?= n) eqn:C5.
-auto.
-apply nat_compare_lt in C5.
-inversion H.
-lia.
-auto.
-inversion C1.
-
-case (treeMin t2) eqn:C2.
-simpl.
-case (treeMin t1) eqn:C3.
-inversion C1.
-case (treeMin t2) eqn:C4.
-inversion C2.
-subst.
-inversion C1.
-simpl.
-case (Init.Nat.min n0 n1 ?= n) eqn:C5.
-auto.
-apply nat_compare_lt in C5.
-inversion H.
-lia.
-auto.
-inversion C2.
-simpl.
-case (treeMin t1) eqn:C3.
-inversion C1.
-case (treeMin t2) eqn:C4.
-inversion C2.
-inversion H.
-subst.
-simpl.
-case (n ?= n) eqn:C5.
-auto.
-apply nat_compare_lt in C5.
-lia.
-auto.
+  intros.
+  induction t.
+  - simpl.
+    auto.
+  - simpl in H.
+    case (treeMin t1) eqn:C1.
+    + case (treeMin t2) eqn:C2; simpl.
+      * case (treeMin t1) eqn:C3.
+        case (treeMin t2) eqn:C4.
+        simpl.
+        case (Init.Nat.min n0 (Init.Nat.min n3 n4) ?= n) eqn:C5; auto.
+        apply nat_compare_lt in C5; intuition.
+        inversion C1.
+        inversion C2.
+        inversion H.
+        subst.
+        lia.
+        simpl.
+        case (Init.Nat.min n0 n3 ?= n) eqn:C5; auto.
+        apply nat_compare_lt in C5.
+        inversion C1.
+        inversion C2.
+        case (treeMin t2) eqn:C4.
+        inversion C1.
+        inversion C2.
+      * case (treeMin t1) eqn:C3.
+        case (treeMin t2) eqn:C4.
+        inversion C1.
+        inversion C2.
+        inversion C1.
+        subst.
+        simpl.
+        case (Init.Nat.min n0 n1 ?= n) eqn:C5; auto.
+        apply nat_compare_lt in C5.
+        inversion H.
+        lia.
+        inversion C1.
+    + case (treeMin t2) eqn:C2; simpl.
+      * case (treeMin t1) eqn:C3.
+        inversion C1.
+        case (treeMin t2) eqn:C4.
+        inversion C2.
+        subst.
+        inversion C1.
+        simpl.
+        case (Init.Nat.min n0 n1 ?= n) eqn:C5; auto.
+        apply nat_compare_lt in C5.
+        inversion H.
+        lia.
+        inversion C2.
+      * case (treeMin t1) eqn:C3.
+        inversion C1.
+        case (treeMin t2) eqn:C4.
+        inversion C2.
+        inversion H.
+        subst.
+        simpl.
+        case (n ?= n) eqn:C5; auto.
+        apply nat_compare_lt in C5.
+        lia.
 Qed.
 
 Lemma treeMin_is_min: forall (t: tree) (n: nat), treeMin t = Some n -> tree_forall (fun y => n <= y) t.
