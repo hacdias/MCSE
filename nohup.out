@@ -1,0 +1,10 @@
+
+(coqide:78187): Gtk-WARNING **: 12:28:45.541: Drawing a gadget with negative dimensions. Did you forget to allocate a size? (node header owner GtkNotebook)
+
+(coqide:78187): Gtk-WARNING **: 12:28:45.541: Drawing a gadget with negative dimensions. Did you forget to allocate a size? (node tabs owner GtkNotebook)
+
+(coqide:78187): Gtk-WARNING **: 12:28:45.541: Drawing a gadget with negative dimensions. Did you forget to allocate a size? (node tab owner GtkNotebook)
+
+(coqide:78187): Gtk-WARNING **: 12:29:11.422: Drawing a gadget with negative dimensions. Did you forget to allocate a size? (node tab owner GtkNotebook)
+Coqide internal error: gtk_range_add_step_timer: assertion 'priv->timer == NULL' failed
+Coqide internal error: gtk_range_add_step_timer: assertion 'priv->timer == NULL' failed

@@ -5,7 +5,7 @@ Require Import Lia.
 (*
   match authors with
     | Henrique Dias (1531484)
-    | Venislav Varbanov (XXXXXXXX)
+    | Venislav Varbanov (1284401)
   end.
 *)
 
@@ -24,7 +24,7 @@ Fixpoint tree_forall (c: nat -> Prop) (t: tree) : Prop :=
   end.
 
 (* Recursively check if tree t is a binary search tree. *)
-Fixpoint bst (t : tree) : Prop :=
+Fixpoint bst (t: tree) : Prop :=
   match t with
   | leaf => True
   | node l v r =>
@@ -60,7 +60,7 @@ Proof.
 Qed.
 
 (* Prove that inserting in a bst produces a bst. *)
-Lemma insert_bst: forall (t:tree) (n:nat), bst t -> bst (insert n t).
+Lemma insert_bst: forall (t: tree) (n: nat), bst t -> bst (insert n t).
 Proof.
   intros.
   induction t; simpl.
@@ -317,8 +317,9 @@ Proof.
         auto.
 Qed.
 
-(* TODO: explain perhaps better name *)
-Function helperGE (n : option nat) (m : option nat) : Prop :=
+(* For two optional numbers n and m, checks if n is greater or
+equal to m. In case n is None, it is also True. *)
+Function helper_ge (n m: option nat) : Prop :=
   match n, m with
     | None, None => False
     | Some a, None => False
@@ -330,8 +331,10 @@ Function helperGE (n : option nat) (m : option nat) : Prop :=
   end
 end.
 
-Lemma treeMin_correct2: forall (t: tree) (n: nat), 
-  helperGE (treeMin t) (Some n) -> tree_forall (fun y => n <= y) t.
+(* Proves that if a tree t has a minimum and the minimum if larger than some n, then
+all elements on tree t are smaller than n. *)
+Lemma treeMin_helper_smaller_than_min_is_min: forall (t: tree) (n: nat), 
+  helper_ge (treeMin t) (Some n) -> tree_forall (fun y => n <= y) t.
 Proof.
   intros.
   induction t; simpl; intuition.
@@ -438,9 +441,10 @@ Proof.
           auto.
 Qed.
 
-(* TOO: explain and give better name *)
-Lemma treeMin_correct3: forall (t: tree) (n: nat), 
-  treeMin t = Some n -> helperGE (treeMin t) (Some n).
+(* Proves that if the tree t has some minimum n, then n is greater or equal
+than the tree minimum, using the helper function. *)
+Lemma treeMin_helper_min_is_smaller: forall (t: tree) (n: nat), 
+  treeMin t = Some n -> helper_ge (treeMin t) (Some n).
 Proof.
   intros.
   induction t.
@@ -506,8 +510,8 @@ Qed.
 Lemma treeMin_is_min: forall (t: tree) (n: nat), treeMin t = Some n -> tree_forall (fun y => n <= y) t.
 Proof.
   intros.
-  apply treeMin_correct2.
-  apply treeMin_correct3 in H.
+  apply treeMin_helper_smaller_than_min_is_min.
+  apply treeMin_helper_min_is_smaller in H.
   auto.
 Qed.
 
@@ -557,7 +561,7 @@ Proof.
     lia.
 Qed.
 
-(* the minimal element of a BST is its leftmost node *)
+(* Prove that the minimal element of a BST is its leftmost node. *)
 Lemma leftmost_is_min_bst: forall (t: tree), bst t -> treeMin t = leftmost t.
 Proof.
   intros.
