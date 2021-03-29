@@ -1,5 +1,6 @@
 \documentclass[a4paper]{article}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{listings}
 \usepackage{enumitem}
 \lstset
@@ -16,16 +17,23 @@
   Binary Search Trees in Coq \\
   \large Proving with Computer Assistance Assignment}
     
-\author{Henrique Dias (1531484), Venislav Varbanov (XXXXXXX)}
+\author{Henrique Dias (1531484), Venislav Varbanov (284401)}
 \date{March 2021}
 
 \begin{document}
 
 \maketitle
 
+\section{Introduction}
+
+The goal of this assignment is to formally define trees and binary search trees of natural numbers, as well as define some of its common operations, such as sort, insert and tree minimum value.
+
+A binary search tree (BST) is a tree that for each of its nodes, its left subtree only stores values smaller than the value of the node, and the right subtree only stores values larger than the value of the node.
+
+%   Explanation of the problem and your approach to it.
+
 %Do not make it too long. 15 pages is the absolute maximum but normally it should be much shorter. Keep in mind that longer does not mean better!
 %What you should write:
-%   Names and student numbers.
 %   Explanation of the problem and your approach to it.
 %   Description of the main definitions and the line of your proofs (e.g. sublemmas you used). If you had some alternative ideas to solve those problems describe them and explain your choice for the solution to this problem.
 %   Write about your experience with the prover. What did you like, what you did not like etc.
@@ -34,25 +42,49 @@
 %   Do not unnecessarily repeat the code. Refer to appendix and quote the code only to illustrate something.
 %   Do not write obvious things! Description of the proofs of the shape: "the goal is as follows so we apply this tactic and that is what we get..." are useless.
 
+\section{Part I: Sorting a Tree}
 
-\section{Introduction}
+\paragraph{Definition of a BST}
 
-The goal of this assignment was to formally define trees and binary search trees (BSTs) of natural numbers, define some of its common operations, prove their correctness, and prove that the leftmost node of a BST is its minimal element.
+The definition of a BST (\texttt{bst}, line 26) is a recursive function where, for each left and right node, we check if its value is larger or smaller than the ones of all of its children. To check those conditions, we defined a helper function \texttt{tree\_forall} that for a certain condition and certain node, checks if the node and its children satisfy the condition.
 
-The implemented operations are:
+\paragraph{Insert Operation}
 
-\begin{itemize}[noitemsep]
-    \item Sort: transforms a regular tree in a BST.
-    \item Occurs: checks if a certain number occurs in a tree.
-    \item Tree minimum: retrieves the minimum value stored in a tree.
-    \item Left most item: retrieves the left most node's value of a tree.
-    \item Insert: inserts a value in a BST.
-    \item Search: similar to occurs, but leverages the fact that the given tree is a BST.
+The insert operation (\texttt{insert}, line 38) can be applied to a BST and is recursive by nature. To prove the correctness of the insertion, we started by proving a sublemma \texttt{insert\_forall} (line 50).
+
+The sublemma proves that for a certain condition and tree, if all the elements of the tree meet the condition, the condition will still be met by all nodes after the insert operation. The proof is by induction and simple.
+
+To prove the correctness of insertion, i.e., to prove that inserting a new value in a BST produces a BST, we made a proof by induction (line 63) that leverages the sublemma \texttt{insert\_forall}, applying the necessary conditions that a BST needs to meet on its left and right branches.
+
+\paragraph{Sort Operation}
+
+The sort operation (\texttt{sort}, line 93) transforms an arbitrary tree into a BST. To do so, we first transform the tree into a list (line 79) and then we rebuild from the list (line 86) by simply using the insert operation on all list elements.
+
+To prove that the sort operation results in a BST (line 104), we proved a sublemma that shows that any tree built from a list is a BST. When building a tree from a list, we simply use the insert operation from an empty tree and insert all elements consecutively. Since the \texttt{insert} operation always results in a BST, it follows that \texttt{sort} results in a BST.
+
+We also prove that the sorted tree has the exact same elements of the initial tree (\texttt{sorted\_occurs}, line 168). To prove this, we first defined the function \texttt{occurs} (line 111) that checks if a certain element is present on a tree. Then, we define three sublemmas:
+
+\begin{itemize}
+    \item \texttt{occurs\_insert} (line 118), which proves that, for two numbers $n$ and $m$, if $m=n$ or n occurs in the tree, then $n$ occurs in the tree after inserting $m$. The "or" operation is needed for the case where the initial tree is an empty tree, i.e., is a leaf. In that case, it is impossible for $n$ to initially occur in the tree.
+    \item \texttt{occurs\_list\_tree} (line 155), which proves that if a list contains a number, then it will occur in the tree built from that list, and vice-versa.
+    \item \texttt{occurs\_tree\_list} (line 136), which proves that if a number occurs in a tree, then it will also occur in its list transformation, and vice-versa.
 \end{itemize}
 
-\section{Sorting of BSTs}
+Using this sublemmas, it is trivial to prove \texttt{sorted\_occurs} by induction.
 
-\section{Minimum of BSTs}
+\section{Part II: The Minimum of a BST}
+
+\paragraph{Tree Minimum}
+
+tree min and correctness
+ 
+\paragraph{Leftmost Node}
+
+leftmost and leftmost BST is tree min
+
+\paragraph{Search a BST}
+
+search for BST, correctness
 
 \appendix
 
