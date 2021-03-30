@@ -74,17 +74,24 @@ Using this sublemmas, it is trivial to prove \texttt{sorted\_occurs} by inductio
 
 \section{Part II: The Minimum of a BST}
 
-\paragraph{Tree Minimum}
+\paragraph{Tree Minimum} The tree minimum function (\texttt{treeMin}, line 195) is defined recursively using the builtin \texttt{Nat.min} function. It returns an \texttt{option nat}, representing the minimum value in the tree. In case the tree is a leaf, \texttt{None} is returned.
 
-tree min and correctness
+The correctness of the function is proved through lemma\texttt{treeMin\_is\_min} (line 519), which proves that for all trees, if the tree has a natural number, then it occurs in the tree and it is smaller or equal than all of its elements. To prove this lemma, we had to split it into many sublemmas:
+
+\begin{itemize}
+    \item \texttt{treeMin\_occurs} (line 197), which proves that if a tree has a minimum, then it occurs in the tree. The proof is quite long as we need to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{occurs}.
+    \item \texttt{treeMin\_is\_min} (line 510), which proves that if a tree has a minimum, it is smaller or equal than all of the elements of the tree. This sublemma is also divided into two further sublemmas described below and it is a direct consequence of them.
+    \item \texttt{treeMin\_helper\_smaller\_than\_min\_is\_min} (line 336) - TODO
+    \item \texttt{treeMin\_helper\_min\_is\_smaller} (line 446) - TODO
+\end{itemize}
  
 \paragraph{Leftmost Node}
 
-leftmost and leftmost BST is tree min
+TODO: leftmost and leftmost BST is tree min
 
 \paragraph{Search a BST}
 
-search for BST, correctness
+TODO: search for BST, correctness
 
 \appendix
 
