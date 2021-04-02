@@ -331,9 +331,9 @@ Function helper_ge (n m: option nat) : Prop :=
   end
 end.
 
-(* Proves that if a tree t has a minimum and the minimum if larger than some n, then
-all elements on tree t are smaller than n. *)
-Lemma treeMin_helper_smaller_than_min_is_min: forall (t: tree) (n: nat), 
+(* Proves that if a tree t has no minimum (it is a leaf) or the minimum is greater than or 
+equal to n (using helper_ge), then all elements in tree t are greater than or equal to n. *)
+Lemma le_than_treeMin_is_le_than_all: forall (t: tree) (n: nat), 
   helper_ge (treeMin t) (Some n) -> tree_forall (fun y => n <= y) t.
 Proof.
   intros.
@@ -441,9 +441,9 @@ Proof.
           auto.
 Qed.
 
-(* Proves that if the tree t has some minimum n, then n is greater or equal
-than the tree minimum, using the helper function. *)
-Lemma treeMin_helper_min_is_smaller: forall (t: tree) (n: nat), 
+(* Proves the trivial: if the tree minimum of t is equal to n, then the tree minimum is 
+greater than or equal to n, using the helper function. *)
+Lemma equal_implies_greater_or_equal: forall (t: tree) (n: nat), 
   treeMin t = Some n -> helper_ge (treeMin t) (Some n).
 Proof.
   intros.
@@ -506,16 +506,16 @@ Proof.
         lia.
 Qed.
 
-(* Proves that the result of treeMin in a tree is smaller than all elements of the tree. *) 
+(* Proves that the result of treeMin in a tree is smaller than or equal to all elements of the tree. *) 
 Lemma treeMin_is_min: forall (t: tree) (n: nat), treeMin t = Some n -> tree_forall (fun y => n <= y) t.
 Proof.
   intros.
-  apply treeMin_helper_smaller_than_min_is_min.
-  apply treeMin_helper_min_is_smaller in H.
+  apply le_than_treeMin_is_le_than_all.
+  apply equal_implies_greater_or_equal in H.
   auto.
 Qed.
 
-(* Proves that the result of treeMin in a tree is smaller than all elements of the tree and an element of the tree. *)
+(* Proves that treeMin of a tree is an element of the tree and it is smaller than or equal to all elements of the tree. *)
 Lemma treeMin_correct: forall (t: tree) (n: nat), 
   treeMin t = Some n -> occurs n t /\ tree_forall (fun y => n <= y) t.
 Proof.
@@ -525,7 +525,7 @@ Proof.
   - apply treeMin_is_min; auto.
 Qed.
 
-(* Returns a value of the leftmost node of a tree t. *)
+(* Returns the value of the leftmost node of a tree t. *)
 Fixpoint leftmost (t: tree): option nat :=
   match t with
   | leaf => None
@@ -535,9 +535,8 @@ Fixpoint leftmost (t: tree): option nat :=
     end
   end.
 
-(* Prove that for all trees and two natural numbers n, m, if n occurs in the tree and all elements in the
-tree are smaller than m, then n is smaller than m. *)
-Lemma occurs_is_lt: forall (t: tree) (n m: nat), occurs n t /\ tree_forall (fun y : nat => y < m) t -> n < m.
+(* Prove that if a condition c is valid for all values in a tree t and a value n occurs in t, then c is valid for n. *)
+Lemma valid_for_all_valid_for_one: forall (c: nat -> Prop) (t: tree) (n m: nat), occurs n t /\ tree_forall c t -> c n.
 Proof.
   intuition.
   induction t.
@@ -545,20 +544,8 @@ Proof.
     intuition.
   - simpl in H0,H1.
     intuition.
-    lia.
-Qed.
-
-(* Prove that for all trees and two natural numbers n, m, if n occurs in the tree and all elements in the
-tree are larger than m, then n is larger than m. *)
-Lemma occurs_is_gt: forall (t: tree) (n m: nat), occurs n t /\ tree_forall (fun y : nat => y > m) t -> n > m.
-Proof.
-  intuition.
-  induction t.
-  - simpl in H0.
-    intuition.
-  - simpl in H0,H1.
-    intuition.
-    lia.
+    subst.
+    auto.
 Qed.
 
 (* Prove that the minimal element of a BST is its leftmost node. *)
@@ -576,30 +563,34 @@ Proof.
         * apply treeMin_occurs in C1.
           apply treeMin_occurs in C2.
           assert (CC1 := conj C1 H0).
-          apply occurs_is_lt in CC1.
+          apply valid_for_all_valid_for_one in CC1.
           assert (CC2 := conj C2 H).
-          apply occurs_is_gt in CC2.
+          apply valid_for_all_valid_for_one in CC2.
           replace (Some (Init.Nat.min n (Init.Nat.min n0 n1))) with (Some n0).
           auto.
           f_equal.
           lia.
+          auto.
+          auto.
     + case (t1) eqn:C3.
         * simpl in C1.
           discriminate.
         * apply treeMin_occurs in C1.
           assert (CC1 := conj C1 H0).
-          apply occurs_is_lt in CC1.
+          apply valid_for_all_valid_for_one in CC1.
           replace (Some (Init.Nat.min n n0)) with (Some n0).
           auto.
           f_equal.
           lia.
+          auto.
   - case (treeMin t2) eqn:C2.
     + case (t1) eqn:C3.
         * apply treeMin_occurs in C2.
           assert (CC2 := conj C2 H).
-          apply occurs_is_gt in CC2.
+          apply valid_for_all_valid_for_one in CC2.
           f_equal.
           lia.
+          auto.
         * simpl in C1.
           case (treeMin t3) eqn:C4.
           case (treeMin t4) eqn:C5.
@@ -646,11 +637,15 @@ Proof.
     + case (n ?= n0) eqn:C1; auto.
       apply nat_compare_gt in C1.
       assert (C := conj H0 H1).
-      apply occurs_is_lt in C; lia.
+      apply valid_for_all_valid_for_one in C.
+      lia.
+      auto.
     + case (n ?= n0) eqn:C1; auto.
       apply nat_compare_lt in C1.
       assert (C := conj H0 H).
-      apply occurs_is_gt in C; lia.
+      apply valid_for_all_valid_for_one in C. 
+      lia.
+      auto.
   - induction t; simpl; auto. 
     simpl in H,H0.
     intuition.
