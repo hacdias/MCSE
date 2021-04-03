@@ -1,11 +1,13 @@
 \documentclass[a4paper]{article}
+\usepackage[a4paper, margin=2.56cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{listings}
 \usepackage{enumitem}
 \lstset
 { %Formatting for code in appendix
-    basicstyle=\footnotesize,
+    numberstyle=\tiny,
+    basicstyle=\ttfamily\footnotesize,
     numbers=left,
     showstringspaces=false,
     breaklines=true,
@@ -30,76 +32,113 @@ The goal of this assignment is to formally define trees and binary search trees 
 
 A binary search tree (BST) is a tree that for each of its nodes, its left subtree only stores values smaller than the value of the node, and the right subtree only stores values larger than the value of the node.
 
-%   Explanation of the problem and your approach to it.
-
-%Do not make it too long. 15 pages is the absolute maximum but normally it should be much shorter. Keep in mind that longer does not mean better!
-%What you should write:
-%   Explanation of the problem and your approach to it.
-%   Description of the main definitions and the line of your proofs (e.g. sublemmas you used). If you had some alternative ideas to solve those problems describe them and explain your choice for the solution to this problem.
-%   Write about your experience with the prover. What did you like, what you did not like etc.
-%   Possibly add the Coq code as an appendix. (But note that you should deliver the Coq .v files separately anyway.)
-%What you should not write
-%   Do not unnecessarily repeat the code. Refer to appendix and quote the code only to illustrate something.
-%   Do not write obvious things! Description of the proofs of the shape: "the goal is as follows so we apply this tactic and that is what we get..." are useless.
+Below we have a description of each function and lemma, as well as the code snippets to which they correspond. The lines in the snippets correspond to the \texttt{.v} file annexed in the end.
 
 \section{Part I: Sorting a Tree}
 
 \paragraph{Definition of a BST}
 
-The definition of a BST (\texttt{bst}, line 26) is a recursive function where, for each node, we check if its value is greater than all the values in the node's left subtree, and less than the ones in the right subtree. To check those conditions, we defined a helper recursive function \texttt{tree\_forall} (line 17) that for a certain condition and a certain node, checks if all of the nodes in the subtree, rooted at the given node, satisfy the given condition.
+The definition of a BST (\texttt{bst}) is a recursive function where, for each node, we check if its value is greater than all the values in the node's left subtree, and less than the ones in the right subtree. To check those conditions, we defined a helper recursive function \texttt{tree\_forall} (line 17) that for a certain condition and a certain node, checks if all of the nodes in the subtree, rooted at the given node, satisfy the given condition.
+
+\lstinputlisting[firstnumber=16,firstline=16,lastline=36]{bst.v}
 
 \paragraph{Insert Operation}
 
-The insert operation (\texttt{insert}, line 38) can be applied to a BST and is recursive by nature. To prove the correctness of the insertion, we started by proving a sublemma \texttt{insert\_forall} (line 50).
+The insert operation (\texttt{insert}) can be applied to a BST and is recursive by nature.
 
-The sublemma proves that for a certain condition, tree and a value (to be inserted), if all the nodes of the tree meet the condition, then if the given value also meets it, the condition will still be met by all nodes after the insert operation. The proof is by induction and simple.
+\lstinputlisting[firstnumber=38,firstline=38,lastline=47]{bst.v}
+
+To prove the correctness of the insertion, we started by proving a sublemma \texttt{insert\_forall}. The sublemma proves that for a certain condition, tree and a value (to be inserted), if all the nodes of the tree meet the condition, then if the given value also meets it, the condition will still be met by all nodes after the insert operation. The proof is by induction and simple.
+
+\lstinputlisting[firstnumber=50,firstline=50,lastline=60]{bst.v}
 
 To prove the correctness of insertion, i.e., to prove that inserting a new value in a BST produces a BST, we made a proof by induction (\texttt{insert\_bst}, line 63) that leverages the sublemma \texttt{insert\_forall}, applying the necessary conditions that a BST needs to meet on its left and right branches.
 
+\lstinputlisting[firstnumber=63,firstline=63,lastline=76]{bst.v}
+
 \paragraph{Sort Operation}
 
-The sort operation (\texttt{sort}, line 93) transforms an arbitrary tree into a BST. To do so, we first transform the tree into a list (\texttt{tree\_to\_list}, line 79) and then we rebuild a BST from the list (\texttt{list\_to\_bst}, line 86) by simply using the insert operation on all list elements.
+The sort operation (\texttt{sort}) transforms an arbitrary tree into a BST. To do so, we first transform the tree into a list (\texttt{tree\_to\_list}) and then we rebuild a BST from the list (\texttt{list\_to\_bst}) by simply using the insert operation on all list elements.
 
-To prove that the sort operation results in a BST (\texttt{sort\_correct}, line 104), we proved a sublemma (\texttt{list\_to\_bst\_correct}, line 96) that shows that any tree built from a list with our insert operation is a BST. When building a tree from a list, we simply use the insert operation from an empty tree and insert all elements consecutively. Since the \texttt{insert} operation always results in a BST, it follows that \texttt{sort} results in a BST.
+\lstinputlisting[firstnumber=78,firstline=78,lastline=93]{bst.v}
 
-We also prove that the sorted tree has the exact same elements as the initial tree (\texttt{sorted\_occurs}, line 168). To prove this, we first defined the function \texttt{occurs} (line 111) that checks if a certain value is present in a tree. Then, we defined three sublemmas:
+To prove that the sort operation results in a BST (\texttt{sort\_correct}), we proved a sublemma that shows that any tree built from a list with our insert operation is a BST (\texttt{list\_to\_bst\_correct}). When building a tree from a list, we simply use the insert operation from an empty tree and insert all elements consecutively. Since the \texttt{insert} operation always results in a BST, it follows that \texttt{sort} results in a BST.
+
+\lstinputlisting[firstnumber=95,firstline=95,lastline=108]{bst.v}
+
+We also prove that the sorted tree has the exact same elements as the initial tree (\texttt{sorted\_occurs}). To prove this, we first defined the function \texttt{occurs} that checks if a certain value is present in a tree.
+
+\lstinputlisting[firstnumber=111,firstline=111,lastline=115]{bst.v}
+
+Then, we defined three sublemmas:
 
 \begin{itemize}
-    \item \texttt{occurs\_insert} (line 118), which proves that, for a tree and two numbers $n$ and $m$ (to be inserted in the tree), if $m=n$ or n occurs in the tree already, then $n$ will occur in the tree after inserting $m$. 
-    %I don't know about that...: The "or" operation is needed for the case where the initial tree is an empty tree, i.e., it is a leaf. In that case, it is impossible for $n$ to initially occur in the tree.
-    \item \texttt{occurs\_tree\_list} (line 136), which proves that if a number occurs in a tree, then it will also occur in its list transformation, and vice-versa.
+    \item \texttt{occurs\_insert}, which proves that, for a tree and two numbers $n$ and $m$ (to be inserted in the tree), if $m=n$ or $n$ occurs in the tree already, then $n$ will occur in the tree after inserting $m$. The check for $m=n$ is needed for the edge case where the initial tree is a leaf. In that case, it is impossible for a number to occur on it.
+    \lstinputlisting[firstnumber=118,firstline=118,lastline=133]{bst.v}
+
+    \item \texttt{occurs\_tree\_list}, which proves that if a number occurs in a tree, then it will also occur in its list transformation, and vice-versa.
+    \lstinputlisting[firstnumber=136,firstline=136,lastline=152]{bst.v}
+    
     \item \texttt{occurs\_list\_tree} (line 155), which proves that if a list contains a number, then it will occur in the BST built from that list, and vice-versa. Here is where we need to apply the \texttt{occurs\_insert} sublemma, as the BST transformation is the one that uses the insert operation.
+    \lstinputlisting[firstnumber=155,firstline=155,lastline=165]{bst.v}
 \end{itemize}
 
 Using this sublemmas, it is trivial to prove \texttt{sorted\_occurs} by induction.
 
+\lstinputlisting[firstnumber=168,firstline=168,lastline=181]{bst.v}
+
 \section{Part II: The Minimum of a BST}
 
-\paragraph{Tree Minimum} The tree minimum function (\texttt{treeMin}, line 195) is defined recursively using the builtin \texttt{Nat.min} function. It returns an \texttt{option nat}, representing the minimum value in the tree, which is the minimum value among the one of the left subtree, the right subtree, and the value of the root. In case the tree is a leaf, \texttt{None} is returned.
+\paragraph{Tree Minimum} The tree minimum function (\texttt{treeMin}) is defined recursively using the builtin \texttt{Nat.min} function. It returns an \texttt{option nat}, representing the minimum value in the tree, which is the minimum value among the one of the left subtree, the right subtree, and the value of the root. In case the tree is a leaf, \texttt{None} is returned.
+
+\lstinputlisting[firstnumber=186,firstline=186,lastline=195]{bst.v}
 
 The correctness of the function is proved through lemma \texttt{treeMin\_is\_min} (line 519), which proves that for all trees, if the tree minimum is a natural number, i.e. the tree is not a leaf, then it occurs in the tree and it is less than or equal to all of its elements. To prove this lemma, we decided to split it into two trivial parts (sublemmas) due to the total length of the proofs and the required additional sublemmas for one of the parts:
 
 \begin{itemize}
-    \item \texttt{treeMin\_occurs} (line 197), which proves the first part, i.e. that if a tree has a natural number as minimum, then it occurs in the tree. The proof is quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{occurs}.
-    \item \texttt{treeMin\_is\_min} (line 510), which proves the second part, i.e. that if a tree has a minimum, it is smaller or equal than all of the elements of the tree. It is hard to prove this sublemma as it is, so we want to prove first a looser version for any number that is less than or equal to the minimum. Thus, to prove this sublemma, we further create a function and two additional sublemmas as described below, and in the end, the sublemma is a direct consequence of them:
+    \item \texttt{treeMin\_occurs}, which proves the first part, i.e. that if a tree has a natural number as minimum, then it occurs in the tree. The proof is quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{occurs}.
+    \lstinputlisting[firstnumber=198,firstline=198,lastline=318]{bst.v}
+    
+    \item \texttt{treeMin\_is\_min}, which proves the second part, i.e. that if a tree has a minimum, it is smaller or equal than all of the elements of the tree. It is hard to prove this sublemma as it is, so we want to prove first a looser version for any number that is less than or equal to the minimum.
+    
+    \lstinputlisting[firstnumber=510,firstline=510,lastline=516]{bst.v}
+    
+    Thus, to prove this sublemma, we further create a function and two additional sublemmas as described below, and in the end, the sublemma is a direct consequence of them:
     \begin{itemize}
-        \item Function \texttt{helper\_ge} (line 322), which serves almost completely as a greater or equal check for two \texttt{option nat} values. It is only ever used with a tree minimum as first value, and its purpose is to imply that if the second value is some smaller or equal natural number, then all elements in the tree are greater than or equal to it. Therefore, when the second value is \texttt{None}, we return \texttt{False}, as the elements in the tree can't be compared to it, and otherwise, when the first value (tree minimum) is \texttt{None}, we return \texttt{True}, as there are no elements in the tree to compare to the second value. The case when they are both natural numbers is a regular greater or equal check.
-        \item \texttt{le\_than\_treeMin\_is\_le\_than\_all} (line 336), which proves that if a tree has no minimum (it is a leaf) or the minimum is greater than or equal to some natural number (using \texttt{helper\_ge}), then all values in the tree are greater than or equal to that number. This proof is also quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{helper\_ge}.
-        \item \texttt{equal\_implies\_greater\_or\_equal} (line 446), which proves that if the tree minimum of a tree is equal to some natural number, then it is also greater than or equal to that number (in the sense of \texttt{helper\_ge}). As in the proof of the previous sublemma, there are quite some cases for \texttt{treeMin} and \texttt{helper\_ge} to be covered.
+        \item Function \texttt{helper\_ge}, which serves almost completely as a greater or equal check for two \texttt{option nat} values. It is only ever used with a tree minimum as first value, and its purpose is to imply that if the second value is some smaller or equal natural number, then all elements in the tree are greater than or equal to it. Therefore, when the second value is \texttt{None}, we return \texttt{False}, as the elements in the tree can't be compared to it, and otherwise, when the first value (tree minimum) is \texttt{None}, we return \texttt{True}, as there are no elements in the tree to compare to the second value. The case when they are both natural numbers is a regular greater or equal check.
+        \lstinputlisting[firstnumber=322,firstline=322,lastline=332]{bst.v}
+        
+        \item \texttt{le\_than\_treeMin\_is\_le\_than\_all}, which proves that if a tree has no minimum (it is a leaf) or the minimum is greater than or equal to some natural number (using \texttt{helper\_ge}), then all values in the tree are greater than or equal to that number. This proof is also quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{helper\_ge}.
+        \lstinputlisting[firstnumber=336,firstline=336,lastline=442]{bst.v}
+        
+        \item \texttt{equal\_implies\_greater\_or\_equal}, which proves that if the tree minimum of a tree is equal to some natural number, then it is also greater than or equal to that number (in the sense of \texttt{helper\_ge}). As in the proof of the previous sublemma, there are quite some cases for \texttt{treeMin} and \texttt{helper\_ge} to be covered.
+        \lstinputlisting[firstnumber=446,firstline=446,lastline=507]{bst.v}
     \end{itemize}
 \end{itemize}
+
+The proof of the lemma follows \texttt{treeMin\_correct}:
+
+\lstinputlisting[firstnumber=519,firstline=519,lastline=526]{bst.v}
  
 \paragraph{Leftmost Node}
-%TODO: leftmost and leftmost BST is tree min
-The recursively defined leftmost function (\texttt{leftmost}, line 529) returns the value of the leftmost node of a tree (as \texttt{option nat}). In case the tree is a leaf, \texttt{None} is returned.
 
-We then want to prove lemma \texttt{leftmost\_is\_min\_bst} (line 552), i.e. that for all BSTs, that the minimal element is the leftmost node. This proof is also quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{leftmost}. Here the aforementioned sublemma \texttt{treeMin\_occurs} is quite useful, which combined with a new small sublemma \texttt{valid\_for\_all\_valid\_for\_one} (line 539), i.e. if a condition is valid for all values in a tree and a specific value occurs in that tree, then the condition is also valid for that value, give us some comparison between tree minimums of different subtrees, which helps us prove the different cases within the lemma.
+The recursively defined leftmost function (\texttt{leftmost}) returns the value of the leftmost node of a tree (as \texttt{option nat}). In case the tree is a leaf, \texttt{None} is returned.
+
+\lstinputlisting[firstnumber=529,firstline=529,lastline=536]{bst.v}
+
+We then want to prove lemma \texttt{leftmost\_is\_min\_bst}, i.e. that for all BSTs, that the minimal element is the leftmost node. This proof is also quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{leftmost}. Here the aforementioned sublemma \texttt{treeMin\_occurs} is quite useful, which combined with the sublemma \texttt{valid\_for\_all\_valid\_for\_one}, i.e. if a condition is valid for all values in a tree and a specific value occurs in that tree, then the condition is also valid for that value, give us some comparison between tree minimums of different subtrees, which helps us prove the different cases within the lemma.
+
+\lstinputlisting[firstnumber=538,firstline=538,lastline=611]{bst.v}
 
 \paragraph{Search a BST}
-%TODO: search for BST, correctness
-The recursively defined search function (\texttt{search}, line 614) searches a BST and checks if specific number occurs in it, leveraging the fact that it is a BST. Trivially, in case the tree is a leaf, \texttt{False} is returned.
 
-We then want to prove lemma \texttt{search\_eq\_occurs} (line 626), i.e. that for all BSTs, \texttt{search} returns the same result as \texttt{occurs}. The proof of this lemma does not require any new sublemmas, but we do make use of the aforementioned sublemma \texttt{valid\_for\_all\_valid\_for\_one}. The proof is fairly straightforward, with induction on the tree in both directions, split into simple different cases for \texttt{search}.
+The recursively defined search function (\texttt{search}) searches a BST and checks if specific number occurs in it, leveraging the fact that it is a BST. Trivially, in case the tree is a leaf, \texttt{False} is returned.
+
+\lstinputlisting[firstnumber=614,firstline=614,lastline=623]{bst.v}
+
+We then want to prove lemma \texttt{search\_eq\_occurs}, i.e. that for all BSTs, \texttt{search} returns the same result as \texttt{occurs}. The proof of this lemma does not require any new sublemmas, but we do make use of the aforementioned sublemma \texttt{valid\_for\_all\_valid\_for\_one}. The proof is fairly straightforward, with induction on the tree in both directions, split into simple different cases for \texttt{search}.
+
+\lstinputlisting[firstnumber=626,firstline=626,lastline=656]{bst.v}
 
 \newpage
 \appendix
@@ -107,5 +146,4 @@ We then want to prove lemma \texttt{search\_eq\_occurs} (line 626), i.e. that fo
 \section{Code}
 
 \lstinputlisting{bst.v}
-
 \end{document}
