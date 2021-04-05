@@ -4,6 +4,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{listings}
 \usepackage{enumitem}
+\usepackage{hyperref}
 \lstset
 { %Formatting for code in appendix
     numberstyle=\tiny,
@@ -11,6 +12,13 @@
     numbers=left,
     showstringspaces=false,
     breaklines=true,
+}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
 }
 
 %\title{Sorting of Binary Search Trees in Coq}
@@ -32,7 +40,7 @@ The goal of this assignment is to formally define trees and binary search trees 
 
 A binary search tree (BST) is a tree that for each of its nodes, its left subtree only stores values smaller than the value of the node, and the right subtree only stores values larger than the value of the node.
 
-Below we have a description of each function and lemma, as well as the code snippets to which they correspond. The lines in the snippets correspond to the \texttt{.v} file annexed in the end.
+Below we have a description of each function and lemma, as well as the code snippets to which they correspond. The lines in the snippets correspond to the \texttt{.v} file that accompanies this document.
 
 \section{Part I: Sorting a Tree}
 
@@ -96,8 +104,9 @@ Using this sublemmas, it is trivial to prove \texttt{sorted\_occurs} by inductio
 The correctness of the function is proved through lemma \texttt{treeMin\_is\_min} (line 519), which proves that for all trees, if the tree minimum is a natural number, i.e. the tree is not a leaf, then it occurs in the tree and it is less than or equal to all of its elements. To prove this lemma, we decided to split it into two trivial parts (sublemmas) due to the total length of the proofs and the required additional sublemmas for one of the parts:
 
 \begin{itemize}
-    \item \texttt{treeMin\_occurs}, which proves the first part, i.e. that if a tree has a natural number as minimum, then it occurs in the tree. The proof is quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{occurs}.
-    \lstinputlisting[firstnumber=198,firstline=198,lastline=318]{bst.v}
+    \item \texttt{treeMin\_occurs}, which proves the first part, i.e. that if a tree has a natural number as minimum, then it occurs in the tree. The proof is quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{occurs}. This is a long lemma, please refer to \autoref{a:treeMinOccurs} for the entire proof.
+    
+    \lstinputlisting[firstnumber=198,firstline=198,lastline=198]{bst.v}
     
     \item \texttt{treeMin\_is\_min}, which proves the second part, i.e. that if a tree has a minimum, it is smaller or equal than all of the elements of the tree. It is hard to prove this sublemma as it is, so we want to prove first a looser version for any number that is less than or equal to the minimum.
     
@@ -108,11 +117,11 @@ The correctness of the function is proved through lemma \texttt{treeMin\_is\_min
         \item Function \texttt{helper\_ge}, which serves almost completely as a greater or equal check for two \texttt{option nat} values. It is only ever used with a tree minimum as first value, and its purpose is to imply that if the second value is some smaller or equal natural number, then all elements in the tree are greater than or equal to it. Therefore, when the second value is \texttt{None}, we return \texttt{False}, as the elements in the tree can't be compared to it, and otherwise, when the first value (tree minimum) is \texttt{None}, we return \texttt{True}, as there are no elements in the tree to compare to the second value. The case when they are both natural numbers is a regular greater or equal check.
         \lstinputlisting[firstnumber=322,firstline=322,lastline=332]{bst.v}
         
-        \item \texttt{le\_than\_treeMin\_is\_le\_than\_all}, which proves that if a tree has no minimum (it is a leaf) or the minimum is greater than or equal to some natural number (using \texttt{helper\_ge}), then all values in the tree are greater than or equal to that number. This proof is also quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{helper\_ge}.
-        \lstinputlisting[firstnumber=336,firstline=336,lastline=442]{bst.v}
+        \item \texttt{le\_than\_treeMin\_is\_le\_than\_all}, which proves that if a tree has no minimum (it is a leaf) or the minimum is greater than or equal to some natural number (using \texttt{helper\_ge}), then all values in the tree are greater than or equal to that number. This proof is also quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{helper\_ge}. This is a long lemma, please refer to \autoref{a:leThanTreeMinIsLeThanAll} for the entire proof.
+        \lstinputlisting[firstnumber=336,firstline=336,lastline=337]{bst.v}
         
-        \item \texttt{equal\_implies\_greater\_or\_equal}, which proves that if the tree minimum of a tree is equal to some natural number, then it is also greater than or equal to that number (in the sense of \texttt{helper\_ge}). As in the proof of the previous sublemma, there are quite some cases for \texttt{treeMin} and \texttt{helper\_ge} to be covered.
-        \lstinputlisting[firstnumber=446,firstline=446,lastline=507]{bst.v}
+        \item \texttt{equal\_implies\_greater\_or\_equal}, which proves that if the tree minimum of a tree is equal to some natural number, then it is also greater than or equal to that number (in the sense of \texttt{helper\_ge}). As in the proof of the previous sublemma, there are quite some cases for \texttt{treeMin} and \texttt{helper\_ge} to be covered. This is a long lemma, please refer to \autoref{a:equalImpliesGreaterOrEqual} for the entire proof.
+        \lstinputlisting[firstnumber=446,firstline=446,lastline=447]{bst.v}
     \end{itemize}
 \end{itemize}
 
@@ -126,9 +135,13 @@ The recursively defined leftmost function (\texttt{leftmost}) returns the value 
 
 \lstinputlisting[firstnumber=529,firstline=529,lastline=536]{bst.v}
 
-We then want to prove lemma \texttt{leftmost\_is\_min\_bst}, i.e. that for all BSTs, that the minimal element is the leftmost node. This proof is also quite long as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{leftmost}. Here the aforementioned sublemma \texttt{treeMin\_occurs} is quite useful, which combined with the sublemma \texttt{valid\_for\_all\_valid\_for\_one}, i.e. if a condition is valid for all values in a tree and a specific value occurs in that tree, then the condition is also valid for that value, give us some comparison between tree minimums of different subtrees, which helps us prove the different cases within the lemma.
+We then want to prove lemma \texttt{leftmost\_is\_min\_bst}, i.e. that for all BSTs, that the minimal element is the leftmost node. This proof is also quite long (see \autoref{a:leftmostIsMinBst}) as we needed to prove for the different ramifications of the tree during the execution of \texttt{treeMin} and \texttt{leftmost}.
 
-\lstinputlisting[firstnumber=538,firstline=538,lastline=611]{bst.v}
+\lstinputlisting[firstnumber=552,firstline=552,lastline=552]{bst.v}
+
+Here the aforementioned sublemma \texttt{treeMin\_occurs} is quite useful, which combined with the sublemma \texttt{valid\_for\_all\_valid\_for\_one}, i.e. if a condition is valid for all values in a tree and a specific value occurs in that tree, then the condition is also valid for that value, give us some comparison between tree minimums of different subtrees, which helps us prove the different cases within the lemma.
+
+\lstinputlisting[firstnumber=539,firstline=539,lastline=549]{bst.v}
 
 \paragraph{Search a BST}
 
@@ -141,9 +154,22 @@ We then want to prove lemma \texttt{search\_eq\_occurs}, i.e. that for all BSTs,
 \lstinputlisting[firstnumber=626,firstline=626,lastline=656]{bst.v}
 
 \newpage
-\appendix
+\appendix\section{Lemmas and Proofs}
 
-\section{Code}
+\subsection{\texttt{treeMin\_occurs}}
+\label{a:treeMinOccurs}
+\lstinputlisting[firstnumber=198,firstline=198,lastline=318]{bst.v}
 
-\lstinputlisting{bst.v}
+\subsection{\texttt{le\_than\_treeMin\_is\_le\_than\_all}}
+\label{a:leThanTreeMinIsLeThanAll}
+\lstinputlisting[firstnumber=336,firstline=336,lastline=442]{bst.v}
+
+\subsection{\texttt{equal\_implies\_greater\_or\_equal}}
+\label{a:equalImpliesGreaterOrEqual}
+\lstinputlisting[firstnumber=446,firstline=446,lastline=507]{bst.v}
+
+\subsection{\texttt{leftmost\_is\_min\_bst}}
+\label{a:leftmostIsMinBst}
+\lstinputlisting[firstnumber=552,firstline=552,lastline=611]{bst.v}
+ 
 \end{document}
