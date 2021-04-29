@@ -3,7 +3,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import DecimalType, IntegerType, StringType, StructField, StructType, TimestampType
 
 # %%
-USERS_DATA_PATH = "data/subset_users.csv"
+USERS_DATA_PATH = "data/users.csv"
 
 # %%
 spark = SparkSession.builder.appName("FuncD").getOrCreate()
@@ -29,7 +29,7 @@ schema = StructType([
 users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
 
 # Print some results to see if it worked
-print(users.head(3))
+print(users.tail(3))
 
 # %%
 spark.stop()
