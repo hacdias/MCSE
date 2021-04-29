@@ -19,8 +19,8 @@ schema = StructType([
     StructField("type", StringType()),
     StructField("fake", IntegerType()),
     StructField("deleted", IntegerType()),
-    StructField("long", DecimalType(11, 8)),
-    StructField("lat", DecimalType(10, 8)),
+    StructField("long", DecimalType(11, 8)), # numbers define precision
+    StructField("lat", DecimalType(10, 8)), # numbers define precision
     StructField("country_code", StringType()),
     StructField("state", StringType()),
     StructField("city", StringType()),
@@ -28,8 +28,16 @@ schema = StructType([
 ])
 users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
 
-# Print some results to see if it worked
-print(users.tail(3))
+# %% Print the first row
+print(users.head(1))
+
+# %% Use the RDD interpretation of the DataFrame (slow)
+nimo = users.rdd.filter(lambda user: user.login == 'nimobeeren').collect()
+print(nimo)
+
+# %% Use the DataFrame directly (faster)
+nimo = users.filter(users.login == 'nimobeeren').collect()
+print(nimo)
 
 # %%
 spark.stop()
