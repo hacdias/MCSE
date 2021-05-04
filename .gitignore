@@ -1,6 +1,13 @@
+# Python stuff
 __pycache__/
-.vscode/
+.python-version
+
+# IDE stuff
+.vscode/**/*
+!.vscode/extensions.json
 .idea/
 *.iml
-.python-version
+
+# Large data files
 data/
+data
