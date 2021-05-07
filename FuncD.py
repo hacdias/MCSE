@@ -1,9 +1,14 @@
 # %%
+from os import replace
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import udf
 from pyspark.sql.types import DecimalType, IntegerType, StringType, StructField, StructType, TimestampType
+from ISO3166 import *
 
+    
 # %%
 USERS_DATA_PATH = "data/users.csv"
+USERS_DATA_PATH_SUBSET = "data/subset_users.csv"
 
 # %%
 spark = SparkSession.builder.appName("FuncD").getOrCreate()
@@ -21,23 +26,24 @@ schema = StructType([
     StructField("deleted", IntegerType()),
     StructField("long", DecimalType(11, 8)), # numbers define precision
     StructField("lat", DecimalType(10, 8)), # numbers define precision
-    StructField("country_code", StringType()),
+    StructField("country_code", StringType()), 
+    StructField("country", StringType()), # ADDED country field
     StructField("state", StringType()),
     StructField("city", StringType()),
     StructField("location", StringType()),
 ])
-users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
+users = spark.read.csv(USERS_DATA_PATH_SUBSET, schema, nullValue='\\N')
 
-# %% Print the first row
-print(users.head(1))
 
-# %% Use the RDD interpretation of the DataFrame (slow)
-nimo = users.rdd.filter(lambda user: user.login == 'nimobeeren').collect()
-print(nimo)
+users = users.filter(users.fake==0) # FIlter out fake users
+print(users.count())
 
-# %% Use the DataFrame directly (faster)
-nimo = users.filter(users.login == 'nimobeeren').collect()
-print(nimo)
+# Use country code Dict to add a column with the full country name 
+country_imputer = udf(lambda code: ISO3166.get(code.upper()) if code != None else code, StringType()) 
+updated_users = users.withColumn('country',country_imputer(users.country_code))
 
-# %%
+print(updated_users.tail(10))
+
+
+
 spark.stop()
