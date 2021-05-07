@@ -27,7 +27,6 @@ schema = StructType([
     StructField("long", DecimalType(11, 8)), # numbers define precision
     StructField("lat", DecimalType(10, 8)), # numbers define precision
     StructField("country_code", StringType()), 
-    StructField("country", StringType()), # ADDED country field
     StructField("state", StringType()),
     StructField("city", StringType()),
     StructField("location", StringType()),
