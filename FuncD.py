@@ -26,7 +26,8 @@ schema = StructType([
     StructField("deleted", IntegerType()),
     StructField("long", DecimalType(11, 8)), # numbers define precision
     StructField("lat", DecimalType(10, 8)), # numbers define precision
-    StructField("country", StringType()), # RENAMED country_code FIELD TO country
+    StructField("country_code", StringType()), 
+    StructField("country", StringType()), # ADDED country field
     StructField("state", StringType()),
     StructField("city", StringType()),
     StructField("location", StringType()),
@@ -37,12 +38,10 @@ users = spark.read.csv(USERS_DATA_PATH_SUBSET, schema, nullValue='\\N')
 users = users.filter(users.fake==0) # FIlter out fake users
 print(users.count())
 
-# Replace each country code with a country from the Dict
+# Use country code Dict to add a column with the full country name 
 country_imputer = udf(lambda code: ISO3166.get(code.upper()) if code != None else code, StringType()) 
-updated_users = users.withColumn('country',country_imputer(users.country))
+updated_users = users.withColumn('country',country_imputer(users.country_code))
 
-# Drop the location field since that information now exists in another column
-updated_users = updated_users.drop("location")
 print(updated_users.tail(10))
 
 
