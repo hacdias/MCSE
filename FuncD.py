@@ -116,7 +116,6 @@ def reduce_counts(a, b):
 def calculate_probability(reduction):
   total = reduction['total']
   probs = reduction['probabilities']
-  weighted_prob = 0
 
   # Hard FDs: the sum of all probabilities is the same as
   # the number of different elements because they're all 1.
