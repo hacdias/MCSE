@@ -42,7 +42,7 @@ users = spark.read.csv(USERS_DATA_SUBSET_PATH, schema, nullValue='\\N')
 users = users.filter(users.fake == 0)
 
 # 2. Impute column "country" with the country name based on the country_code.
-country_imputer = udf(lambda code: ISO3166.get(code.upper()) if code != None else code, StringType()) 
+country_imputer = udf(lambda code: countries.get(code).name if code != None else code, StringType()) 
 users = users.withColumn('country', country_imputer(users.country_code))
 
 # %% Configuration.
