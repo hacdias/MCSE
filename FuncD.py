@@ -6,9 +6,8 @@ from os import replace
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
 from pyspark.sql.types import DecimalType, IntegerType, StringType, StructField, StructType, TimestampType
-from ISO3166 import *
+from iso3166 import countries
 
-    
 # %%
 USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_SUBSET_PATH = "data/subset_users.csv"
@@ -29,7 +28,7 @@ schema = StructType([
     StructField("deleted", IntegerType()),
     StructField("long", DecimalType(11, 8)), # numbers define precision
     StructField("lat", DecimalType(10, 8)), # numbers define precision
-    StructField("country_code", StringType()), 
+    StructField("country_code", StringType()),
     StructField("state", StringType()),
     StructField("city", StringType()),
     StructField("location", StringType()),
@@ -42,7 +41,7 @@ users = spark.read.csv(USERS_DATA_SUBSET_PATH, schema, nullValue='\\N')
 users = users.filter(users.fake == 0)
 
 # 2. Impute column "country" with the country name based on the country_code.
-country_imputer = udf(lambda code: countries.get(code).name if code != None else code, StringType()) 
+country_imputer = udf(lambda code: countries.get(code).name if code != None else code, StringType())
 users = users.withColumn('country', country_imputer(users.country_code))
 
 # %% Configuration.
@@ -57,7 +56,7 @@ ignored_fields = (
   'lat'
 )
 
-soft_threshold = 0.7
+soft_threshold = 0.9
 
 # %% Mapping and reducing functions.
 
@@ -88,18 +87,48 @@ def get_majority_sum(values):
   rhs_values_frequencies = values[1]
   rhs_frequencies = rhs_values_frequencies.values()
 
+  total = sum(rhs_frequencies)
+  prob = 0
+
+  if total == 1:
+    # Avoid divisions by zero.
+    return {
+      'probabilities': [(1.0, 1)],
+      'total': total
+    }
+
+  for freq in rhs_frequencies:
+    prob += (freq / total) * ((freq - 1) / (total - 1))
+
   return {
-    'majority': max(rhs_frequencies),
-    'total': sum(rhs_frequencies)
+    'probabilities': [(prob, total)],
+    'total': total
   }
 
 # reduce_counts reduces all counts by summing all majority values
 # and all total values.
 def reduce_counts(a, b):
   return {
-    'majority': a['majority'] + b['majority'],
+    'probabilities': [*a['probabilities'], *b['probabilities']],
     'total': a['total'] + b['total']
   }
+
+def calculate_probability(reduction):
+  total = reduction['total']
+  probs = reduction['probabilities']
+  weighted_prob = 0
+
+  # Hard FDs: the sum of all probabilities is the same as
+  # the number of different elements because they're all 1.
+  # We do this to avoid floating point imprecisions.
+  if sum([p[0] for p in probs]) == len(probs):
+    return 1.0
+
+  weighted_prob = 0
+  for (p, freq) in probs:
+    weighted_prob += p * (freq/total)
+
+  return weighted_prob
 
 # dependency_ratio returns a ratio majority / total, where majority
 # is the number of rows that have the most common right hand side value
@@ -112,7 +141,8 @@ def dependency_ratio(lhs_cols, rhs_cols):
   dt = dt.reduceByKey(merge_columns)
   dt = dt.map(get_majority_sum)
   re = dt.reduce(reduce_counts)
-  return re['majority'] / re['total']
+  prob = calculate_probability(re)
+  return prob
 
 # Generates A -> B rules, where A has up to 3 columns and B one from the
 # columns.
@@ -155,12 +185,12 @@ for (lhs_cols, rhs_cols) in to_check:
   elif v > soft_threshold:
     classification = 'Soft'
 
-  print(f'Majority / Total = {v}, {classification}')
+  print(f'Probability = {v}, {classification}')
   results.append([lhs_cols, rhs_cols, v, classification])
 
 with open('brute_force_results.csv', mode='w') as file:
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
-  wr.writerow(['Left-hand Side', 'Right-hand side', 'Majority / Total', 'Classification'])
+  wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification'])
   wr.writerows(results)
 
 spark.stop()
