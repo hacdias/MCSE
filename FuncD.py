@@ -80,10 +80,10 @@ def merge_columns(a, b):
 
   return b
 
-# get_majority_sum gets the sum for all elements with the same
-# left hand side and the count of elements with the majority
-# right hand value for that left hand side.
-def get_majority_sum(values):
+# calculate_probabilities calculates the probability
+# of two random columns with the same left hand side having
+# the same right hand side. 
+def calculate_probabilities(values):
   rhs_values_frequencies = values[1]
   rhs_frequencies = rhs_values_frequencies.values()
 
@@ -105,9 +105,9 @@ def get_majority_sum(values):
     'total': total
   }
 
-# reduce_counts reduces all counts by summing all majority values
-# and all total values.
-def reduce_counts(a, b):
+# reduce_probabilities reduces all probabilities into a single
+# list and also stores the total.
+def reduce_probabilities(a, b):
   return {
     'probabilities': [*a['probabilities'], *b['probabilities']],
     'total': a['total'] + b['total']
@@ -138,8 +138,8 @@ def calculate_probability(reduction):
 def dependency_ratio(lhs_cols, rhs_cols):
   dt = users.rdd.map(map_cols_to_tuple(lhs_cols, rhs_cols))
   dt = dt.reduceByKey(merge_columns)
-  dt = dt.map(get_majority_sum)
-  re = dt.reduce(reduce_counts)
+  dt = dt.map(calculate_probabilities)
+  re = dt.reduce(reduce_probabilities)
   prob = calculate_probability(re)
   return prob
 
