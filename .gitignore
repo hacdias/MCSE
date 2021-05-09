@@ -11,3 +11,6 @@ __pycache__/
 # Large data files
 data/
 data
+
+# Results
+*.csv
