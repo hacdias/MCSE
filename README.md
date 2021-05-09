@@ -13,7 +13,6 @@
 ```bash 
 pip install -r requirements.txt
 ```
-
 Tested on Python 3.6.8.
 
 ## ⚙️ Usage
