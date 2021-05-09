@@ -8,9 +8,10 @@ from pyspark.sql.functions import udf
 from pyspark.sql.types import DecimalType, IntegerType, StringType, StructField, StructType, TimestampType
 from iso3166 import countries
 
-# %%
+# %% Configuration
+SOFT_THRESHOLD = 0.9
 USERS_DATA_PATH = "data/users.csv"
-USERS_DATA_SUBSET_PATH = "data/subset_users.csv"
+# USERS_DATA_PATH = "data/subset_users.csv"
 
 # %%
 spark = SparkSession.builder.appName("FuncD").getOrCreate()
@@ -33,7 +34,7 @@ schema = StructType([
     StructField("city", StringType()),
     StructField("location", StringType()),
 ])
-users = spark.read.csv(USERS_DATA_SUBSET_PATH, schema, nullValue='\\N')
+users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
 
 # %% Preprocessing
 
@@ -55,8 +56,6 @@ ignored_fields = (
   'long',
   'lat'
 )
-
-soft_threshold = 0.9
 
 # %% Mapping and reducing functions.
 
@@ -181,7 +180,7 @@ for (lhs_cols, rhs_cols) in to_check:
   classification = 'No FD'
   if v == 1:
     classification = 'Hard'
-  elif v > soft_threshold:
+  elif v > SOFT_THRESHOLD:
     classification = 'Soft'
 
   print(f'Probability = {v}, {classification}')
