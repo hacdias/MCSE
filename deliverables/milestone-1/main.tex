@@ -1,0 +1,368 @@
+\documentclass{article}
+\usepackage{caption}
+\usepackage{comment}
+\usepackage[a4paper,left=2.5cm,right=2.5cm,top=3.5cm,bottom=2.5cm]{geometry}
+\usepackage{graphicx}
+
+\usepackage[utf8]{inputenc}
+\usepackage{makecell}
+\usepackage{moresize}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{natbib}
+\usepackage{stmaryrd}
+\usepackage{amsmath}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{paracol}
+\usepackage[inline]{enumitem}
+\usepackage{threeparttable}
+\usepackage{amsfonts}
+\usepackage{array}
+
+% Used for code snippets from here 
+
+\usepackage{listings}
+
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+% Until here
+
+
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\hypersetup{
+    colorlinks=true,
+    linkcolor={red!60!black},
+    filecolor=magenta,      
+    urlcolor=blue,
+    citecolor={green!60!black}
+}
+
+% Settings for code listing
+\usepackage{listings}
+\lstset{
+    basicstyle=\footnotesize,
+    breaklines=true,
+    frame=single,
+    language=C++,
+    title=\lstname,
+    numbers=left,
+    showstringspaces=false,
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Big Data Management}
+\lhead{\textbf{Eindhoven University of Technology}}
+\rfoot{\thepage}
+\lfoot{Group 5}
+
+% if we want to hide the date
+\date{\vspace{-2ex}}
+% \date{\today}
+
+\begin{document}
+
+\begin{titlepage}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{tuelogo}
+    
+        \vspace*{1cm}
+    
+        {\huge \textbf{Dataset Analysis \& \\ Distribution of Computation}}\\
+        \vspace*{0.25cm}
+        
+        {\Large Big Data Management}\\
+        
+        \large{Milestone 1}
+    
+    \end{center}
+    
+    \vfill
+       
+    {\parindent0pt
+        \textbf{Group 5}\\
+        
+        Çağla Sözen, 1597884\\
+        c.sozen@student.tue.nl\\
+        
+        Gabriela Slavova, 1555855\\
+        g.slavova@student.tue.nl\\
+        
+        Henrique Dias, 1531484\\
+        h.a.coelho.dias@student.tue.nl\\
+        
+        Maria Pogodaeva, 1615556\\
+        m.pogodaeva@student.tue.nl\\
+        
+        Nimo Beeren, 1019824\\
+        n.beeren@student.tue.nl\\
+        
+        Panagiotis Banos, 1622773\\
+        p.banos@student.tue.nl\\
+        
+        \vspace*{1cm}
+    
+        \textbf{Department of Mathematics and Computer Science}\\
+        P.O.Box 513, MetaForum\\
+        5612 AZ, 5600 MB Eindhoven\\
+        The Netherlands
+    }
+\end{titlepage}
+
+\section{Dataset}\label{sec:dataset}
+    % Section 1. Datasets: description of the dataset(s), links for downloading them, and the preprocessing you performed, step-by-step. (40\%). \\
+    
+    GitHub is a popular online code collaboration platform and archive with over 65 million users and 200 million repositories \cite{github}. A large part of metadata regarding users and their actions is available through a public API\footnote{\href{https://api.github.com/events}{https://api.github.com/events}}. The GHTorrent Project~\cite{Gousi13} aggregates this data and provides it as database dumps. For our project, we will detect functional dependencies only in the \texttt{users} table of this dataset.
+    
+    % Initially, the database consists of several SQL tables joined on specific id keys. The core of the hierarchical structure of the database is formed by the following tables: \textit{Users, Projects, Commits, Pull~requests, Issues}. There are also several smaller tables. The detailed structure of the database can be seen on the website\footnote{\href{https://ghtorrent.org/relational.html}{https://ghtorrent.org/relational.html}, Database Schema.}.
+    
+    \subsection{Source links}
+    Incremental updates of the dataset are made available on the GHTorrent website\footnote{\href{https://ghtorrent.org/downloads.html}{https://ghtorrent.org/downloads.html}}. For this project we are using the latest available version dated June 2019. The database dumps are provided as a \texttt{.csv} file for each table. 
+    % , which can also be downloaded directly\footnote{\href{http://ghtorrent-downloads.ewi.tudelft.nl/mysql/mysql-2019-06-01.tar.gz}{http://ghtorrent-downloads.ewi.tudelft.nl/mysql/mysql-2019-06-01.tar.gz}, GHTorrent database dump June 2019.}.
+    For convenience, we also provide the data file for only the \texttt{users} table, as well as a subset containing the first 10,000 records (not to be distributed further)\footnote{\href{https://drive.google.com/drive/folders/16xy-5SntyM0atfJNQh3Ognw2XZcrdZHz?usp=sharing}{https://drive.google.com/drive/folders/16xy-5SntyM0atfJNQh3Ognw2XZcrdZHz?usp=sharing}}.
+    
+    \subsection{Description}
+    For this assignment we only consider the \texttt{users} table. It contains 32,430,223 records with 14 attributes. A brief description of the attributes can be found in \autoref{tab:schema}.
+
+    \begin{table}[ht]
+        \centering
+        \begin{minipage}[b]{0.48\linewidth}
+            \centering
+            \begin{tabular}{|c|c|c|c|}
+            \hline
+            \textbf{Attribute} & \textbf{Type} & \textbf{Description} \\
+            \Xhline{2\arrayrulewidth}
+            \texttt{id} & Int & Unique user id \\
+            \hline
+            \texttt{login} & String & Username \\
+            \hline
+            \texttt{created\_at} & Date & Account creation date \\
+            \hline
+            \texttt{type} & String & Person/Organization \\
+            \hline
+            \texttt{fake} & Bool & Fake user*\\
+            \hline
+            \texttt{deleted} & Bool & Account still exists\\
+            \hline
+            \end{tabular}
+        \end{minipage}
+        \begin{minipage}[b]{0.48\linewidth}
+            \centering
+            \begin{tabular}{|c|c|c|c|}
+            \hline
+            \textbf{Attribute} & \textbf{Type} & \textbf{Description}\\
+            \Xhline{2\arrayrulewidth}
+
+            \texttt{long} & Float & User longitude \\
+            \hline
+            \texttt{lat} & Float & User latitude \\
+            \hline
+            \texttt{country\_code} & String & ISO two-letter code\\
+            \hline
+            \texttt{state} & String & e.g. ``Texas'' \\
+            \hline
+            \texttt{city} & String &  e.g. ``Eindhoven''\\
+            \hline
+            \texttt{location} & String &  Free-form text input\\
+            \hline
+            \end{tabular}
+        \end{minipage}
+    \caption{Database schema of the \texttt{users} table. *Fake users only appear as authors or committers of commits, but typically do not have a specified location.}
+    \label{tab:schema}
+    \end{table}
+    
+    \subsection{Preprocessing}
+    \label{subsec:preprocessing}
+    We perform preprocessing on the dataset in two ways. First, we discovered that there are fake users in the table for which no other information than the username and id is provided. Since we are not interested in functional dependencies (FDs) involving these fields, we drop all records that are marked as fake. After this filtering, we are left with 24,562,103 records.
+    
+    Second, because we do not expect to find any non-trivial hard functional dependencies in the original data, we introduce a new attribute \texttt{country}. This attribute consists of the full country name that corresponds to the ISO 3166 code given in the \texttt{country\_code} attribute. Hence, this introduces a hard (bidirectional) FD.
+
+\section{Functional Dependencies}\label{sec:fd}
+    % \textit{Section 2. Used dependencies: a list of the expected dependencies and a brief explanation
+    %— if some of these dependencies are introduced by you, explain how. (20\%).}
+    
+    The goal of this project is to find the functional dependencies that exist in the dataset at hand. For the next milestone, we will develop code to find functional dependencies on the dataset. However, we can already hypothesise about FDs by interpreting the attributes. To start, two attributes are unique to an individual record: \texttt{id} and \texttt{login}. Trivially, both of these attributes functionally determine all other attributes. Further, we describe a number of expected functional dependencies in \autoref{tab:expected-fds}.
+
+    As mentioned in \autoref{subsec:preprocessing}, the introduction of the \texttt{country} attribute created a hard bidirectional functional dependency between \texttt{country} and \texttt{country\_code}. Note that these two attributes are interchangeable in any FD since they are mapped 1-to-1. In the following, we will leave this implicit.
+    
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c|l|p{8cm}|}
+            \hline
+            \textbf{Type} & \textbf{Dependency} & \textbf{Description} \\
+            \Xhline{2\arrayrulewidth}
+            Hard & $\texttt{country\_code} \rightarrow \texttt{country}$ & The country code is mapped to a unique country name.\\
+            \hline
+            Soft & $\texttt{state} \rightarrow \texttt{country}$ & Most states only exist in a single country. However, the dependency is not hard since a null value of \texttt{state} may be associated with different countries.\\
+            \hline
+            Soft & $\texttt{city} \rightarrow \texttt{country}$ & Most city names only appear in one country, but some appear in multiple.\\
+            \hline
+            Soft & $\texttt{city} \rightarrow \texttt{state}$ & Most city names only appear in one state, but some appear in multiple.\\
+            \hline
+            Soft & $\texttt{company} \rightarrow \texttt{country}$ & For most companies, the majority of employees live in the same country.\\
+            \hline
+            $\delta$ & $\texttt{city}, \texttt{country} \rightarrow \texttt{long}, \texttt{lat}$ & A single city covers a limited range of coordinates. The country is included on the left-hand side to deal with equal-named cities in different countries.\\
+            \hline
+        \end{tabular}
+        \caption{Expected functional dependencies.}
+        \label{tab:expected-fds}
+    \end{table}
+
+\section{Distribution of Computation}\label{sec:distribution}
+
+    We are following a naive brute force approach to detect FDs. For the computations, we leverage Spark's distribution capabilities by applying a sequence of mappers and reducers.
+    
+    We first define some notations. Let $R$ be the collection of records and for a record $r$ and set of attributes $A$, let $r[A]$ be the collection of values of $r$ for those attributes. For convenience, define $r[a] := r[\{a\}]$ for a single attribute $a$.
+    
+    The first step is to generate a set $H$ of all candidate FDs $A \rightarrow B$, under the condition that $A$ is between 1 and 3 attributes and $B$ is exactly 1 attribute. This is done on the central computer.
+    
+    \subsection{Hard and Soft Functional Dependencies}
+    
+    To detect hard and soft FDs, we compute for two randomly selected records $r_i, r_j \in R$ the probability $P(r_i[B] = r_j[B] \;|\; r_i[A] = r_j[A])$. To achieve this, we apply a sequence of mappers and reducers for each candidate FD $A \rightarrow B \in H$:
+    
+    \begin{enumerate}
+        \item \textbf{Map} each record $r \in R$ to a pair $((r[A], r[B]), 1)$. The right side of the pair represents the number of records with left-hand values $r[A]$ and right-hand values $r[B]$.
+        
+        % \item \textbf{Reduce} all pairs $(a, s)$ \textbf{by key} $a$, by combining their sets $s$. E.g.: given $\{(b_1, 1)\}$ and $\{ (b_1, 3), (b_2, 1)\}$, we get  $\{ (b_1, 4), (b_2, 1)\}$. This will result in a single pair $(a, f)$, where $f$ is a function $f: V(B) \rightarrow \mathbb{N}$ that maps all $b \in V(B)$ to their count in $R(A = a)$.
+        
+        \item \textbf{Reduce} each pair of pairs $((a, b), c_1), ((a, b), c_2)$ \textbf{by key} $(a, b)$, to a pair containing the sum of their counts $((a, b), c_1 + c_2)$.
+        
+        \item \textbf{Map} each pair $((a, b), c)$ to a pair $(a, \{(b, c)\})$.
+        
+        \item \textbf{Reduce} each pair of pairs $(a, S_1), (a, S_2)$ \textbf{by key} $a$ to a pair $(a, S_1 \cup S_2)$.
+        % Define a family of functions $f_S$ such that $f_S(b) = c$ if and only if $(b, c) \in S$.
+        
+        % \item \textbf{Map} each $(a, f)$ into a tuple $(P(B|a), t_a)$, where $P(B|a)$ is the probability of picking two records with the same $b$ when $r[A] = a$ - given by  $\sum_{b \in V(B)}(\frac{f(b)}{t_a})(\frac{f(b) - 1}{t_a-1})$ - and $t_a = \sum_{b \in V(B)} f(b)$.
+        
+        \item \textbf{Map} each pair $(a, S)$ to a pair $(t_a, P_a)$, where $t_a = \sum_{(b,c) \in S} c$ is the total number of records $r \in R$ with $r[A] = a$ and $P_a = \sum_{(b, c) \in S}(\frac{c}{t_a})(\frac{c-1}{t_a-1})$ is the probability of randomly selecting two records $r_i, r_j$ with $r_i[B] = r_j[B]$ given that $r_i[A] = r_j[A] = a$.
+        
+        \item \textbf{Map} each pair $(t_a, P_a)$ to a pair $(t_a, t_aP_a)$, where $t_aP_a$ is the probability from the previous mapper weighted by the total number of records $r \in R$ with $r[A] = a$.
+        
+        \item \textbf{Reduce} each pair of pairs $(t_1, t_1P_1), (t_2, t_2P_2)$ to a pair $(t_1 + t_2, t_1P_1 + t_2P_2)$.
+        
+        \item \textbf{Map} each pair $(T, tP)$ to the value $tP / T$, which is the desired probability $p = P(r_i[B] = r_j[B] \;|\; r_i[A] = r_j[A])$.
+    \end{enumerate}
+    
+    \noindent Given a threshold $0 \leq \tau \leq 1$, we can now classify $A \rightarrow B$ as a hard FD if $p = 1$ or soft FD if $p \geq \tau$. Finally, non-minimal FDs are dropped by scanning over the detected FDs $A \rightarrow B$, and dropping it if there exists an FD $A' \rightarrow B$ such that $A' \subset A$.
+
+    \subsection{\texorpdfstring{$\delta$}{delta}-Functional Dependencies}
+    
+    To detect $\delta$-FDs, we use a binary difference function $\Delta$ to determine if two values are significantly different from each other. This $\Delta$ is different depending on the types of values that are being compared. For numerical attributes, we use the absolute difference $|a - b|$. For string-valued attributes, we use the edit distance \cite{edit_dist}. For each candidate FD $A \rightarrow B \in H$, we apply the first 4 steps from the previous section. After that, we continue as follows:
+    
+    \begin{enumerate}
+        \setcounter{enumi}{4}
+        \item \textbf{Map} each pair $(a, S)$ to a boolean value $X = \forall_{(b,c) \in S} \forall_{(b', c') \in S} : \Delta(b, b') \leq \delta$.
+        \item \textbf{Reduce} each pair of booleans $(X_1, X_2)$ to the boolean value $X_1 \wedge X_2$.
+    \end{enumerate}
+
+    \noindent The resulting boolean value indicates whether the $\delta$-FD holds or not. Removing non-minimal $\delta$-FDs is done in the same way as for hard/soft FDs.
+    
+    % The general idea is to use a pre-determined $\Delta$ that fits the structure of the attribute. The computation for numerical and non-numerical attributes differs. Both procedures are explained below.
+    
+    % For numerical attributes, the range of possible values for a specific attribute can be used in the $\Delta$ function to determine whether the difference is significant or not. The idea is to retrieve the minimum and maximum values and check whether those values satisfy $\Delta$. Thus, for each FD $A \rightarrow B \in H$, we do:
+    
+    % \begin{enumerate}
+    %     \item \textbf{Map} a record $r$ to a pair $(r[A], r[B])$.
+    %     \item \textbf{Reduce by key} $a$ to a tuple $(a, (\min (b_i, b_j), \max (b_i, b_j)))$ for each pair of input the reducer receives. In the end, we will have $(a, (\min_b, \max_b))$ for all $b \in V(B)$ where the column $A$ has value $a$.
+    %     \item \textbf{Map} all elements to $\Delta(\min_b, \max_b)$.
+    %     \item \textbf{Reduce} all elements to a boolean value by checking if $\forall a : \Delta(\min_b, \max_b)$ satisfies the comparison function. If so, $A \rightarrow B$ is a a $\delta$-FD.
+    % \end{enumerate}
+    
+    % For non-numeric attributes, it is not possible to define concepts such as small, large or mean. Therefore, the approach we use is purely comparison based. For comparing strings, \textit{Edit Distance}\cite{edit_dist} is used as $\Delta$ and $\delta$ defines the maximum number of allowed edits in the string relative to its length. Thus, for each FD $A \rightarrow B \in H$, we do:
+    
+    % \begin{enumerate}
+    %     \item \textbf{Map} all elements to the format $(a, \{b\})$, where $a \in V(A)$ and $b \in V(B)$.
+    %     \item \textbf{Reduce by key} where we merge two tuples $(a, B_1)$ and $(a, B_2)$ into $(a, B_1 \cup B_2)$. After the reduction we will have a tuple $(a, B)$ for all $a \in V(A)$ where $B$ is the set of all possible $b \in V(B)$ when column $A$ has value $a$.
+    %     \item \textbf{Map} all tuples to $E(B)$, where $E$ is the maximum edit distance of all pairs of elements in $B$. If the difference satisfies the $\Delta$ comparison function, then $A \rightarrow B$ is a a $\delta$-FD.
+    % \end{enumerate}
+
+    \subsection{Optimizations}
+    
+    \paragraph{Reducing the Number of $\Delta$-Comparisons.} Depending on the choice of $\Delta$ for a particular attribute, it may not be necessary to compute the difference between all pairs of right-hand side values. In particular, if $\Delta$ is transitive in the sense that $\Delta(x, y) + \Delta(y, z) = \Delta(x, z)$ for values $x \leq y \leq z$, then we can maintain the minimum and maximum values that we have seen, and only compute a difference if a new record falls outside this range. This optimization is useful for numeric attributes, but not for strings, since the edit distance does not satisfy this transitivity condition.
+    
+    \paragraph{Early Stopping.} When detecting hard- or $\delta$-FDs, we can use an early stopping technique where we stop the computation as soon as we find two distinct values for the right-hand side values for the same left-hand side value. This can be applied in step 5 of the described algorithm by stopping if $|S| > 1$. Since we look for hard and soft FDs at the same time, this optimization is not used for those kinds of dependencies. However, since $\delta$-FDs cannot be soft according to our definitions, this optimization can save time.
+    
+    
+    \subsection{Discussion}
+    %LOAD IMBALANCES, BOTTLENECKS
+    
+    By applying the MapReduce paradigm, the algorithm can be efficiently distributed over a cluster of computers. The set of records is first partitioned and distributed over the workers. Then each worker starts counting values in the records it received. Because each reducer applies a commutative and associative function, the order in which elements are reduced does not matter. This allows some workers to start reducing while other workers are still at the previous mapping step. Furthermore, Spark will perform the reduction locally as much as possible, limiting communication cost.
+    
+    There is a possibility of load imbalance if some nodes receive records with a larger number of different values. This is because dealing with more values takes more time and as a consequence some node could be loaded more than others. Still, this depends on the way Spark distributes the records over the workers.
+    
+    %Explain your initial steps regarding the distribution of computation. How will you break the computation for each of the three dependencies such that it can be distributed to the workers (which mappers, reducers, aggregators, etc. do you need, what will each of them do, how will you partition your input data, etc.)? Which additional optimizations will you consider for each dependency? Mention which parts of the code will be executed centrally, and discuss possible bottlenecks and load imbalance. After reading this section, one should be able to get a good idea on how your final implementation will work. (40\% — notice footnote 2).
+    
+\newpage
+\appendix
+\section{Appendix}\label{appendix}
+    \subsection{Team Contribution}
+     
+    \begin{table}[ht]
+    \centering
+        \begin{tabular}{|l|l|m{8cm}|}
+        \hline
+        \textbf{Student Name} & \textbf{Contribution (\%)} & \textbf{Participation in Tasks} \\
+        \Xhline{2\arrayrulewidth}
+        
+        Çağla Sözen & $16.\overline{6}\%$ & Datasets research, algorithms research, writing the report, preparing the poster, recording the video\\
+        \hline
+        
+        Gabriela Slavova & $16.\overline{6}\%$ & Datasets research, algorithms research, writing the report.\\
+        \hline
+        
+        Henrique Dias & $16.\overline{6}\%$ & Datasets research, algorithms research, distribution of computation code, writing the report.\\
+        \hline
+        
+        Maria Pogodaeva & $16.\overline{6}\%$ & Datasets research, algorithms research, writing the report, preparing the poster.\\
+        \hline
+        
+        Nimo Beeren & $16.\overline{6}\%$ & Datasets research, algorithms research, initial code, pre-processing code, writing the report. \\
+        \hline
+        
+        Panagiotis Banos & $16.\overline{6}\%$ & Datasets research, algorithms research, pre-processing code, writing the report. \\
+        \hline
+        
+        \end{tabular}
+        \caption{Team Contribution}
+        \label{tab:contribution}
+    \end{table}
+    
+    Every team member is involved in the project, approaches the tasks responsibly and shows interest. Mostly our work is conducted as a team effort during the meetings, in addition to that we also try to distribute separate tasks among the team members.
+    
+
+% if we want to sort the links in alphabetical order:
+\bibliographystyle{plain}
+% if we want to sort the links as they appear in the text:
+% \bibliographystyle{unsrt}
+\bibliography{references}
+
+\end{document}
