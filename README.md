@@ -2,7 +2,9 @@
 
 *Group #5*
 
-## Installation
+**💡 Note:** this initial implementation does not yet handle δ-FDs, and the algorithm is implemented in a slightly different way than the report.
+
+## 📦 Installation
 
 1. Download [the dataset](https://ghtorrent.org/downloads.html) and place the `users.csv` file in a subdirectory named `data` (create it if it does not exist).
 
@@ -11,13 +13,12 @@
 ```bash 
 pip install -r requirements.txt
 ```
+Tested on Python 3.6.8.
 
-## Usage
+## ⚙️ Usage
 
 Running locally:
 
 ```bash
 python FuncD.py
 ```
-
-Tested on Python 3.6.8.
