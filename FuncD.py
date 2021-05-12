@@ -2,13 +2,18 @@
 import csv
 from itertools import chain, combinations
 from operator import add
-from typing import Any
+from typing import Any, Tuple
 
 from iso3166 import countries
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
+
+# Type alias
+# Uses `Tuple[]` because `tuple[]` is only supported since Python 3.9
+# See: https://docs.python.org/3/library/typing.html#typing.Tuple
+FunctionalDependency = Tuple[Tuple[str, ...], str]
 
 # %% Configuration
 
@@ -80,7 +85,8 @@ def attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
   return anon
 
 
-def tuple_to_dict(tup: 'tuple[tuple[tuple[str, ...], str], int]'):
+# TODO: don't like this function name
+def tuple_to_dict(tup: 'tuple[FunctionalDependency, int]') -> 'tuple[Any, dict[str, int]]':
   (lhs, rhs), count = tup
   return (lhs, {rhs: count})
 
@@ -138,7 +144,7 @@ def dependency_ratio(lhs_cols: 'tuple[str, ...]', rhs_col: str):
   return d['weighted_probs'] / d['total']
 
 
-def generate_deps(attributes: 'list[str]') -> 'list[tuple[tuple[str, ...], str]]':
+def generate_deps(attributes: 'list[str]') -> 'list[FunctionalDependency]':
   """
   Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
   """
