@@ -2,6 +2,7 @@
 import csv
 from itertools import chain, combinations
 from operator import add
+from typing import Any
 
 from iso3166 import countries
 from pyspark.sql import SparkSession
@@ -10,6 +11,7 @@ from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
 
 # %% Configuration
+
 SOFT_THRESHOLD = 0.9
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
@@ -28,6 +30,7 @@ IGNORED_ATTRIBUTES = {
 spark = SparkSession.builder.appName("FuncD").getOrCreate()
 
 # %% Read the data from CSV
+
 # This reflects the SQL schema of the `users` table provided at:
 # https://github.com/gousiosg/github-mirror/blob/3d5f4b2ffa5d510455e58b1209c31f4d1b211306/sql/schema.sql
 schema = StructType([
@@ -52,9 +55,8 @@ users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
 # Remove fake users
 users = users.filter(users.fake == 0)
 
-# Add column "country" with the country name based on the country code.
 @udf
-def get_country_name(code):
+def get_country_name(code: str):
   if code is None:
     return None
   try:
@@ -62,12 +64,15 @@ def get_country_name(code):
   except:
     return None
 
+# Add column "country" with the country name based on the country code.
 users = users.withColumn('country', get_country_name(users.country_code))
 
 # %% Mapping and reducing functions.
 
-# Maps every user's lhs and rhs attributes to a tuple ((lhs, rhs), 1).
 def attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
+  """
+  Maps every user's lhs and rhs attributes to a tuple ((lhs, rhs), 1).
+  """
   def anon(user):
     lhs_values = tuple(str(user[attr]) for attr in lhs_attrs)
     rhs_value = str(user[rhs_attr])
@@ -80,58 +85,36 @@ def tuple_to_dict(tup: 'tuple[tuple[tuple[str, ...], str], int]'):
   return (lhs, {rhs: count})
 
 
-# calculate_probabilities calculates the probability
-# of two random columns with the same left hand side having
-# the same right hand side. 
-def calculate_probabilities(values):
+def counts_to_prob(values: 'tuple[Any, dict[str, int]]'):
+  """
+  Calculates the probability that two random records with a particular LHS side
+  have the same RHS.
+  """
   lhs, rhs_count_dicts = values
   rhs_counts = rhs_count_dicts.values()
 
   total = sum(rhs_counts)
-  prob = 0
 
   if total == 1:
     # Avoid divisions by zero.
     return {
-      'probabilities': [(1.0, 1)],
+      'prob': 1.0,
       'total': total
     }
 
+  prob = 0.0
   for count in rhs_counts:
     prob += (count / total) * ((count - 1) / (total - 1))
 
   return {
-    'probabilities': [(prob, total)],
+    'prob': prob,
     'total': total
   }
 
 
-# reduce_probabilities reduces all probabilities into a single
-# list and also stores the total.
-def reduce_probabilities(a, b):
-  return {
-    'probabilities': [*a['probabilities'], *b['probabilities']],
-    'total': a['total'] + b['total']
-  }
-
-
-def calculate_probability(reduction):
-  total = reduction['total']
-  probs = reduction['probabilities']
-
-  # Hard FDs: the sum of all probabilities is the same as
-  # the number of different elements because they're all 1.
-  # We do this to avoid floating point imprecisions.
-  if sum([p[0] for p in probs]) == len(probs):
-    return 1.0
-
-  weighted_prob = 0
-  for (p, freq) in probs:
-    weighted_prob += p * (freq/total)
-
-  return weighted_prob
-
-
+# TODO: update this description
+# TODO: add comments for lambdas where not obvious
+# TODO: FD class?
 # dependency_ratio returns a ratio majority / total, where majority
 # is the number of rows that have the most common right hand side value
 # for all left side values. The total is basically the total number of rows.
@@ -143,14 +126,22 @@ def dependency_ratio(lhs_cols: 'tuple[str, ...]', rhs_col: str):
   rdd = rdd.reduceByKey(add)
   rdd = rdd.map(tuple_to_dict)
   rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2})
-  rdd = rdd.map(calculate_probabilities)
-  re = rdd.reduce(reduce_probabilities)
-  prob = calculate_probability(re)
-  return prob
+  rdd = rdd.map(counts_to_prob)
+  rdd = rdd.map(lambda d: {
+    'weighted_probs': d['prob'] * d['total'],
+    'total': d['total']
+  })
+  d = rdd.reduce(lambda d1, d2: {
+    'weighted_probs': d1['weighted_probs'] + d2['weighted_probs'],
+    'total': d1['total'] + d2['total']
+  })
+  return d['weighted_probs'] / d['total']
 
 
-# Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
 def generate_deps(attributes: 'list[str]') -> 'list[tuple[tuple[str, ...], str]]':
+  """
+  Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
+  """
   attrs = set(attributes) - IGNORED_ATTRIBUTES
   lhs_combos = chain(
     combinations(attrs, 1),
