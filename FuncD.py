@@ -1,7 +1,6 @@
-# %%
+# %% Imports
 import csv
 from itertools import combinations
-from os import replace
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
@@ -10,13 +9,13 @@ from iso3166 import countries
 
 # %% Configuration
 SOFT_THRESHOLD = 0.9
-USERS_DATA_PATH = "data/users.csv"
-# USERS_DATA_PATH = "data/subset_users.csv"
+# USERS_DATA_PATH = "data/users.csv"
+USERS_DATA_PATH = "data/subset_users.csv"
 
-# %%
+# %% Create Spark session
 spark = SparkSession.builder.appName("FuncD").getOrCreate()
 
-# %%
+# %% Read the data from CSV
 # This reflects the SQL schema of the `users` table provided at:
 # https://github.com/gousiosg/github-mirror/blob/3d5f4b2ffa5d510455e58b1209c31f4d1b211306/sql/schema.sql
 schema = StructType([
@@ -38,12 +37,20 @@ users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
 
 # %% Preprocessing
 
-# 1. Remove fake users
+# Remove fake users
 users = users.filter(users.fake == 0)
 
-# 2. Impute column "country" with the country name based on the country_code.
-country_imputer = udf(lambda code: countries.get(code).name if code != None else code, StringType())
-users = users.withColumn('country', country_imputer(users.country_code))
+# Add column "country" with the country name based on the country code.
+@udf
+def get_country_name(code):
+  if code is None:
+    return None
+  try:
+    return countries.get(code).name # type: ignore
+  except:
+    return None
+
+users = users.withColumn('country', get_country_name(users.country_code))
 
 # %% Configuration.
 ignored_fields = (
