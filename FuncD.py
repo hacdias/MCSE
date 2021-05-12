@@ -1,6 +1,6 @@
 # %% Imports
 import csv
-from itertools import combinations
+from itertools import chain, combinations, product
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
@@ -11,6 +11,16 @@ from iso3166 import countries
 SOFT_THRESHOLD = 0.9
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
+IGNORED_ATTRIBUTES = set([
+  'id',
+  'login',
+  'created_at',
+  'deleted',
+  'fake',
+  'type',
+  'long',
+  'lat'
+])
 
 # %% Create Spark session
 spark = SparkSession.builder.appName("FuncD").getOrCreate()
@@ -52,27 +62,15 @@ def get_country_name(code):
 
 users = users.withColumn('country', get_country_name(users.country_code))
 
-# %% Configuration.
-ignored_fields = (
-  'id',
-  'login',
-  'created_at',
-  'deleted',
-  'fake',
-  'type',
-  'long',
-  'lat'
-)
-
 # %% Mapping and reducing functions.
 
-# map_cols_to_tuple maps every user's lhs and rhs columns
+# map_cols_to_tuple maps every user's lhs and rhs attributes
 # to a tuple (lhs, { rhs: 1 }).
-def map_cols_to_tuple(lhs_cols, rhs_cols):
+def map_attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
   def anon(user):
-    lhs_values = tuple(str(user[col]) for col in lhs_cols)
-    rhs_values = tuple(str(user[col]) for col in rhs_cols)
-    return (lhs_values, {rhs_values: 1})
+    lhs_values = tuple(str(user[attr]) for attr in lhs_attrs)
+    rhs_value = str(user[rhs_attr])
+    return (lhs_values, {rhs_value: 1})
   return anon
 
 # merge_columns merges dictionary b into a, where a and b
@@ -141,48 +139,37 @@ def calculate_probability(reduction):
 #
 # NOTE: we probably don't need to calculate total as it is the total number
 # of rows.
-def dependency_ratio(lhs_cols, rhs_cols):
-  dt = users.rdd.map(map_cols_to_tuple(lhs_cols, rhs_cols))
+def dependency_ratio(lhs_cols: 'tuple[str, ...]', rhs_col: str):
+  dt = users.rdd.map(map_attrs_to_tuple(lhs_cols, rhs_col))
   dt = dt.reduceByKey(merge_columns)
   dt = dt.map(calculate_probabilities)
   re = dt.reduce(reduce_probabilities)
   prob = calculate_probability(re)
   return prob
 
-# Generates A -> B rules, where A has up to 3 columns and B one from the
-# columns.
-def generate_combos(columns):
-  lhs_combos = [
-    *list(combinations(columns, 1)),
-    *list(combinations(columns, 2)),
-    *list(combinations(columns, 3)),
-  ]
+# Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
+def generate_deps(attributes: 'list[str]') -> 'list[tuple[tuple[str, ...], str]]':
+  attrs = set(attributes) - IGNORED_ATTRIBUTES
+  lhs_combos = chain(
+    combinations(attrs, 1),
+    combinations(attrs, 2),
+    combinations(attrs, 3)
+  )
 
-  combos = []
+  deps = []
+  for lhs_attrs in lhs_combos:
+    for rhs_attr in attrs:
+      if rhs_attr not in lhs_attrs:
+        deps.append((lhs_attrs, rhs_attr))
 
-  for lhs_cols in lhs_combos:
-    for col in columns:
-      if col not in lhs_cols:
-        combos.append((lhs_cols, (col,)))
+  return deps
 
-  return combos
-
-# Filter by ignored_fields.
-def filter_ignored(relation):
-  for field in ignored_fields:
-    if field in relation[0] or field in relation[1]:
-      return False
-  return True
-
-to_check = generate_combos(users.columns)
-to_check = filter(filter_ignored, to_check)
-to_check = list(to_check)
-
+candidate_deps = generate_deps(users.columns)
 results = []
 
-for (lhs_cols, rhs_cols) in to_check:
-  print(f'Checking FS: {lhs_cols} -> {rhs_cols}')
-  v = dependency_ratio(lhs_cols, rhs_cols)
+for (lhs_attrs, rhs_attr) in candidate_deps:
+  print(f'Checking FS: {lhs_attrs} -> {rhs_attr}')
+  v = dependency_ratio(lhs_attrs, rhs_attr)
 
   classification = 'No FD'
   if v == 1:
@@ -191,7 +178,7 @@ for (lhs_cols, rhs_cols) in to_check:
     classification = 'Soft'
 
   print(f'Probability = {v}, {classification}')
-  results.append([lhs_cols, rhs_cols, v, classification])
+  results.append([lhs_attrs, rhs_attr, v, classification])
 
 with open('brute_force_results.csv', mode='w') as file:
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
