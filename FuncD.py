@@ -1,17 +1,19 @@
 # %% Imports
 import csv
-from itertools import chain, combinations, product
+from itertools import chain, combinations
+from operator import add
 
+from iso3166 import countries
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
-from pyspark.sql.types import DecimalType, IntegerType, StringType, StructField, StructType, TimestampType
-from iso3166 import countries
+from pyspark.sql.types import (DecimalType, IntegerType, StringType,
+                               StructField, StructType, TimestampType)
 
 # %% Configuration
 SOFT_THRESHOLD = 0.9
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
-IGNORED_ATTRIBUTES = set([
+IGNORED_ATTRIBUTES = {
   'id',
   'login',
   'created_at',
@@ -20,7 +22,7 @@ IGNORED_ATTRIBUTES = set([
   'type',
   'long',
   'lat'
-])
+}
 
 # %% Create Spark session
 spark = SparkSession.builder.appName("FuncD").getOrCreate()
@@ -64,34 +66,28 @@ users = users.withColumn('country', get_country_name(users.country_code))
 
 # %% Mapping and reducing functions.
 
-# map_cols_to_tuple maps every user's lhs and rhs attributes
-# to a tuple (lhs, { rhs: 1 }).
-def map_attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
+# Maps every user's lhs and rhs attributes to a tuple ((lhs, rhs), 1).
+def attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
   def anon(user):
     lhs_values = tuple(str(user[attr]) for attr in lhs_attrs)
     rhs_value = str(user[rhs_attr])
-    return (lhs_values, {rhs_value: 1})
+    return ((lhs_values, rhs_value), 1)
   return anon
 
-# merge_columns merges dictionary b into a, where a and b
-# are of type { col_name: count, ... }, summing the counts
-# for the same keys.
-def merge_columns(a, b):
-  for rhs_values in a.keys():
-    if rhs_values not in b:
-      b[rhs_values] = 0
-    b[rhs_values] += a[rhs_values]
 
-  return b
+def tuple_to_dict(tup: 'tuple[tuple[tuple[str, ...], str], int]'):
+  (lhs, rhs), count = tup
+  return (lhs, {rhs: count})
+
 
 # calculate_probabilities calculates the probability
 # of two random columns with the same left hand side having
 # the same right hand side. 
 def calculate_probabilities(values):
-  rhs_values_frequencies = values[1]
-  rhs_frequencies = rhs_values_frequencies.values()
+  lhs, rhs_count_dicts = values
+  rhs_counts = rhs_count_dicts.values()
 
-  total = sum(rhs_frequencies)
+  total = sum(rhs_counts)
   prob = 0
 
   if total == 1:
@@ -101,13 +97,14 @@ def calculate_probabilities(values):
       'total': total
     }
 
-  for freq in rhs_frequencies:
-    prob += (freq / total) * ((freq - 1) / (total - 1))
+  for count in rhs_counts:
+    prob += (count / total) * ((count - 1) / (total - 1))
 
   return {
     'probabilities': [(prob, total)],
     'total': total
   }
+
 
 # reduce_probabilities reduces all probabilities into a single
 # list and also stores the total.
@@ -116,6 +113,7 @@ def reduce_probabilities(a, b):
     'probabilities': [*a['probabilities'], *b['probabilities']],
     'total': a['total'] + b['total']
   }
+
 
 def calculate_probability(reduction):
   total = reduction['total']
@@ -133,6 +131,7 @@ def calculate_probability(reduction):
 
   return weighted_prob
 
+
 # dependency_ratio returns a ratio majority / total, where majority
 # is the number of rows that have the most common right hand side value
 # for all left side values. The total is basically the total number of rows.
@@ -140,12 +139,15 @@ def calculate_probability(reduction):
 # NOTE: we probably don't need to calculate total as it is the total number
 # of rows.
 def dependency_ratio(lhs_cols: 'tuple[str, ...]', rhs_col: str):
-  dt = users.rdd.map(map_attrs_to_tuple(lhs_cols, rhs_col))
-  dt = dt.reduceByKey(merge_columns)
-  dt = dt.map(calculate_probabilities)
-  re = dt.reduce(reduce_probabilities)
+  rdd = users.rdd.map(attrs_to_tuple(lhs_cols, rhs_col))
+  rdd = rdd.reduceByKey(add)
+  rdd = rdd.map(tuple_to_dict)
+  rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2})
+  rdd = rdd.map(calculate_probabilities)
+  re = rdd.reduce(reduce_probabilities)
   prob = calculate_probability(re)
   return prob
+
 
 # Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
 def generate_deps(attributes: 'list[str]') -> 'list[tuple[tuple[str, ...], str]]':
@@ -163,6 +165,7 @@ def generate_deps(attributes: 'list[str]') -> 'list[tuple[tuple[str, ...], str]]
         deps.append((lhs_attrs, rhs_attr))
 
   return deps
+
 
 candidate_deps = generate_deps(users.columns)
 results = []
