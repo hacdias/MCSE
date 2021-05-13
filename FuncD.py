@@ -44,9 +44,9 @@ def attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
   return anon
 
 
-def tuple_to_dict(tup: 'tuple[FunctionalDependency, int]') -> 'tuple[Any, dict[str, int]]':
-  fd, count = tup
-  return (fd.lhs, {fd.rhs: count})
+def tuple_to_dict(tup: 'tuple[tuple[tuple[Any, ...], Any], int]'):
+  (lhs_values, rhs_value), count = tup
+  return (lhs_values, {rhs_value: count})
 
 
 def counts_to_prob(values: 'tuple[Any, dict[str, int]]'):
@@ -54,8 +54,8 @@ def counts_to_prob(values: 'tuple[Any, dict[str, int]]'):
   Given the RHS values and their counts for each set of LHS values, computes the
   probability that two records with the same LHS have the same RHS.
   """
-  lhs, rhs_count_dicts = values
-  rhs_counts = rhs_count_dicts.values()
+  lhs_values, rhs_value_counts = values
+  rhs_counts = rhs_value_counts.values() # confusing: gets values from dict, which are the counts in this case
 
   total = sum(rhs_counts)
 
@@ -104,7 +104,7 @@ def dependency_prob(fd: FunctionalDependency):
   return d['weighted_probs'] / d['total']
 
 
-def generate_deps(attributes: 'list[str]') -> 'list[FunctionalDependency]':
+def generate_deps(attributes: 'list[str]'):
   """
   Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
   """
@@ -115,7 +115,7 @@ def generate_deps(attributes: 'list[str]') -> 'list[FunctionalDependency]':
     combinations(attrs, 3)
   )
 
-  deps = []
+  deps: list[FunctionalDependency] = []
   for lhs_attrs in lhs_combos:
     for rhs_attr in attrs:
       if rhs_attr not in lhs_attrs:
@@ -169,7 +169,7 @@ users = users.withColumn('country', get_country_name(users.country_code))
 candidate_deps = generate_deps(users.columns)
 results = []
 for fd in candidate_deps:
-  print(f'Checking FD: {fd}')
+  print(f'Checking FD {fd}')
 
   p = dependency_prob(fd)
 
