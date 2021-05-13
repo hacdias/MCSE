@@ -1,8 +1,8 @@
 # 📦 2AMD15 Big Data Management
 
-*Group #5*
+_Group #5_
 
-**💡 Note:** this initial implementation does not yet handle δ-FDs, and the algorithm is implemented in a slightly different way than the report.
+**💡 Note:** this initial implementation does not yet handle δ-FDs.
 
 ## 📦 Installation
 
@@ -10,9 +10,10 @@
 
 2. Install dependencies with pip:
 
-```bash 
+```bash
 pip install -r requirements.txt
 ```
+
 Tested on Python 3.6.8.
 
 ## ⚙️ Usage
