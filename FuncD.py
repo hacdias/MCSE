@@ -2,7 +2,7 @@
 import csv
 from itertools import chain, combinations
 from operator import add
-from typing import Any
+from typing import Hashable
 
 from iso3166 import countries
 from pyspark.sql import SparkSession
@@ -24,8 +24,12 @@ IGNORED_ATTRIBUTES = {
   'lat'
 }
 
+# Type aliases to give types some semantic meaning 
+DataValue = Hashable # must be hashable because it is used as dict key
+AttrName = str
+
 class FunctionalDependency:
-  def __init__(self, lhs: 'tuple[str, ...]', rhs: str):
+  def __init__(self, lhs: 'tuple[AttrName, ...]', rhs: AttrName):
     self.lhs = lhs
     self.rhs = rhs
 
@@ -33,7 +37,7 @@ class FunctionalDependency:
     return f'({",".join(self.lhs)}) -> {self.rhs}'
 
 
-def attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
+def attrs_to_tuple(lhs_attrs: 'tuple[AttrName, ...]', rhs_attr: AttrName):
   """
   Maps every user's lhs and rhs attributes to a tuple ((lhs, rhs), 1).
   """
@@ -44,12 +48,12 @@ def attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
   return anon
 
 
-def tuple_to_dict(tup: 'tuple[tuple[tuple[Any, ...], Any], int]'):
+def tuple_to_dict(tup: 'tuple[tuple[tuple[DataValue, ...], DataValue], int]'):
   (lhs_values, rhs_value), count = tup
   return (lhs_values, {rhs_value: count})
 
 
-def counts_to_prob(values: 'tuple[Any, dict[str, int]]'):
+def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
   """
   Given the RHS values and their counts for each set of LHS values, computes the
   probability that two records with the same LHS have the same RHS.
@@ -104,7 +108,7 @@ def dependency_prob(fd: FunctionalDependency):
   return d['weighted_probs'] / d['total']
 
 
-def generate_deps(attributes: 'list[str]'):
+def generate_deps(attributes: 'list[AttrName]'):
   """
   Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
   """
