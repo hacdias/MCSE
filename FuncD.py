@@ -16,7 +16,6 @@ from pyspark.sql.types import (DecimalType, IntegerType, StringType,
 FunctionalDependency = Tuple[Tuple[str, ...], str]
 
 # %% Configuration
-
 SOFT_THRESHOLD = 0.9
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
@@ -31,48 +30,7 @@ IGNORED_ATTRIBUTES = {
   'lat'
 }
 
-# %% Create Spark session
-spark = SparkSession.builder.appName("FuncD").getOrCreate()
-
-# %% Read the data from CSV
-
-# This reflects the SQL schema of the `users` table provided at:
-# https://github.com/gousiosg/github-mirror/blob/3d5f4b2ffa5d510455e58b1209c31f4d1b211306/sql/schema.sql
-schema = StructType([
-    StructField("id", IntegerType()),
-    StructField("login", StringType()),
-    StructField("company", StringType()),
-    StructField("created_at", TimestampType()),
-    StructField("type", StringType()),
-    StructField("fake", IntegerType()),
-    StructField("deleted", IntegerType()),
-    StructField("long", DecimalType(11, 8)), # numbers define precision
-    StructField("lat", DecimalType(10, 8)), # numbers define precision
-    StructField("country_code", StringType()),
-    StructField("state", StringType()),
-    StructField("city", StringType()),
-    StructField("location", StringType()),
-])
-users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
-
-# %% Preprocessing
-
-# Remove fake users
-users = users.filter(users.fake == 0)
-
-@udf
-def get_country_name(code: str):
-  if code is None:
-    return None
-  try:
-    return countries.get(code).name # type: ignore
-  except:
-    return None
-
-# Add column "country" with the country name based on the country code.
-users = users.withColumn('country', get_country_name(users.country_code))
-
-# %% Mapping and reducing functions.
+# %% Mapping and reducing functions
 
 def attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
   """
@@ -165,9 +123,52 @@ def generate_deps(attributes: 'list[str]') -> 'list[FunctionalDependency]':
   return deps
 
 
+# %% Create Spark session
+spark = SparkSession.builder.appName("FuncD").getOrCreate()
+
+# %% Read the data from CSV
+
+# This reflects the SQL schema of the `users` table provided at:
+# https://github.com/gousiosg/github-mirror/blob/3d5f4b2ffa5d510455e58b1209c31f4d1b211306/sql/schema.sql
+schema = StructType([
+    StructField("id", IntegerType()),
+    StructField("login", StringType()),
+    StructField("company", StringType()),
+    StructField("created_at", TimestampType()),
+    StructField("type", StringType()),
+    StructField("fake", IntegerType()),
+    StructField("deleted", IntegerType()),
+    StructField("long", DecimalType(11, 8)), # numbers define precision
+    StructField("lat", DecimalType(10, 8)), # numbers define precision
+    StructField("country_code", StringType()),
+    StructField("state", StringType()),
+    StructField("city", StringType()),
+    StructField("location", StringType()),
+])
+users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
+
+# %% Preprocessing
+
+# Remove fake users
+users = users.filter(users.fake == 0)
+
+@udf
+def get_country_name(code: str):
+  if code is None:
+    return None
+  try:
+    return countries.get(code).name # type: ignore
+  except:
+    return None
+
+# Add column "country" with the country name based on the country code.
+users = users.withColumn('country', get_country_name(users.country_code))
+
+# %% Compute FDs
 candidate_deps = generate_deps(users.columns)
 results = []
 
+# %% Check FDs
 for (lhs_attrs, rhs_attr) in candidate_deps:
   print(f'Checking FS: {lhs_attrs} -> {rhs_attr}')
   p = dependency_prob(lhs_attrs, rhs_attr)
@@ -181,9 +182,11 @@ for (lhs_attrs, rhs_attr) in candidate_deps:
   print(f'Probability = {p}, {classification}')
   results.append([lhs_attrs, rhs_attr, p, classification])
 
+# %% Write results
 with open('brute_force_results.csv', mode='w') as file:
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
   wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification'])
   wr.writerows(results)
 
+# %%
 spark.stop()
