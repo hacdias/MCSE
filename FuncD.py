@@ -98,14 +98,14 @@ def dependency_prob(fd: FunctionalDependency):
 
   # Compute weighted average of probabilites
   rdd = rdd.map(lambda d: {
-    'weighted_probs': d['prob'] * d['total'],
+    'weighted_prob': d['prob'] * d['total'],
     'total': d['total']
   })
   d = rdd.reduce(lambda d1, d2: {
-    'weighted_probs': d1['weighted_probs'] + d2['weighted_probs'],
+    'weighted_prob': d1['weighted_prob'] + d2['weighted_prob'],
     'total': d1['total'] + d2['total']
   })
-  return d['weighted_probs'] / d['total']
+  return d['weighted_prob'] / d['total']
 
 
 def generate_deps(attributes: 'list[AttrName]'):
