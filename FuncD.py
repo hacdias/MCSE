@@ -29,6 +29,10 @@ class FunctionalDependency:
     self.lhs = lhs
     self.rhs = rhs
 
+  def __str__(self):
+    return f'({",".join(self.lhs)}) -> {self.rhs}'
+
+
 def attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
   """
   Maps every user's lhs and rhs attributes to a tuple ((lhs, rhs), 1).
@@ -165,7 +169,7 @@ users = users.withColumn('country', get_country_name(users.country_code))
 candidate_deps = generate_deps(users.columns)
 results = []
 for fd in candidate_deps:
-  print(f'Checking FS: {fd.lhs} -> {fd.rhs}')
+  print(f'Checking FD: {fd}')
 
   p = dependency_prob(fd)
 
