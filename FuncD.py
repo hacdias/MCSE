@@ -85,7 +85,6 @@ def attrs_to_tuple(lhs_attrs: 'tuple[str, ...]', rhs_attr: str):
   return anon
 
 
-# TODO: don't like this function name
 def tuple_to_dict(tup: 'tuple[FunctionalDependency, int]') -> 'tuple[Any, dict[str, int]]':
   (lhs, rhs), count = tup
   return (lhs, {rhs: count})
@@ -93,16 +92,16 @@ def tuple_to_dict(tup: 'tuple[FunctionalDependency, int]') -> 'tuple[Any, dict[s
 
 def counts_to_prob(values: 'tuple[Any, dict[str, int]]'):
   """
-  Calculates the probability that two random records with a particular LHS side
-  have the same RHS.
+  Given the RHS values and their counts for each set of LHS values, computes the
+  probability that two records with the same LHS have the same RHS.
   """
   lhs, rhs_count_dicts = values
   rhs_counts = rhs_count_dicts.values()
 
   total = sum(rhs_counts)
 
+  # Avoid divisions by zero
   if total == 1:
-    # Avoid divisions by zero.
     return {
       'prob': 1.0,
       'total': total
@@ -118,21 +117,23 @@ def counts_to_prob(values: 'tuple[Any, dict[str, int]]'):
   }
 
 
-# TODO: update this description
-# TODO: add comments for lambdas where not obvious
-# TODO: FD class?
-# dependency_ratio returns a ratio majority / total, where majority
-# is the number of rows that have the most common right hand side value
-# for all left side values. The total is basically the total number of rows.
-#
-# NOTE: we probably don't need to calculate total as it is the total number
-# of rows.
-def dependency_ratio(lhs_cols: 'tuple[str, ...]', rhs_col: str):
+def dependency_prob(lhs_cols: 'tuple[str, ...]', rhs_col: str):
+  """
+  Computes the probablity that two records with the same values for the LHS
+  attributes have the same RHS value.
+  """
+  # Count RHS values by LHS value
   rdd = users.rdd.map(attrs_to_tuple(lhs_cols, rhs_col))
   rdd = rdd.reduceByKey(add)
   rdd = rdd.map(tuple_to_dict)
+
+  # Merge dictonaries assuming keys are unique
+  # (they are unique because of the `reduceByKey` from before)
   rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2})
+
   rdd = rdd.map(counts_to_prob)
+
+  # Compute weighted average of probabilites
   rdd = rdd.map(lambda d: {
     'weighted_probs': d['prob'] * d['total'],
     'total': d['total']
@@ -169,16 +170,16 @@ results = []
 
 for (lhs_attrs, rhs_attr) in candidate_deps:
   print(f'Checking FS: {lhs_attrs} -> {rhs_attr}')
-  v = dependency_ratio(lhs_attrs, rhs_attr)
+  p = dependency_prob(lhs_attrs, rhs_attr)
 
   classification = 'No FD'
-  if v == 1:
+  if p == 1:
     classification = 'Hard'
-  elif v > SOFT_THRESHOLD:
+  elif p > SOFT_THRESHOLD:
     classification = 'Soft'
 
-  print(f'Probability = {v}, {classification}')
-  results.append([lhs_attrs, rhs_attr, v, classification])
+  print(f'Probability = {p}, {classification}')
+  results.append([lhs_attrs, rhs_attr, p, classification])
 
 with open('brute_force_results.csv', mode='w') as file:
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
