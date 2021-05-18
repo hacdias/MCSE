@@ -1,52 +1,19 @@
 # %%
 import csv
-from itertools import combinations
-from os import replace
+from itertools import chain, combinations
+from operator import add
+from typing import Hashable
 
+from iso3166 import countries
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
-from pyspark.sql.types import DecimalType, IntegerType, StringType, StructField, StructType, TimestampType
-from iso3166 import countries
+from pyspark.sql.types import (DecimalType, IntegerType, StringType,
+                               StructField, StructType, TimestampType)
 
-# %% Configuration
 SOFT_THRESHOLD = 0.9
-USERS_DATA_PATH = "data/users.csv"
-# USERS_DATA_PATH = "data/subset_users.csv"
-
-# %%
-spark = SparkSession.builder.appName("FuncD").getOrCreate()
-
-# %%
-# This reflects the SQL schema of the `users` table provided at:
-# https://github.com/gousiosg/github-mirror/blob/3d5f4b2ffa5d510455e58b1209c31f4d1b211306/sql/schema.sql
-schema = StructType([
-    StructField("id", IntegerType()),
-    StructField("login", StringType()),
-    StructField("company", StringType()),
-    StructField("created_at", TimestampType()),
-    StructField("type", StringType()),
-    StructField("fake", IntegerType()),
-    StructField("deleted", IntegerType()),
-    StructField("long", DecimalType(11, 8)), # numbers define precision
-    StructField("lat", DecimalType(10, 8)), # numbers define precision
-    StructField("country_code", StringType()),
-    StructField("state", StringType()),
-    StructField("city", StringType()),
-    StructField("location", StringType()),
-])
-users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
-
-# %% Preprocessing
-
-# 1. Remove fake users
-users = users.filter(users.fake == 0)
-
-# 2. Impute column "country" with the country name based on the country_code.
-country_imputer = udf(lambda code: countries.get(code).name if code != None else code, StringType())
-users = users.withColumn('country', country_imputer(users.country_code))
-
-# %% Configuration.
-ignored_fields = (
+# USERS_DATA_PATH = "data/users.csv"
+USERS_DATA_PATH = "data/subset_users.csv"
+IGNORED_ATTRIBUTES = {
   'id',
   'login',
   'created_at',
@@ -55,140 +22,175 @@ ignored_fields = (
   'type',
   'long',
   'lat'
-)
+}
 
-# %% Mapping and reducing functions.
+# Type aliases to give types some semantic meaning 
+DataValue = Hashable # must be hashable because it is used as dict key
+AttrName = str
 
-# map_cols_to_tuple maps every user's lhs and rhs columns
-# to a tuple (lhs, { rhs: 1 }).
-def map_cols_to_tuple(lhs_cols, rhs_cols):
+class FunctionalDependency:
+  def __init__(self, lhs: 'tuple[AttrName, ...]', rhs: AttrName):
+    self.lhs = lhs
+    self.rhs = rhs
+
+  def __str__(self):
+    return f'({",".join(self.lhs)}) -> {self.rhs}'
+
+
+def attrs_to_tuple(lhs_attrs: 'tuple[AttrName, ...]', rhs_attr: AttrName):
+  """
+  Maps every user's lhs and rhs attributes to a tuple ((lhs, rhs), 1).
+  """
   def anon(user):
-    lhs_values = tuple(str(user[col]) for col in lhs_cols)
-    rhs_values = tuple(str(user[col]) for col in rhs_cols)
-    return (lhs_values, {rhs_values: 1})
+    lhs_values = tuple(str(user[attr]) for attr in lhs_attrs)
+    rhs_value = str(user[rhs_attr])
+    return ((lhs_values, rhs_value), 1)
   return anon
 
-# merge_columns merges dictionary b into a, where a and b
-# are of type { col_name: count, ... }, summing the counts
-# for the same keys.
-def merge_columns(a, b):
-  for rhs_values in a.keys():
-    if rhs_values not in b:
-      b[rhs_values] = 0
-    b[rhs_values] += a[rhs_values]
 
-  return b
+def tuple_to_dict(tup: 'tuple[tuple[tuple[DataValue, ...], DataValue], int]'):
+  (lhs_values, rhs_value), count = tup
+  return (lhs_values, {rhs_value: count})
 
-# calculate_probabilities calculates the probability
-# of two random columns with the same left hand side having
-# the same right hand side. 
-def calculate_probabilities(values):
-  rhs_values_frequencies = values[1]
-  rhs_frequencies = rhs_values_frequencies.values()
 
-  total = sum(rhs_frequencies)
-  prob = 0
+def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
+  """
+  Given the RHS values and their counts for each set of LHS values, computes the
+  probability that two records with the same LHS have the same RHS.
+  """
+  lhs_values, rhs_value_counts = values
+  rhs_counts = rhs_value_counts.values() # confusing: gets values from dict, which are the counts in this case
 
+  total = sum(rhs_counts)
+
+  # Avoid divisions by zero
   if total == 1:
-    # Avoid divisions by zero.
     return {
-      'probabilities': [(1.0, 1)],
+      'prob': 1.0,
       'total': total
     }
 
-  for freq in rhs_frequencies:
-    prob += (freq / total) * ((freq - 1) / (total - 1))
+  prob = 0.0
+  for count in rhs_counts:
+    prob += (count / total) * ((count - 1) / (total - 1))
 
   return {
-    'probabilities': [(prob, total)],
+    'prob': prob,
     'total': total
   }
 
-# reduce_probabilities reduces all probabilities into a single
-# list and also stores the total.
-def reduce_probabilities(a, b):
-  return {
-    'probabilities': [*a['probabilities'], *b['probabilities']],
-    'total': a['total'] + b['total']
-  }
 
-def calculate_probability(reduction):
-  total = reduction['total']
-  probs = reduction['probabilities']
+def dependency_prob(fd: FunctionalDependency):
+  """
+  Computes the probablity that two records with the same values for the LHS
+  attributes have the same RHS value.
+  """
+  # Count RHS values by LHS value
+  rdd = users.rdd.map(attrs_to_tuple(fd.lhs, fd.rhs))
+  rdd = rdd.reduceByKey(add)
+  rdd = rdd.map(tuple_to_dict)
 
-  # Hard FDs: the sum of all probabilities is the same as
-  # the number of different elements because they're all 1.
-  # We do this to avoid floating point imprecisions.
-  if sum([p[0] for p in probs]) == len(probs):
-    return 1.0
+  # Merge dictonaries assuming keys are unique
+  # (they are unique because of the `reduceByKey` from before)
+  rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2})
 
-  weighted_prob = 0
-  for (p, freq) in probs:
-    weighted_prob += p * (freq/total)
+  rdd = rdd.map(counts_to_prob)
 
-  return weighted_prob
+  # Compute weighted average of probabilites
+  rdd = rdd.map(lambda d: {
+    'weighted_prob': d['prob'] * d['total'],
+    'total': d['total']
+  })
+  d = rdd.reduce(lambda d1, d2: {
+    'weighted_prob': d1['weighted_prob'] + d2['weighted_prob'],
+    'total': d1['total'] + d2['total']
+  })
+  return d['weighted_prob'] / d['total']
 
-# dependency_ratio returns a ratio majority / total, where majority
-# is the number of rows that have the most common right hand side value
-# for all left side values. The total is basically the total number of rows.
-#
-# NOTE: we probably don't need to calculate total as it is the total number
-# of rows.
-def dependency_ratio(lhs_cols, rhs_cols):
-  dt = users.rdd.map(map_cols_to_tuple(lhs_cols, rhs_cols))
-  dt = dt.reduceByKey(merge_columns)
-  dt = dt.map(calculate_probabilities)
-  re = dt.reduce(reduce_probabilities)
-  prob = calculate_probability(re)
-  return prob
 
-# Generates A -> B rules, where A has up to 3 columns and B one from the
-# columns.
-def generate_combos(columns):
-  lhs_combos = [
-    *list(combinations(columns, 1)),
-    *list(combinations(columns, 2)),
-    *list(combinations(columns, 3)),
-  ]
+def generate_deps(attributes: 'list[AttrName]'):
+  """
+  Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
+  """
+  attrs = set(attributes) - IGNORED_ATTRIBUTES
+  lhs_combos = chain(
+    combinations(attrs, 1),
+    combinations(attrs, 2),
+    combinations(attrs, 3)
+  )
 
-  combos = []
+  deps: list[FunctionalDependency] = []
+  for lhs_attrs in lhs_combos:
+    for rhs_attr in attrs:
+      if rhs_attr not in lhs_attrs:
+        deps.append(FunctionalDependency(lhs_attrs, rhs_attr))
 
-  for lhs_cols in lhs_combos:
-    for col in columns:
-      if col not in lhs_cols:
-        combos.append((lhs_cols, (col,)))
+  return deps
 
-  return combos
 
-# Filter by ignored_fields.
-def filter_ignored(relation):
-  for field in ignored_fields:
-    if field in relation[0] or field in relation[1]:
-      return False
-  return True
+# %% Create Spark session
+spark = SparkSession.builder.appName("FuncD").getOrCreate()
 
-to_check = generate_combos(users.columns)
-to_check = filter(filter_ignored, to_check)
-to_check = list(to_check)
+# %% Read the data from CSV
 
+# This reflects the SQL schema of the `users` table provided at:
+# https://github.com/gousiosg/github-mirror/blob/3d5f4b2ffa5d510455e58b1209c31f4d1b211306/sql/schema.sql
+schema = StructType([
+  StructField("id", IntegerType()),
+  StructField("login", StringType()),
+  StructField("company", StringType()),
+  StructField("created_at", TimestampType()),
+  StructField("type", StringType()),
+  StructField("fake", IntegerType()),
+  StructField("deleted", IntegerType()),
+  StructField("long", DecimalType(11, 8)), # numbers define precision
+  StructField("lat", DecimalType(10, 8)), # numbers define precision
+  StructField("country_code", StringType()),
+  StructField("state", StringType()),
+  StructField("city", StringType()),
+  StructField("location", StringType()),
+])
+users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
+
+# %% Preprocessing
+
+# Remove fake users
+users = users.filter(users.fake == 0)
+
+@udf
+def get_country_name(code: str):
+  if code is None:
+    return None
+  try:
+    return countries.get(code).name # type: ignore
+  except:
+    return None
+
+# Add column "country" with the country name based on the country code.
+users = users.withColumn('country', get_country_name(users.country_code))
+
+# %% Check FDs
+candidate_deps = generate_deps(users.columns)
 results = []
+for fd in candidate_deps:
+  print(f'Checking FD {fd}')
 
-for (lhs_cols, rhs_cols) in to_check:
-  print(f'Checking FS: {lhs_cols} -> {rhs_cols}')
-  v = dependency_ratio(lhs_cols, rhs_cols)
+  p = dependency_prob(fd)
 
   classification = 'No FD'
-  if v == 1:
+  if p == 1:
     classification = 'Hard'
-  elif v > SOFT_THRESHOLD:
+  elif p > SOFT_THRESHOLD:
     classification = 'Soft'
 
-  print(f'Probability = {v}, {classification}')
-  results.append([lhs_cols, rhs_cols, v, classification])
+  print(f'Probability = {p}, {classification}')
+  results.append([fd.lhs, fd.rhs, p, classification])
 
+# %% Write results
 with open('brute_force_results.csv', mode='w') as file:
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
   wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification'])
   wr.writerows(results)
 
+# %%
 spark.stop()
