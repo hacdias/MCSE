@@ -37,6 +37,15 @@ class FunctionalDependency:
     return f'({",".join(self.lhs)}) -> {self.rhs}'
 
 
+def difference(a, b) -> 'int | float':
+  if type(a) != type(b):
+    raise TypeError(f'Arguments to be compared must be of the same type. Got types: {type(a)} and {type(b)}.')
+  if isinstance(a, int) or isinstance(a, float):
+    return abs(a - b)
+  else:
+    raise NotImplementedError(f'Comparison of values of type {type(a)} not implemented.')
+
+
 def attrs_to_tuple(lhs_attrs: 'tuple[AttrName, ...]', rhs_attr: AttrName):
   """
   Maps every user's lhs and rhs attributes to a tuple ((lhs, rhs), 1).
