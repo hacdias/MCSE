@@ -42,7 +42,11 @@ class FunctionalDependency:
     return f'({",".join(self.lhs)}) -> {self.rhs}'
 
 
-def difference(a, b):
+def difference(a, b) -> 'int | float':
+  """
+  Computes the absolute difference between two values.
+  Different metrics are used depending on the types of values (see implementation).
+  """
   if type(a) is not type(b):
     raise TypeError(f'Arguments to be compared must be of the same type. Got types: {type(a)} and {type(b)}.')
   if type(a) is int or type(a) is float:
@@ -52,7 +56,7 @@ def difference(a, b):
   if type(a) is str:
     return damerau.distance(a, b)
   else:
-    raise NotImplementedError(f'Comparison of values of type {type(a)} not implemented.')
+    raise NotImplementedError(f'Comparison of arguments of type {type(a)} not implemented.')
 
 
 def attrs_to_tuple(lhs_attrs: 'tuple[AttrName, ...]', rhs_attr: AttrName):
