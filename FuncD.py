@@ -1,5 +1,6 @@
 # %%
 import csv
+import datetime
 from itertools import chain, combinations
 from operator import add
 from typing import Hashable
@@ -37,11 +38,13 @@ class FunctionalDependency:
     return f'({",".join(self.lhs)}) -> {self.rhs}'
 
 
-def difference(a, b) -> 'int | float':
-  if type(a) != type(b):
+def difference(a, b):
+  if type(a) is not type(b):
     raise TypeError(f'Arguments to be compared must be of the same type. Got types: {type(a)} and {type(b)}.')
-  if isinstance(a, int) or isinstance(a, float):
+  if type(a) is int or type(a) is float:
     return abs(a - b)
+  if type(a) is datetime.datetime:
+    return abs((a - b).total_seconds())
   else:
     raise NotImplementedError(f'Comparison of values of type {type(a)} not implemented.')
 
