@@ -13,6 +13,8 @@ from pyspark.sql.types import (DecimalType, IntegerType, StringType,
 SOFT_THRESHOLD = 0.9
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
+TEST_DATA_PATH = "data/test_data.csv"
+
 IGNORED_ATTRIBUTES = {
   'id',
   'login',
