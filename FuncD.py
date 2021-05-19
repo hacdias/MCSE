@@ -10,6 +10,10 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
+from strsimpy.damerau import Damerau
+
+damerau = Damerau()
+
 
 SOFT_THRESHOLD = 0.9
 # USERS_DATA_PATH = "data/users.csv"
@@ -45,6 +49,8 @@ def difference(a, b):
     return abs(a - b)
   if type(a) is datetime.datetime:
     return abs((a - b).total_seconds())
+  if type(a) is str:
+    return damerau.distance(a, b)
   else:
     raise NotImplementedError(f'Comparison of values of type {type(a)} not implemented.')
 
