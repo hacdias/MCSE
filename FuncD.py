@@ -44,7 +44,7 @@ class FunctionalDependency:
     self.lhs = lhs
     self.rhs = rhs
     self.probability = 0.0
-    self.classification = Classification.NO_FD
+    self.classification = None
 
   def __str__(self):
     return f'({",".join(self.lhs)}) -> {self.rhs}'
