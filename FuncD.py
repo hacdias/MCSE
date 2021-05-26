@@ -1,5 +1,6 @@
 # %%
 import csv
+from enum import Enum
 from itertools import chain, combinations
 from operator import add
 from typing import Hashable
@@ -26,14 +27,24 @@ IGNORED_ATTRIBUTES = {
   'lat'
 }
 
-# Type aliases to give types some semantic meaning 
+# Type aliases to give types some semantic meaning
 DataValue = Hashable # must be hashable because it is used as dict key
 AttrName = str
+
+class Classification(Enum):
+  NO_FD = 'No FD'
+  HARD = 'Hard'
+  SOFT = 'Soft'
+
+  def __str__(self):
+    return str(self.value)
 
 class FunctionalDependency:
   def __init__(self, lhs: 'tuple[AttrName, ...]', rhs: AttrName):
     self.lhs = lhs
     self.rhs = rhs
+    self.probability = 0.0
+    self.classification = Classification.NO_FD
 
   def __str__(self):
     return f'({",".join(self.lhs)}) -> {self.rhs}'
@@ -84,7 +95,7 @@ def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
 
 def dependency_prob(fd: FunctionalDependency):
   """
-  Computes the probablity that two records with the same values for the LHS
+  Computes the probability that two records with the same values for the LHS
   attributes have the same RHS value.
   """
   # Count RHS values by LHS value
@@ -92,7 +103,7 @@ def dependency_prob(fd: FunctionalDependency):
   rdd = rdd.reduceByKey(add)
   rdd = rdd.map(tuple_to_dict)
 
-  # Merge dictonaries assuming keys are unique
+  # Merge dictionaries assuming keys are unique
   # (they are unique because of the `reduceByKey` from before)
   rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2})
 
@@ -128,6 +139,28 @@ def generate_deps(attributes: 'list[AttrName]'):
         deps.append(FunctionalDependency(lhs_attrs, rhs_attr))
 
   return deps
+
+
+def purge_non_minimal_deps(candidate_deps: 'list[FunctionalDependency]', fd: 'FunctionalDependency'):
+  """
+  Given a list of candidate dependencies, purge all non-minimal dependencies
+  regarding given fd.
+  """
+  if fd.classification != Classification.HARD and fd.classification != Classification.SOFT:
+    # If fd is not a hard or soft dependency, then we cannot proceed.
+    return candidate_deps, []
+
+  minimal_deps = []
+  purged_deps = []
+
+  for cfd in candidate_deps:
+    is_minimal = not (set(fd.lhs).issubset(set(cfd.lhs)) and fd.rhs == cfd.rhs)
+    if is_minimal:
+      minimal_deps.append(cfd)
+    else:
+      purged_deps.append(cfd)
+
+  return minimal_deps, purged_deps
 
 
 # %% Create Spark session
@@ -173,23 +206,38 @@ users = users.withColumn('country', get_country_name(users.country_code))
 
 # %% Check FDs
 candidate_deps = generate_deps(users.columns)
-results = []
-for fd in candidate_deps:
+discovered_deps = []
+
+while len(candidate_deps) > 0:
+  fd = candidate_deps.pop(0)
   print(f'Checking FD {fd}')
 
   p = dependency_prob(fd)
 
-  classification = 'No FD'
+  classification = Classification.NO_FD
   if p == 1:
-    classification = 'Hard'
+    classification = Classification.HARD
   elif p > SOFT_THRESHOLD:
-    classification = 'Soft'
+    classification = Classification.SOFT
 
   print(f'Probability = {p}, {classification}')
-  results.append([fd.lhs, fd.rhs, p, classification])
+
+  fd.probability = p
+  fd.classification = classification
+  discovered_deps.append(fd)
+
+  # We purge as we go because candidate_deps is sorted from the smallest to the
+  # largest candidate FDs. Thus, the first time we see a soft or hard FD it is
+  # already minimal.
+  candidate_deps, purged = purge_non_minimal_deps(candidate_deps, fd)
+  if len(purged) > 0:
+    print('\tPurged FDs:')
+    for fd in purged:
+      print(f'\t\t{fd}')
 
 # %% Write results
 with open('brute_force_results.csv', mode='w') as file:
+  results = [[fd.lhs, fd.rhs, fd.probability, fd.classification] for fd in discovered_deps]
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
   wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification'])
   wr.writerows(results)
