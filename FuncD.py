@@ -1,11 +1,12 @@
 # %%
 import csv
+import sys
 from enum import Enum
 from itertools import chain, combinations
 from operator import add
 from typing import Hashable
 
-from iso3166 import countries
+from pyspark import SparkFiles
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
@@ -165,6 +166,12 @@ def purge_non_minimal_deps(candidate_deps: 'list[FunctionalDependency]', fd: 'Fu
 
 # %% Create Spark session
 spark = SparkSession.builder.appName("FuncD").getOrCreate()
+
+# Add to Spark the third party modules we need.
+spark.sparkContext.addFile("iso3166.py")
+sys.path.insert(0,SparkFiles.getRootDirectory())
+
+from iso3166 import countries
 
 # %% Read the data from CSV
 
