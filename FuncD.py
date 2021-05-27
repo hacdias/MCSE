@@ -3,21 +3,27 @@ import csv
 import datetime
 import sys
 from enum import Enum
-from itertools import chain, combinations
+from itertools import chain, combinations, product
 from operator import add
 from typing import Hashable
 
 from pyspark import SparkFiles
+from pyspark.rdd import RDD
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
 from strsimpy.damerau import Damerau
 
-damerau = Damerau()
+damerau = Damerau() # distance
 
 
 SOFT_THRESHOLD = 0.9
+
+DELTA_NUM = 100 # random
+DELTA_DATE = 86400 # seconds in 24 hours
+DELTA_STR = 10.0 # random
+
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
 TEST_DATA_PATH = "data/test_data.csv"
@@ -51,24 +57,25 @@ class FunctionalDependency:
     self.rhs = rhs
     self.probability = 0.0
     self.classification: 'Classification | None' = None
+    self.delta = False
 
   def __str__(self):
     return f'({",".join(self.lhs)}) -> {self.rhs}'
 
 
-def difference(a, b) -> 'int | float':
+def isDifferenceMoreThanDelta(a, b) -> 'bool':
   """
-  Computes the absolute difference between two values.
+  Returns True if the absolute difference between two values is more than delta, False otherwise
   Different metrics are used depending on the types of values (see implementation).
   """
   if type(a) is not type(b):
     raise TypeError(f'Arguments to be compared must be of the same type. Got types: {type(a)} and {type(b)}.')
   if type(a) is int or type(a) is float:
-    return abs(a - b)
+    return abs(a - b) > DELTA_NUM
   if type(a) is datetime.datetime:
-    return abs((a - b).total_seconds())
+    return abs((a - b).total_seconds()) > DELTA_DATE
   if type(a) is str:
-    return damerau.distance(a, b)
+    return damerau.distance(a, b) > DELTA_STR
   else:
     raise NotImplementedError(f'Comparison of arguments of type {type(a)} not implemented.')
 
@@ -94,7 +101,7 @@ def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
   Given the RHS values and their counts for each set of LHS values, computes the
   probability that two records with the same LHS have the same RHS.
   """
-  lhs_values, rhs_value_counts = values
+  _, rhs_value_counts = values
   rhs_counts = rhs_value_counts.values() # confusing: gets values from dict, which are the counts in this case
 
   total = sum(rhs_counts)
@@ -116,33 +123,50 @@ def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
   }
 
 
-def dependency_prob(fd: FunctionalDependency):
-  """
-  Computes the probability that two records with the same values for the LHS
-  attributes have the same RHS value.
-  """
-  # Count RHS values by LHS value
-  rdd = users.rdd.map(attrs_to_tuple(fd.lhs, fd.rhs))
-  rdd = rdd.reduceByKey(add)
-  rdd = rdd.map(tuple_to_dict)
+def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]'):
+  _, rhs_value_counts = values
+  answer = True
+  all_b = rhs_value_counts.keys()
+  for pair in product(all_b, repeat=2):
+    if isDifferenceMoreThanDelta(*pair):
+      answer = False
+      break
+  return answer
 
-  # Merge dictionaries assuming keys are unique
-  # (they are unique because of the `reduceByKey` from before)
-  rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2})
+def common_part(fd: FunctionalDependency):
+  # Count RHS values by LHS value 
+  rdd = users.rdd.map(attrs_to_tuple(fd.lhs, fd.rhs)) # 1 in the report
+  rdd = rdd.reduceByKey(add) # 2 in the report
+  # rdd = rdd.reduceByKey(lambda x, y: x+y) # 2 in the report
+  rdd = rdd.map(tuple_to_dict) # 3 in the report
+ 
+  # Merge dictionaries assuming keys are unique 
+  # (they are unique because of the `reduceByKey` from before) 
+  rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2}) # 4 in the report
+  return rdd
 
-  rdd = rdd.map(counts_to_prob)
+def hard_soft_part(rdd: RDD):
+  rdd = rdd.map(counts_to_prob) # 5 in the report
 
   # Compute weighted average of probabilites
+  # 6 in the report
   rdd = rdd.map(lambda d: {
     'weighted_prob': d['prob'] * d['total'],
     'total': d['total']
   })
+  # 7 in the report
   d = rdd.reduce(lambda d1, d2: {
     'weighted_prob': d1['weighted_prob'] + d2['weighted_prob'],
     'total': d1['total'] + d2['total']
   })
+  # 8 in the report
   return d['weighted_prob'] / d['total']
 
+
+def delta_part(rdd: RDD):
+  rdd = rdd.map(map_to_boolean_by_distance) # 5 in the report
+  rdd = rdd.reduce(lambda x1, x2: x1 and x2) # 6 in the report
+  return rdd
 
 def generate_deps(attributes: 'list[AttrName]'):
   """
@@ -236,23 +260,31 @@ users = users.withColumn('country', get_country_name(users.country_code))
 # %% Check FDs
 candidate_deps = generate_deps(users.columns)
 discovered_deps = []
+isDelta = False
+count = 0
 
 while len(candidate_deps) > 0:
+  count += 1
   fd = candidate_deps.pop(0)
-  print(f'Checking FD {fd}')
+  print("="*100,f'\n{count}\nChecking FD {fd}')
 
-  p = dependency_prob(fd)
+  both = common_part(fd)
+  p = hard_soft_part(both)
 
   classification = Classification.NO_FD
   if p == 1:
     classification = Classification.HARD
-  elif p > SOFT_THRESHOLD:
-    classification = Classification.SOFT
+    isDelta = True
+  else:
+    if p > SOFT_THRESHOLD:
+      classification = Classification.SOFT
+    isDelta = delta_part(both)
 
   print(f'Probability = {p}, {classification}')
 
   fd.probability = p
   fd.classification = classification
+  fd.delta = isDelta
   discovered_deps.append(fd)
 
   # We purge as we go because candidate_deps is sorted from the smallest to the
@@ -264,11 +296,14 @@ while len(candidate_deps) > 0:
     for fd in purged:
       print(f'\t\t{fd}')
 
+  print("Delta-FD is found") if isDelta else print("No Delta-FD")
+
 # %% Write results
-with open('brute_force_results.csv', mode='w') as file:
-  results = [[fd.lhs, fd.rhs, fd.probability, fd.classification] for fd in discovered_deps]
+file_name = f"results for {SOFT_THRESHOLD}, {DELTA_NUM}, {DELTA_DATE}, {DELTA_STR}.csv"
+with open(file_name, mode='w') as file:
+  results = [[fd.lhs, fd.rhs, fd.probability, fd.classification, fd.delta] for fd in discovered_deps]
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
-  wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification'])
+  wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification', 'Delta'])
   wr.writerows(results)
 
 # %%
