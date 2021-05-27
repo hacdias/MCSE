@@ -50,7 +50,7 @@ class FunctionalDependency:
     self.lhs = lhs
     self.rhs = rhs
     self.probability = 0.0
-    self.classification = None
+    self.classification: 'Classification | None' = None
 
   def __str__(self):
     return f'({",".join(self.lhs)}) -> {self.rhs}'
@@ -191,7 +191,7 @@ spark = SparkSession.builder.appName("FuncD").getOrCreate()
 
 # Add to Spark the third party modules we need.
 spark.sparkContext.addFile("iso3166.py")
-sys.path.insert(0, SparkFiles.getRootDirectory())
+sys.path.insert(0, SparkFiles.getRootDirectory()) # type: ignore
 
 from iso3166 import countries
 
