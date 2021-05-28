@@ -14,15 +14,16 @@ from pyspark.sql.functions import udf
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
 from strsimpy.damerau import Damerau
+from timeit import default_timer as timer
 
 damerau = Damerau() # distance
 
 
 SOFT_THRESHOLD = 0.9
 
-DELTA_NUM = 100 # random
-DELTA_DATE = 86400 # seconds in 24 hours
-DELTA_STR = 10.0 # random
+DELTA_NUM = 1000000 # random
+DELTA_DATE = 86400*365 # seconds in 24 hours
+DELTA_STR = 100.0 # random
 
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
@@ -44,7 +45,7 @@ DataValue = Hashable # must be hashable because it is used as dict key
 AttrName = str
 
 class Classification(Enum):
-  NO_FD = 'No FD'
+  NO_FD = 'No Hard/Soft FD'
   HARD = 'Hard'
   SOFT = 'Soft'
 
@@ -126,11 +127,32 @@ def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
 def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]'):
   _, rhs_value_counts = values
   answer = True
+
+  # if set(map(type, rhs_value_counts)) != {str}: # if type of keys in the dictionary is not str
+  #   if isDifferenceMoreThanDelta(min(rhs_value_counts), max(rhs_value_counts)): 
+  #     answer = False
+  # else:
+  #   all_b = rhs_value_counts.keys()
+  #   for pair in product(all_b, repeat=2): # this is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
+  #     if isDifferenceMoreThanDelta(*pair):
+  #       answer = False
+  #       break
+
   all_b = rhs_value_counts.keys()
+
+  # max = list(all_b)[0]
+  # min = list(all_b)[0]
+  # for b in all_b:
+  #   if b > max: max = b
+  #   if b < min: min = b
+
+  # if isDifferenceMoreThanDelta(min, max): answer = False
+
   for pair in product(all_b, repeat=2):
     if isDifferenceMoreThanDelta(*pair):
       answer = False
       break
+
   return answer
 
 def common_part(fd: FunctionalDependency):
@@ -212,6 +234,8 @@ def purge_non_minimal_deps(candidate_deps: 'list[FunctionalDependency]', fd: 'Fu
 
 # %% Create Spark session
 spark = SparkSession.builder.appName("FuncD").getOrCreate()
+
+t = timer()
 
 # Add to Spark the third party modules we need.
 spark.sparkContext.addFile("iso3166.py")
@@ -305,6 +329,9 @@ with open(file_name, mode='w') as file:
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
   wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification', 'Delta'])
   wr.writerows(results)
+
+t1 = timer() - t
+print("Elapsed time: {:.2f}".format(t1), "sec")
 
 # %%
 spark.stop()
