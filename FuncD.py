@@ -22,7 +22,7 @@ damerau = Damerau() # distance
 SOFT_THRESHOLD = 0.9
 
 DELTA_NUM = 1000000 # random
-DELTA_DATE = 86400*365 # seconds in 24 hours
+DELTA_DATE = 86400*365 # seconds in 24 hours * 365days
 DELTA_STR = 100.0 # random
 
 # USERS_DATA_PATH = "data/users.csv"
@@ -128,30 +128,21 @@ def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]')
   _, rhs_value_counts = values
   answer = True
 
-  # if set(map(type, rhs_value_counts)) != {str}: # if type of keys in the dictionary is not str
-  #   if isDifferenceMoreThanDelta(min(rhs_value_counts), max(rhs_value_counts)): 
-  #     answer = False
-  # else:
-  #   all_b = rhs_value_counts.keys()
-  #   for pair in product(all_b, repeat=2): # this is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
-  #     if isDifferenceMoreThanDelta(*pair):
-  #       answer = False
-  #       break
-
-  all_b = rhs_value_counts.keys()
-
-  # max = list(all_b)[0]
-  # min = list(all_b)[0]
-  # for b in all_b:
-  #   if b > max: max = b
-  #   if b < min: min = b
-
-  # if isDifferenceMoreThanDelta(min, max): answer = False
-
-  for pair in product(all_b, repeat=2):
-    if isDifferenceMoreThanDelta(*pair):
+  if set(map(type, rhs_value_counts)) != {str}: # if type of keys in the dictionary is not str
+    if isDifferenceMoreThanDelta(min(rhs_value_counts), max(rhs_value_counts)): 
       answer = False
-      break
+  else:
+    all_b = rhs_value_counts.keys()
+    for pair in product(all_b, repeat=2): # this is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
+      if isDifferenceMoreThanDelta(*pair):
+        answer = False
+        break
+
+  # all_b = rhs_value_counts.keys()
+  # for pair in product(all_b, repeat=2):
+  #   if isDifferenceMoreThanDelta(*pair):
+  #     answer = False
+  #     break
 
   return answer
 
