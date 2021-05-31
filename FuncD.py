@@ -57,7 +57,7 @@ class FunctionalDependency:
     self.rhs = rhs
     self.probability = 0.0
     self.classification: 'Classification | None' = None
-    self.delta = False
+    self.is_delta = False
 
   def __str__(self):
     return f'({",".join(self.lhs)}) -> {self.rhs}'
@@ -168,10 +168,9 @@ def hard_soft_part(rdd: RDD):
   return d['weighted_prob'] / d['total']
 
 
-def delta_part(rdd: RDD):
+def delta_part(rdd: RDD) -> bool:
   rdd = rdd.map(map_to_boolean_by_distance) # 5 in the report
-  rdd = rdd.reduce(lambda x1, x2: x1 and x2) # 6 in the report
-  return rdd
+  return rdd.reduce(lambda x1, x2: x1 and x2) # 6 in the report
 
 def generate_deps(attributes: 'list[AttrName]'):
   """
@@ -267,31 +266,28 @@ users = users.withColumn('country', get_country_name(users.country_code))
 # %% Check FDs
 candidate_deps = generate_deps(users.columns)
 discovered_deps = []
-isDelta = False
 count = 0
 
 while len(candidate_deps) > 0:
   count += 1
   fd = candidate_deps.pop(0)
-  print("="*100,f'\n{count}\nChecking FD {fd}')
+  print("=" * 80)
+  print(f'Checking FD ({count}/{len(candidate_deps)}): {fd}')
 
-  both = common_part(fd)
-  p = hard_soft_part(both)
+  common_result = common_part(fd)
+  fd.probability = hard_soft_part(common_result)
 
-  classification = Classification.NO_FD
-  if p == 1:
-    classification = Classification.HARD
-    isDelta = True
+  fd.classification = Classification.NO_FD
+  if fd.probability == 1:
+    fd.classification = Classification.HARD
+    fd.is_delta = True
   else:
-    if p > SOFT_THRESHOLD:
-      classification = Classification.SOFT
-    isDelta = delta_part(both)
+    if fd.probability > SOFT_THRESHOLD:
+      fd.classification = Classification.SOFT
+    fd.is_delta = delta_part(common_result)
 
-  print(f'Probability = {p}, {classification}')
-
-  fd.probability = p
-  fd.classification = classification
-  fd.delta = isDelta
+  print(f'Probability = {fd.probability}, {fd.classification}')
+  print("Delta-FD is found") if fd.is_delta else print("No Delta-FD")
   discovered_deps.append(fd)
 
   # We purge as we go because candidate_deps is sorted from the smallest to the
@@ -299,11 +295,9 @@ while len(candidate_deps) > 0:
   # already minimal.
   candidate_deps, purged = purge_non_minimal_deps(candidate_deps, fd)
   if len(purged) > 0:
-    print('\tPurged FDs:')
+    print(f'\tPurged {len(purged)} FDs:')
     for fd in purged:
       print(f'\t\t{fd}')
-
-  print("Delta-FD is found") if isDelta else print("No Delta-FD")
 
 # %% Write results
 file_name = f"results for {SOFT_THRESHOLD}, {DELTA_NUM}, {DELTA_DATE}, {DELTA_STR}.csv"
@@ -314,7 +308,7 @@ with open(file_name, mode='w') as file:
   wr.writerows(results)
 
 t1 = timer() - t
-print("Elapsed time: {:.2f}".format(t1), "sec")
+print(f'Elapsed time: {t1:.2f} sec')
 
 # %%
 spark.stop()
