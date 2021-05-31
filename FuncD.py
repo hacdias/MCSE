@@ -128,7 +128,9 @@ def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]')
   _, rhs_value_counts = values
   answer = True
 
-  if set(map(type, rhs_value_counts)) != {str}: # if type of keys in the dictionary is not str
+  if {type(value) for value in rhs_value_counts} <= {int, float, datetime.datetime}:
+    # For these types, we only need to compare the min and max because the difference
+    # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
     if isDifferenceMoreThanDelta(min(rhs_value_counts), max(rhs_value_counts)): 
       answer = False
   else:
