@@ -133,7 +133,7 @@ def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]')
       answer = False
   else:
     all_b = rhs_value_counts.keys()
-    for pair in product(all_b, repeat=2): # this is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
+    for pair in combinations(all_b, 2): # this is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
       if isDifferenceMoreThanDelta(*pair):
         answer = False
         break
