@@ -125,20 +125,19 @@ def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
 
 def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]'):
   _, rhs_value_counts = values
-  answer = True
-
-  if {type(value) for value in rhs_value_counts} <= {int, float, datetime.datetime}:
+  rhs_values = rhs_value_counts.keys()
+  
+  if {type(value) for value in rhs_values} <= {int, float, datetime.datetime}:
     # For these types, we only need to compare the min and max because the difference
     # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
-    if isDifferenceMoreThanDelta(min(rhs_value_counts), max(rhs_value_counts)): 
-      answer = False
+    return not isDifferenceMoreThanDelta(min(rhs_values), max(rhs_values))  # type: ignore
   else:
-    all_b = rhs_value_counts.keys()
-    for pair in combinations(all_b, 2): # this is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
+    # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
+    for pair in combinations(rhs_values, 2):
       if isDifferenceMoreThanDelta(*pair):
-        answer = False
-        break
-  return answer
+        return False
+
+  return True
 
 def common_part(fd: FunctionalDependency):
   # Count RHS values by LHS value 
