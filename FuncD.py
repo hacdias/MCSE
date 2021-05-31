@@ -3,7 +3,7 @@ import csv
 import datetime
 import sys
 from enum import Enum
-from itertools import chain, combinations, product
+from itertools import chain, combinations
 from operator import add
 from typing import Hashable
 
@@ -18,12 +18,11 @@ from timeit import default_timer as timer
 
 damerau = Damerau() # distance
 
-
 SOFT_THRESHOLD = 0.9
 
-DELTA_NUM = 1000000 # random
+DELTA_NUM = 1000 # random
 DELTA_DATE = 86400*365 # seconds in 24 hours * 365days
-DELTA_STR = 100.0 # random
+DELTA_STR = 10.0 # random
 
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
@@ -139,20 +138,12 @@ def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]')
       if isDifferenceMoreThanDelta(*pair):
         answer = False
         break
-
-  # all_b = rhs_value_counts.keys()
-  # for pair in product(all_b, repeat=2):
-  #   if isDifferenceMoreThanDelta(*pair):
-  #     answer = False
-  #     break
-
   return answer
 
 def common_part(fd: FunctionalDependency):
   # Count RHS values by LHS value 
   rdd = users.rdd.map(attrs_to_tuple(fd.lhs, fd.rhs)) # 1 in the report
   rdd = rdd.reduceByKey(add) # 2 in the report
-  # rdd = rdd.reduceByKey(lambda x, y: x+y) # 2 in the report
   rdd = rdd.map(tuple_to_dict) # 3 in the report
  
   # Merge dictionaries assuming keys are unique 
