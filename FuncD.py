@@ -1,11 +1,11 @@
 # %%
 import csv
 import datetime
+import operator
 import sys
 from difflib import SequenceMatcher
 from enum import Enum
 from itertools import chain, combinations
-from operator import add
 from typing import Hashable
 
 from pyspark import SparkFiles
@@ -141,7 +141,7 @@ def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]')
 def common_part(fd: FunctionalDependency):
   # Count RHS values by LHS value 
   rdd = users.rdd.map(attrs_to_tuple(fd.lhs, fd.rhs)) # 1 in the report
-  rdd = rdd.reduceByKey(add) # 2 in the report
+  rdd = rdd.reduceByKey(operator.add) # 2 in the report
   rdd = rdd.map(tuple_to_dict) # 3 in the report
  
   # Merge dictionaries assuming keys are unique 
@@ -169,7 +169,7 @@ def hard_soft_part(rdd: RDD):
 
 def delta_part(rdd: RDD) -> bool:
   rdd = rdd.map(map_to_boolean_by_distance) # 5 in the report
-  return rdd.reduce(lambda x1, x2: x1 and x2) # 6 in the report
+  return rdd.reduce(operator.and_) # 6 in the report
 
 def generate_deps(attributes: 'list[AttrName]'):
   """
