@@ -6,7 +6,7 @@ import sys
 from difflib import SequenceMatcher
 from enum import Enum
 from itertools import chain, combinations
-from typing import Hashable
+from typing import Hashable, Tuple, TypeVar
 
 from pyspark import SparkFiles
 from pyspark.rdd import RDD
@@ -39,7 +39,7 @@ DataValue = Hashable # must be hashable because it is used as dict key
 AttrName = str
 
 class Classification(Enum):
-  NO_FD = 'No Hard/Soft FD'
+  NO_HARD_SOFT_FD = 'No Hard/Soft FD'
   HARD = 'Hard'
   SOFT = 'Soft'
 
@@ -58,8 +58,7 @@ class FunctionalDependency:
     return f'({",".join(self.lhs)}) -> {self.rhs}'
 
 
-# TODO: take range parameter
-def difference(a, b) -> float:
+def difference(a, b, val_range) -> float:
   """
   The relative difference between two values. Returns 0.0 if values are equal,
   and returns 1.0 if values are completely different.
@@ -67,12 +66,10 @@ def difference(a, b) -> float:
   """
   if type(a) is not type(b):
     raise TypeError(f'Arguments to be compared must be of the same type. Got types: {type(a)} and {type(b)}.')
-  if type(a) is int or type(a) is float:
-    return min(abs(a), abs(b)) / max(abs(a), abs(b)) # TODO: use range
-  if type(a) is datetime.datetime:
-    min_date = datetime.datetime(2007, 10, 20) # TODO: use range
-    max_date = datetime.datetime(2019, 5, 16)
-    return abs(a - b) / (max_date - min_date)
+  if type(a) is int or type(a) is float or type(a) is datetime.datetime:
+    if not val_range:
+      raise TypeError(f'A value range must be given when comparing values of type {type(a)}')
+    return abs(a - b) / (val_range[1] - val_range[0])
   if type(a) is str:
     return 1 - SequenceMatcher(a=a, b=b, autojunk=False).real_quick_ratio()
   else:
@@ -122,25 +119,29 @@ def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
   }
 
 
-def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]'):
-  _, rhs_value_counts = values
-  rhs_values = rhs_value_counts.keys()
-  
-  if {type(value) for value in rhs_values} <= {int, float, datetime.datetime}:
-    # For these types, we only need to compare the min and max because the difference
-    # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
-    return difference(min(rhs_values), max(rhs_values)) <= DELTA_THRESHOLD  # type: ignore
-  else:
-    # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
-    for pair in combinations(rhs_values, 2):
-      if difference(*pair) > DELTA_THRESHOLD:
-        return False
+def map_to_boolean_by_difference(val_range):
+  def anon(values: 'tuple[DataValue, dict[DataValue, int]]'):
+    _, rhs_value_counts = values
+    rhs_values = rhs_value_counts.keys()
+    
+    if {type(value) for value in rhs_values} <= {int, float, datetime.datetime}:
+      # For these types, we only need to compare the min and max because the difference
+      # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
+      return difference(min(rhs_values), max(rhs_values), val_range) <= DELTA_THRESHOLD  # type: ignore
+    else:
+      # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
+      for pair in combinations(rhs_values, 2):
+        if difference(*pair, val_range) > DELTA_THRESHOLD:
+          return False
 
-  return True
+    return True
 
-def common_part(fd: FunctionalDependency):
+  return anon
+
+
+def common_part(rdd: RDD, fd: FunctionalDependency):
   # Count RHS values by LHS value 
-  rdd = users.rdd.map(attrs_to_tuple(fd.lhs, fd.rhs)) # 1 in the report
+  rdd = rdd.map(attrs_to_tuple(fd.lhs, fd.rhs)) # 1 in the report
   rdd = rdd.reduceByKey(operator.add) # 2 in the report
   rdd = rdd.map(tuple_to_dict) # 3 in the report
  
@@ -148,6 +149,7 @@ def common_part(fd: FunctionalDependency):
   # (they are unique because of the `reduceByKey` from before) 
   rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2}) # 4 in the report
   return rdd
+
 
 def hard_soft_part(rdd: RDD):
   rdd = rdd.map(counts_to_prob) # 5 in the report
@@ -167,9 +169,10 @@ def hard_soft_part(rdd: RDD):
   return d['weighted_prob'] / d['total']
 
 
-def delta_part(rdd: RDD) -> bool:
-  rdd = rdd.map(map_to_boolean_by_distance) # 5 in the report
+def delta_part(rdd: RDD, val_range) -> bool:
+  rdd = rdd.map(map_to_boolean_by_difference(val_range)) # 5 in the report
   return rdd.reduce(operator.and_) # 6 in the report
+
 
 def generate_deps(attributes: 'list[AttrName]'):
   """
@@ -262,28 +265,39 @@ def get_country_name(code: str):
 # Add column "country" with the country name based on the country code.
 users = users.withColumn('country', get_country_name(users.country_code))
 
+# %%
+print("Computing attribute value ranges")
+value_ranges = {}
+for attr in users.columns:
+  minimum = users.agg({attr: 'min'}).collect()
+  maximum = users.agg({attr: 'max'}).collect()
+  value_ranges[attr] = (minimum, maximum)
+
 # %% Check FDs
 candidate_deps = generate_deps(users.columns)
 discovered_deps = []
-count = 0
 
 while len(candidate_deps) > 0:
-  count += 1
   fd = candidate_deps.pop(0)
   print("=" * 70)
   print(f'Checking FD ({len(candidate_deps)} left): {fd}')
 
-  common_result = common_part(fd)
+  common_result = common_part(users.rdd, fd)
   fd.probability = hard_soft_part(common_result)
 
-  fd.classification = Classification.NO_FD
+  # Classify FD as soft, hard or neither
   if fd.probability == 1:
     fd.classification = Classification.HARD
+  elif fd.probability > SOFT_THRESHOLD:
+      fd.classification = Classification.SOFT
+  else:
+    fd.classification = Classification.NO_HARD_SOFT_FD
+
+  # Classify FD as delta or not
+  if fd.classification == Classification.HARD:
     fd.is_delta = True
   else:
-    if fd.probability > SOFT_THRESHOLD:
-      fd.classification = Classification.SOFT
-    fd.is_delta = delta_part(common_result)
+    fd.is_delta = delta_part(common_result, value_ranges[fd.rhs])
 
   print(f'Probability = {fd.probability}, {fd.classification}')
   print("Delta-FD is found") if fd.is_delta else print("No Delta-FD")
