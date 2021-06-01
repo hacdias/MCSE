@@ -6,7 +6,8 @@ import sys
 from difflib import SequenceMatcher
 from enum import Enum
 from itertools import chain, combinations
-from typing import Hashable, Tuple, TypeVar
+from timeit import default_timer as timer
+from typing import Hashable
 
 from pyspark import SparkFiles
 from pyspark.rdd import RDD
@@ -14,10 +15,9 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
-from timeit import default_timer as timer
 
-SOFT_THRESHOLD = 0.9
-DELTA_THRESHOLD = 0.5
+SOFT_THRESHOLD = 0.9  # probablity is at least this much
+DELTA_THRESHOLD = 0.1  # values differ at most this much
 
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
@@ -55,7 +55,7 @@ class FunctionalDependency:
     return f'({",".join(self.lhs)}) -> {self.rhs}'
 
 
-def difference(a, b, val_range) -> float:
+def difference(a, b, val_range=None) -> float:
   """
   The relative difference between two values. Returns 0.0 if values are equal,
   and returns 1.0 if values are completely different.
@@ -116,19 +116,19 @@ def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
   }
 
 
-def map_to_boolean_by_difference(val_range):
+def map_to_boolean_by_difference(fd: FunctionalDependency):
   def anon(values: 'tuple[DataValue, dict[DataValue, int]]'):
     _, rhs_value_counts = values
     rhs_values = rhs_value_counts.keys()
     
-    if {type(value) for value in rhs_values} <= {int, float, datetime.datetime}:
+    if fd.rhs not in STRING_ATTRS:
       # For these types, we only need to compare the min and max because the difference
       # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
-      return difference(min(rhs_values), max(rhs_values), val_range) <= DELTA_THRESHOLD  # type: ignore
+      return difference(min(rhs_values), max(rhs_values), value_ranges[fd.rhs]) <= DELTA_THRESHOLD  # type: ignore
     else:
       # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
       for pair in combinations(rhs_values, 2):
-        if difference(*pair, val_range) > DELTA_THRESHOLD:
+        if difference(*pair) > DELTA_THRESHOLD:
           return False
 
     return True
@@ -166,8 +166,8 @@ def hard_soft_part(rdd: RDD):
   return d['weighted_prob'] / d['total']
 
 
-def delta_part(rdd: RDD, val_range) -> bool:
-  rdd = rdd.map(map_to_boolean_by_difference(val_range)) # 5 in the report
+def delta_part(rdd: RDD, fd: FunctionalDependency) -> bool:
+  rdd = rdd.map(map_to_boolean_by_difference(fd)) # 5 in the report
   return rdd.reduce(operator.and_) # 6 in the report
 
 
@@ -245,6 +245,17 @@ schema = StructType([
   StructField("city", StringType()),
   StructField("location", StringType()),
 ])
+# TODO: hardcoded, maybe we can do this programatically
+STRING_ATTRS = {
+  'login',
+  'company',
+  'type',
+  'country_code',
+  'country',  # note: not in schema
+  'state',
+  'city',
+  'location'
+}
 users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
 
 # %% Preprocessing
@@ -269,7 +280,7 @@ users = users.withColumn('country', get_country_name(users.country_code))
 # %%
 print("Computing attribute value ranges")
 value_ranges = {}
-for attr in users.columns:
+for attr in set(users.columns) - STRING_ATTRS:
   minimum = users.agg({attr: 'min'}).collect()[0][0]
   maximum = users.agg({attr: 'max'}).collect()[0][0]
   value_ranges[attr] = (minimum, maximum)
@@ -300,7 +311,7 @@ while len(candidate_deps) > 0:
   if fd.classification == Classification.HARD:
     fd.is_delta = True
   else:
-    fd.is_delta = delta_part(common_result, value_ranges[fd.rhs])
+    fd.is_delta = delta_part(common_result, fd)
 
   print(f'Probability = {fd.probability}, {fd.classification}')
   print("Delta-FD is found") if fd.is_delta else print("No Delta-FD")
