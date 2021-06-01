@@ -2,6 +2,7 @@
 import csv
 import datetime
 import sys
+from difflib import SequenceMatcher
 from enum import Enum
 from itertools import chain, combinations
 from operator import add
@@ -13,16 +14,10 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
-from strsimpy.damerau import Damerau
 from timeit import default_timer as timer
 
-damerau = Damerau() # distance
-
 SOFT_THRESHOLD = 0.9
-
-DELTA_NUM = 1000 # random
-DELTA_DATE = 86400*365 # seconds in 24 hours * 365days
-DELTA_STR = 10.0 # random
+DELTA_THRESHOLD = 0.5
 
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
@@ -63,19 +58,23 @@ class FunctionalDependency:
     return f'({",".join(self.lhs)}) -> {self.rhs}'
 
 
-def isDifferenceMoreThanDelta(a, b) -> 'bool':
+# TODO: take range parameter
+def difference(a, b) -> float:
   """
-  Returns True if the absolute difference between two values is more than delta, False otherwise
+  The relative difference between two values. Returns 0.0 if values are equal,
+  and returns 1.0 if values are completely different.
   Different metrics are used depending on the types of values (see implementation).
   """
   if type(a) is not type(b):
     raise TypeError(f'Arguments to be compared must be of the same type. Got types: {type(a)} and {type(b)}.')
   if type(a) is int or type(a) is float:
-    return abs(a - b) > DELTA_NUM
+    return min(abs(a), abs(b)) / max(abs(a), abs(b)) # TODO: use range
   if type(a) is datetime.datetime:
-    return abs((a - b).total_seconds()) > DELTA_DATE
+    min_date = datetime.datetime(2007, 10, 20) # TODO: use range
+    max_date = datetime.datetime(2019, 5, 16)
+    return abs(a - b) / (max_date - min_date)
   if type(a) is str:
-    return damerau.distance(a, b) > DELTA_STR
+    return 1 - SequenceMatcher(a=a, b=b, autojunk=False).real_quick_ratio()
   else:
     raise NotImplementedError(f'Comparison of arguments of type {type(a)} not implemented.')
 
@@ -130,11 +129,11 @@ def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]')
   if {type(value) for value in rhs_values} <= {int, float, datetime.datetime}:
     # For these types, we only need to compare the min and max because the difference
     # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
-    return not isDifferenceMoreThanDelta(min(rhs_values), max(rhs_values))  # type: ignore
+    return difference(min(rhs_values), max(rhs_values)) <= DELTA_THRESHOLD  # type: ignore
   else:
     # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
     for pair in combinations(rhs_values, 2):
-      if isDifferenceMoreThanDelta(*pair):
+      if difference(*pair) > DELTA_THRESHOLD:
         return False
 
   return True
@@ -271,8 +270,8 @@ count = 0
 while len(candidate_deps) > 0:
   count += 1
   fd = candidate_deps.pop(0)
-  print("=" * 80)
-  print(f'Checking FD ({count}/{len(candidate_deps)}): {fd}')
+  print("=" * 70)
+  print(f'Checking FD ({len(candidate_deps)} left): {fd}')
 
   common_result = common_part(fd)
   fd.probability = hard_soft_part(common_result)
@@ -300,9 +299,11 @@ while len(candidate_deps) > 0:
       print(f'\t\t{fd}')
 
 # %% Write results
-file_name = f"results for {SOFT_THRESHOLD}, {DELTA_NUM}, {DELTA_DATE}, {DELTA_STR}.csv"
+print(f'Found {len(discovered_deps)} FDs')
+
+file_name = f"results for tau {SOFT_THRESHOLD} and delta {DELTA_THRESHOLD}.csv"
 with open(file_name, mode='w') as file:
-  results = [[fd.lhs, fd.rhs, fd.probability, fd.classification, fd.delta] for fd in discovered_deps]
+  results = [[fd.lhs, fd.rhs, fd.probability, fd.classification, fd.is_delta] for fd in discovered_deps]
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
   wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification', 'Delta'])
   wr.writerows(results)
