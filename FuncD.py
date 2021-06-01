@@ -23,13 +23,10 @@ DELTA_THRESHOLD = 0.5
 USERS_DATA_PATH = "data/subset_users.csv"
 TEST_DATA_PATH = "data/test_data.csv"
 
-IGNORED_ATTRIBUTES = {
+IGNORED_LHS_ATTRS = {
   'id',
   'login',
   'created_at',
-  'deleted',
-  'fake',
-  'type',
   'long',
   'lat'
 }
@@ -178,16 +175,18 @@ def generate_deps(attributes: 'list[AttrName]'):
   """
   Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
   """
-  attrs = set(attributes) - IGNORED_ATTRIBUTES
+  lhs_attrs = set(attributes) - IGNORED_LHS_ATTRS
+  rhs_attrs = set(attributes)
+
   lhs_combos = chain(
-    combinations(attrs, 1),
-    combinations(attrs, 2),
-    combinations(attrs, 3)
+    combinations(lhs_attrs, 1),
+    combinations(lhs_attrs, 2),
+    combinations(lhs_attrs, 3)
   )
 
   deps: list[FunctionalDependency] = []
   for lhs_attrs in lhs_combos:
-    for rhs_attr in attrs:
+    for rhs_attr in rhs_attrs:
       if rhs_attr not in lhs_attrs:
         deps.append(FunctionalDependency(lhs_attrs, rhs_attr))
 
@@ -249,9 +248,11 @@ schema = StructType([
 users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
 
 # %% Preprocessing
+print("Preprocessing")
 
 # Remove fake users
 users = users.filter(users.fake == 0)
+users = users.drop('fake')
 
 @udf
 def get_country_name(code: str):
@@ -269,17 +270,19 @@ users = users.withColumn('country', get_country_name(users.country_code))
 print("Computing attribute value ranges")
 value_ranges = {}
 for attr in users.columns:
-  minimum = users.agg({attr: 'min'}).collect()
-  maximum = users.agg({attr: 'max'}).collect()
+  minimum = users.agg({attr: 'min'}).collect()[0][0]
+  maximum = users.agg({attr: 'max'}).collect()[0][0]
   value_ranges[attr] = (minimum, maximum)
 
-# %% Check FDs
+# %% Generate candidates
+print("Generating candidate FDs")
 candidate_deps = generate_deps(users.columns)
-discovered_deps = []
 
+# %% Check FDs
+discovered_deps = []
 while len(candidate_deps) > 0:
   fd = candidate_deps.pop(0)
-  print("=" * 70)
+  print("=" * 60)
   print(f'Checking FD ({len(candidate_deps)} left): {fd}')
 
   common_result = common_part(users.rdd, fd)
