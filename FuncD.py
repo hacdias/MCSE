@@ -17,7 +17,7 @@ from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
 
 SOFT_THRESHOLD = 0.9  # probablity is at least this much
-DELTA_THRESHOLD = 0.1  # values differ at most this much
+DELTA_THRESHOLD = 0.5  # values differ at most this much
 
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
@@ -49,37 +49,30 @@ class FunctionalDependency:
     self.rhs = rhs
     self.probability = 0.0
     self.classification: 'Classification | None' = None
-    self.is_delta = False
+    self.delta = False
 
   def __str__(self):
     return f'({",".join(self.lhs)}) -> {self.rhs}'
 
 
-def difference(a, b, val_range=None) -> float:
+def difference(a, b, value_range) -> float:
   """
-  The relative difference between two values. Returns 0.0 if values are equal,
-  and returns 1.0 if values are completely different.
-  Different metrics are used depending on the types of values (see implementation).
+  The difference between two non-string values, relative to the full range of
+  possible values. Returns 0.0 if values are equal, and returns 1.0 if values
+  are completely different.
   """
-  if type(a) is not type(b):
-    raise TypeError(f'Arguments to be compared must be of the same type. Got types: {type(a)} and {type(b)}.')
-  if type(a) is int or type(a) is float or type(a) is datetime.datetime:
-    if not val_range:
-      raise TypeError(f'A value range must be given when comparing values of type {type(a)}')
-    return abs(a - b) / (val_range[1] - val_range[0])
-  if type(a) is str:
-    return 1 - SequenceMatcher(a=a, b=b, autojunk=False).real_quick_ratio()
-  else:
-    raise NotImplementedError(f'Comparison of arguments of type {type(a)} not implemented.')
+  return abs(a - b) / (value_range[1] - value_range[0])
 
+def stringDifference(a, b):
+  return 1 - SequenceMatcher(a=a, b=b, autojunk=False).ratio()
 
 def attrs_to_tuple(lhs_attrs: 'tuple[AttrName, ...]', rhs_attr: AttrName):
   """
   Maps every user's lhs and rhs attributes to a tuple ((lhs, rhs), 1).
   """
   def anon(user):
-    lhs_values = tuple(str(user[attr]) for attr in lhs_attrs)
-    rhs_value = str(user[rhs_attr])
+    lhs_values = tuple(user[attr] for attr in lhs_attrs)
+    rhs_value = user[rhs_attr]
     return ((lhs_values, rhs_value), 1)
   return anon
 
@@ -120,16 +113,30 @@ def map_to_boolean_by_difference(fd: FunctionalDependency):
   def anon(values: 'tuple[DataValue, dict[DataValue, int]]'):
     _, rhs_value_counts = values
     rhs_values = rhs_value_counts.keys()
+
+    if None in rhs_values:
+      # If at least one value is None, but not all of them, then we say they
+      # are too different.
+      # If all values are None then they are not too different
+      return len(rhs_values) == 1
     
-    if fd.rhs not in STRING_ATTRS:
+    if fd.rhs in STRING_ATTRS:
+      # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
+      for a, b in combinations(rhs_values, 2):
+        # if a != b and (a is None or b is None):
+        #   # If one is None and the other is not, we say it's too different
+        #   return False
+        if stringDifference(a, b) > DELTA_THRESHOLD:
+          return False
+    else:
       # For these types, we only need to compare the min and max because the difference
       # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
-      return difference(min(rhs_values), max(rhs_values), value_ranges[fd.rhs]) <= DELTA_THRESHOLD  # type: ignore
-    else:
-      # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
-      for pair in combinations(rhs_values, 2):
-        if difference(*pair) > DELTA_THRESHOLD:
-          return False
+      mini = min(rhs_values)  # type: ignore
+      maxi = max(rhs_values)  # type: ignore
+      # if mini != maxi and (mini is None or maxi is None):
+      #   # If one is None and the other is not, we say it's too different
+      #   return False
+      return difference(mini, maxi, value_ranges[fd.rhs]) <= DELTA_THRESHOLD
 
     return True
 
@@ -290,7 +297,7 @@ print("Generating candidate FDs")
 candidate_deps = generate_deps(users.columns)
 
 # %% Check FDs
-discovered_deps = []
+discovered_deps: 'list[FunctionalDependency]' = []
 while len(candidate_deps) > 0:
   fd = candidate_deps.pop(0)
   print("=" * 60)
@@ -309,12 +316,13 @@ while len(candidate_deps) > 0:
 
   # Classify FD as delta or not
   if fd.classification == Classification.HARD:
-    fd.is_delta = True
+    fd.delta = True
   else:
-    fd.is_delta = delta_part(common_result, fd)
+    # TODO: it never seems to find a delta FD
+    fd.delta = delta_part(common_result, fd)
 
   print(f'Probability = {fd.probability}, {fd.classification}')
-  print("Delta-FD is found") if fd.is_delta else print("No Delta-FD")
+  print("Delta-FD is found") if fd.delta else print("No Delta-FD")
   discovered_deps.append(fd)
 
   # We purge as we go because candidate_deps is sorted from the smallest to the
@@ -331,7 +339,7 @@ print(f'Found {len(discovered_deps)} FDs')
 
 file_name = f"results for tau {SOFT_THRESHOLD} and delta {DELTA_THRESHOLD}.csv"
 with open(file_name, mode='w') as file:
-  results = [[fd.lhs, fd.rhs, fd.probability, fd.classification, fd.is_delta] for fd in discovered_deps]
+  results = [[fd.lhs, fd.rhs, fd.probability, fd.classification, fd.delta] for fd in discovered_deps]
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
   wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification', 'Delta'])
   wr.writerows(results)
