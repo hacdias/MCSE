@@ -19,14 +19,15 @@ USERS_DATA_PATH = "data/subset_users.csv"
 TEST_DATA_PATH = "data/test_data.csv"
 
 IGNORED_ATTRIBUTES = {
+  'fake',
+}
+
+IGNORED_ATTRIBUTES_LHS = {
   'id',
   'login',
   'created_at',
-  'deleted',
-  'fake',
-  'type',
   'long',
-  'lat'
+  'lat',
 }
 
 # Type aliases to give types some semantic meaning
@@ -140,7 +141,7 @@ def generate_deps(attributes: 'list[AttrName]', n: 'int'):
   Generates A -> B dependencies, where A has n attributes and B one attribute.
   """
   attrs = set(attributes) - IGNORED_ATTRIBUTES
-  lhs_combos = combinations(attrs, n)
+  lhs_combos = combinations(attrs - IGNORED_ATTRIBUTES_LHS, n)
 
   deps: list[FunctionalDependency] = []
 
