@@ -181,43 +181,13 @@ def hard_soft_part(rdd: RDD):
   return rdd.reduce(lambda d1, d2: {**d1, **d2})
 
 
-def delta_part(rdd: RDD):
+def delta_part(rdd: RDD, fds: 'list[FunctionalDependency]'):
+  rdd = rdd.filter(lambda x: x[0][0] in [f.id for f in fds])
   rdd = rdd.map(map_to_boolean_by_distance) # 5 in the report
   rdd = rdd.reduceByKey(lambda x1, x2: x1 and x2) # 6 in the report
-  return rdd.reduce(lambda d1, d2: {**d1, **d2})
-
-
-def dependency_prob(fds: 'list[FunctionalDependency]'):
-  """
-  Computes the probability that two records with the same values for the LHS
-  attributes have the same RHS value.
-  """
-  # Count RHS values by LHS value
-  rdd = users.rdd.flatMap(attrs_to_tuple(fds))
-  rdd = rdd.reduceByKey(add)
-  rdd = rdd.map(tuple_to_dict)
-
-  # Merge dictionaries assuming keys are unique
-  # (they are unique because of the `reduceByKey` from before)
-  rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2})
-
-  rdd = rdd.map(counts_to_prob)
-
-  # Compute weighted average of probabilites
-  rdd = rdd.map(lambda d: (d['fd_id'], {
-    'weighted_prob': d['prob'] * d['total'],
-    'total': d['total']
-  }))
-
-  rdd = rdd.reduceByKey(lambda d1, d2: {
-    'weighted_prob': d1['weighted_prob'] + d2['weighted_prob'],
-    'total': d1['total'] + d2['total']
+  rdd = rdd.map(lambda x: {
+    x[0]: x[1]
   })
-
-  rdd = rdd.map(lambda d: {
-    d[0]: d[1]['weighted_prob'] / d[1]['total']
-  })
-
   return rdd.reduce(lambda d1, d2: {**d1, **d2})
 
 
@@ -309,19 +279,27 @@ def get_country_name(code: str):
 # Add column "country" with the country name based on the country code.
 users = users.withColumn('country', get_country_name(users.country_code))
 
-# Yield successive n-sized chunks from a list.
-def chunks(lst, n):
-  for i in range(0, len(lst), n):
-      yield lst[i:i + n]
+def chunks(lst, n=None):
+  """
+  Yield successive n-sized chunks from a list. The last chunk may be smaller.
+  """
+  if n is None:
+    yield lst
+  else:
+    for i in range(0, len(lst), n):
+      start = i
+      end = min(i + n, len(lst) - 1)
+      yield lst[start:end]
 
 # %% Check FDs
 discovered_deps = []
-chunks_size = -1
+CHUNKS_SIZE = None
 
 # From 1 to 3 LHS elements.
 for n in range(1, 4):
   print(f'Generating FDs with {n} LHS elements...')
   candidates = generate_deps(users.columns, n)
+  delta_candidates: 'list[FunctionalDependency]' = []
 
   # We purge as we go because candidate_deps is sorted from the smallest to the
   # largest candidate FDs. Thus, the first time we see a soft or hard FD it is
@@ -332,43 +310,37 @@ for n in range(1, 4):
     for fd in purged: print(f'\t{fd} purged')
   
   # It will be useful to access candidates by ID.
-  candidates_by_id = {}
-  for fd in candidates:
-    candidates_by_id[fd.id] = fd
-
-  # If we don't a chunk size, set it to the current length of candidates.
-  if chunks_size == -1:
-    chunks_size = len(candidates)
+  candidates_by_id = {fd.id: fd for fd in candidates}
 
   print(f'Calculating probabilities...')
-  for chunk in chunks(candidates, chunks_size):
+  for chunk in chunks(candidates, CHUNKS_SIZE):
     common_result = common_part(chunk)
     ps = hard_soft_part(common_result)
 
     for id, p in ps.items():
       fd = candidates_by_id[id]
 
-      print('=' * 60)
-      print(f'Checking FD {fd}')
-
       classification = Classification.NO_FD
-      isDelta = False
       if p == 1:
         classification = Classification.HARD
-        isDelta = True
+        fd.delta = True
       else:
+        delta_candidates.append(fd)
         if p > SOFT_THRESHOLD:
           classification = Classification.SOFT
-        isDelta = delta_part(common_result)  # FIXME: this will check for all candidates, not just this fd
 
-      print(f'Probability = {p}, {classification}')
-      print("Delta-FD is found") if isDelta else print("No Delta-FD")
+      print(f'Checked FD {fd}: prob {p:.5f} class {classification}')
 
       fd.probability = p
       fd.classification = classification
-      fd.delta = isDelta
       discovered_deps.append(fd)
 
+    print('Delta part')
+    delta_result = delta_part(common_result, delta_candidates)
+
+    for id, result in delta_result.items():
+      fd = candidates_by_id[id]
+      fd.delta = result
 
 # %% Write results
 file_name = f"results for {SOFT_THRESHOLD}, {DELTA_NUM}, {DELTA_DATE}, {DELTA_STR}.csv"
