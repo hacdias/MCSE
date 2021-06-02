@@ -2,6 +2,7 @@
 import csv
 import datetime
 import sys
+import uuid
 from enum import Enum
 from itertools import chain, combinations
 from operator import add
@@ -58,6 +59,7 @@ class FunctionalDependency:
     self.probability = 0.0
     self.classification: 'Classification | None' = None
     self.delta = False
+    self.id = uuid.uuid4().hex
 
   def __str__(self):
     return f'({",".join(self.lhs)}) -> {self.rhs}'
@@ -80,28 +82,31 @@ def isDifferenceMoreThanDelta(a, b) -> 'bool':
     raise NotImplementedError(f'Comparison of arguments of type {type(a)} not implemented.')
 
 
-def attrs_to_tuple(lhs_attrs: 'tuple[AttrName, ...]', rhs_attr: AttrName):
+def attrs_to_tuple(fds: 'list[FunctionalDependency]'):
   """
   Maps every user's lhs and rhs attributes to a tuple ((lhs, rhs), 1).
   """
   def anon(user):
-    lhs_values = tuple(str(user[attr]) for attr in lhs_attrs)
-    rhs_value = str(user[rhs_attr])
-    return ((lhs_values, rhs_value), 1)
+    tuples = []
+    for fd in fds:
+      lhs_values = tuple(str(user[attr]) for attr in fd.lhs)
+      rhs_value = str(user[fd.rhs])
+      tuples.append(((fd.id, lhs_values, rhs_value), 1))
+    return tuples
   return anon
 
 
-def tuple_to_dict(tup: 'tuple[tuple[tuple[DataValue, ...], DataValue], int]'):
-  (lhs_values, rhs_value), count = tup
-  return (lhs_values, {rhs_value: count})
+def tuple_to_dict(tup: 'tuple[tuple[str, tuple[DataValue, ...], DataValue], int]'):
+  (fd_id, lhs_values, rhs_value), count = tup
+  return ((fd_id, lhs_values), {rhs_value: count})
 
 
-def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
+def counts_to_prob(values: 'tuple[tuple[str, DataValue], dict[DataValue, int]]'):
   """
   Given the RHS values and their counts for each set of LHS values, computes the
   probability that two records with the same LHS have the same RHS.
   """
-  _, rhs_value_counts = values
+  (fd_id, _), rhs_value_counts = values
   rhs_counts = rhs_value_counts.values() # confusing: gets values from dict, which are the counts in this case
 
   total = sum(rhs_counts)
@@ -109,6 +114,7 @@ def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
   # Avoid divisions by zero
   if total == 1:
     return {
+      'fd_id': fd_id,
       'prob': 1.0,
       'total': total
     }
@@ -118,13 +124,14 @@ def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
     prob += (count / total) * ((count - 1) / (total - 1))
 
   return {
+    'fd_id': fd_id,
     'prob': prob,
     'total': total
   }
 
 
-def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]'):
-  _, rhs_value_counts = values
+def map_to_boolean_by_distance(values: 'tuple[tuple[str, DataValue], dict[DataValue, int]]'):
+  (fd_id, _), rhs_value_counts = values
   answer = True
 
   if {type(value) for value in rhs_value_counts} <= {int, float, datetime.datetime}:
@@ -138,11 +145,13 @@ def map_to_boolean_by_distance(values: 'tuple[DataValue, dict[DataValue, int]]')
       if isDifferenceMoreThanDelta(*pair):
         answer = False
         break
-  return answer
 
-def common_part(fd: FunctionalDependency):
+  return (fd_id, answer)
+
+
+def common_part(fds: 'list[FunctionalDependency]'):
   # Count RHS values by LHS value 
-  rdd = users.rdd.map(attrs_to_tuple(fd.lhs, fd.rhs)) # 1 in the report
+  rdd = users.rdd.flatMap(attrs_to_tuple(fds)) # 1 in the report
   rdd = rdd.reduceByKey(add) # 2 in the report
   rdd = rdd.map(tuple_to_dict) # 3 in the report
  
@@ -151,41 +160,76 @@ def common_part(fd: FunctionalDependency):
   rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2}) # 4 in the report
   return rdd
 
+
 def hard_soft_part(rdd: RDD):
   rdd = rdd.map(counts_to_prob) # 5 in the report
 
   # Compute weighted average of probabilites
   # 6 in the report
-  rdd = rdd.map(lambda d: {
+  rdd = rdd.map(lambda d: (d['fd_id'], {
     'weighted_prob': d['prob'] * d['total'],
     'total': d['total']
-  })
+  }))
   # 7 in the report
-  d = rdd.reduce(lambda d1, d2: {
+  rdd = rdd.reduceByKey(lambda d1, d2: {
     'weighted_prob': d1['weighted_prob'] + d2['weighted_prob'],
     'total': d1['total'] + d2['total']
   })
-  # 8 in the report
-  return d['weighted_prob'] / d['total']
+  rdd = rdd.map(lambda d: {
+    d[0]: d[1]['weighted_prob'] / d[1]['total']
+  })
+  return rdd.reduce(lambda d1, d2: {**d1, **d2})
 
 
 def delta_part(rdd: RDD):
   rdd = rdd.map(map_to_boolean_by_distance) # 5 in the report
-  rdd = rdd.reduce(lambda x1, x2: x1 and x2) # 6 in the report
-  return rdd
+  rdd = rdd.reduceByKey(lambda x1, x2: x1 and x2) # 6 in the report
+  return rdd.reduce(lambda d1, d2: {**d1, **d2})
 
-def generate_deps(attributes: 'list[AttrName]'):
+
+def dependency_prob(fds: 'list[FunctionalDependency]'):
   """
-  Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
+  Computes the probability that two records with the same values for the LHS
+  attributes have the same RHS value.
+  """
+  # Count RHS values by LHS value
+  rdd = users.rdd.flatMap(attrs_to_tuple(fds))
+  rdd = rdd.reduceByKey(add)
+  rdd = rdd.map(tuple_to_dict)
+
+  # Merge dictionaries assuming keys are unique
+  # (they are unique because of the `reduceByKey` from before)
+  rdd = rdd.reduceByKey(lambda d1, d2: {**d1, **d2})
+
+  rdd = rdd.map(counts_to_prob)
+
+  # Compute weighted average of probabilites
+  rdd = rdd.map(lambda d: (d['fd_id'], {
+    'weighted_prob': d['prob'] * d['total'],
+    'total': d['total']
+  }))
+
+  rdd = rdd.reduceByKey(lambda d1, d2: {
+    'weighted_prob': d1['weighted_prob'] + d2['weighted_prob'],
+    'total': d1['total'] + d2['total']
+  })
+
+  rdd = rdd.map(lambda d: {
+    d[0]: d[1]['weighted_prob'] / d[1]['total']
+  })
+
+  return rdd.reduce(lambda d1, d2: {**d1, **d2})
+
+
+def generate_deps(attributes: 'list[AttrName]', n: 'int'):
+  """
+  Generates A -> B dependencies, where A has n attributes and B one attribute.
   """
   attrs = set(attributes) - IGNORED_ATTRIBUTES
-  lhs_combos = chain(
-    combinations(attrs, 1),
-    combinations(attrs, 2),
-    combinations(attrs, 3)
-  )
+  lhs_combos = combinations(attrs, n)
 
   deps: list[FunctionalDependency] = []
+
   for lhs_attrs in lhs_combos:
     for rhs_attr in attrs:
       if rhs_attr not in lhs_attrs:
@@ -265,46 +309,66 @@ def get_country_name(code: str):
 # Add column "country" with the country name based on the country code.
 users = users.withColumn('country', get_country_name(users.country_code))
 
+# Yield successive n-sized chunks from a list.
+def chunks(lst, n):
+  for i in range(0, len(lst), n):
+      yield lst[i:i + n]
+
 # %% Check FDs
-candidate_deps = generate_deps(users.columns)
 discovered_deps = []
-isDelta = False
-count = 0
+chunks_size = -1
 
-while len(candidate_deps) > 0:
-  count += 1
-  fd = candidate_deps.pop(0)
-  print("="*100,f'\n{count}\nChecking FD {fd}')
-
-  both = common_part(fd)
-  p = hard_soft_part(both)
-
-  classification = Classification.NO_FD
-  if p == 1:
-    classification = Classification.HARD
-    isDelta = True
-  else:
-    if p > SOFT_THRESHOLD:
-      classification = Classification.SOFT
-    isDelta = delta_part(both)
-
-  print(f'Probability = {p}, {classification}')
-
-  fd.probability = p
-  fd.classification = classification
-  fd.delta = isDelta
-  discovered_deps.append(fd)
+# From 1 to 3 LHS elements.
+for n in range(1, 4):
+  print(f'Generating FDs with {n} LHS elements...')
+  candidates = generate_deps(users.columns, n)
 
   # We purge as we go because candidate_deps is sorted from the smallest to the
   # largest candidate FDs. Thus, the first time we see a soft or hard FD it is
   # already minimal.
-  candidate_deps, purged = purge_non_minimal_deps(candidate_deps, fd)
-  if len(purged) > 0:
-    print('\tPurged FDs:')
-    for fd in purged:
-      print(f'\t\t{fd}')
+  print(f'Purging non-minimal FDs...')
+  for fd in discovered_deps:
+    candidates, purged = purge_non_minimal_deps(candidates, fd)
+    for fd in purged: print(f'\t{fd} purged')
+  
+  # It will be useful to access candidates by ID.
+  candidates_by_id = {}
+  for fd in candidates:
+    candidates_by_id[fd.id] = fd
 
-  print("Delta-FD is found") if isDelta else print("No Delta-FD")
+  # If we don't a chunk size, set it to the current length of candidates.
+  if chunks_size == -1:
+    chunks_size = len(candidates)
+
+  print(f'Calculating probabilities...')
+  for chunk in chunks(candidates, chunks_size):
+    common_result = common_part(chunk)
+    ps = hard_soft_part(common_result)
+
+    for id, p in ps.items():
+      fd = candidates_by_id[id]
+
+      print('=' * 60)
+      print(f'Checking FD {fd}')
+
+      classification = Classification.NO_FD
+      isDelta = False
+      if p == 1:
+        classification = Classification.HARD
+        isDelta = True
+      else:
+        if p > SOFT_THRESHOLD:
+          classification = Classification.SOFT
+        isDelta = delta_part(common_result)  # FIXME: this will check for all candidates, not just this fd
+
+      print(f'Probability = {p}, {classification}')
+      print("Delta-FD is found") if isDelta else print("No Delta-FD")
+
+      fd.probability = p
+      fd.classification = classification
+      fd.delta = isDelta
+      discovered_deps.append(fd)
+
 
 # %% Write results
 file_name = f"results for {SOFT_THRESHOLD}, {DELTA_NUM}, {DELTA_DATE}, {DELTA_STR}.csv"
