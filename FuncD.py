@@ -66,7 +66,7 @@ def difference(a, b, value_range) -> float:
   return abs(a - b) / (value_range[1] - value_range[0])
 
 def stringDifference(a, b):
-  return 1 - SequenceMatcher(a=a, b=b, autojunk=False).ratio()
+  return 1 - SequenceMatcher(a=a, b=b, autojunk=False).real_quick_ratio()
 
 def attrs_to_tuple(fds: 'list[FunctionalDependency]'):
   """
@@ -126,7 +126,6 @@ def map_to_boolean_by_difference(fds: 'list[FunctionalDependency]'):
 
     is_delta = True
     if fd.rhs in string_attrs:
-      print('doing string comparisons')
       # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
       for a, b in combinations(rhs_values, 2):
         if stringDifference(a, b) > DELTA_THRESHOLD:
@@ -348,12 +347,14 @@ for n in range(1, 4):
       fd.classification = classification
       discovered_deps.append(fd)
 
-    print('Delta part')
-    delta_result = delta_part(common_result, delta_candidates)
+    delta_result = {}
+    if len(delta_candidates) > 0:
+      print('Checking delta FDs...')
+      delta_result = delta_part(common_result, delta_candidates)
 
     for id, result in delta_result.items():
       fd = candidates_by_id[id]
-      print(f'Checked Delta FD {fd}: {result}')
+      print(f'Checked delta FD {fd}: {result}')
       fd.delta = result
 
 # %% Write results
