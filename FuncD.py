@@ -3,6 +3,7 @@ import csv
 import datetime
 import operator
 import sys
+import uuid
 from difflib import SequenceMatcher
 from enum import Enum
 from itertools import chain, combinations
@@ -50,6 +51,7 @@ class FunctionalDependency:
     self.probability = 0.0
     self.classification: 'Classification | None' = None
     self.delta = False
+    self.id = uuid.uuid4().hex
 
   def __str__(self):
     return f'({",".join(self.lhs)}) -> {self.rhs}'
@@ -66,28 +68,31 @@ def difference(a, b, value_range) -> float:
 def stringDifference(a, b):
   return 1 - SequenceMatcher(a=a, b=b, autojunk=False).ratio()
 
-def attrs_to_tuple(lhs_attrs: 'tuple[AttrName, ...]', rhs_attr: AttrName):
+def attrs_to_tuple(fds: 'list[FunctionalDependency]'):
   """
   Maps every user's lhs and rhs attributes to a tuple ((lhs, rhs), 1).
   """
   def anon(user):
-    lhs_values = tuple(user[attr] for attr in lhs_attrs)
-    rhs_value = user[rhs_attr]
-    return ((lhs_values, rhs_value), 1)
+    tuples = []
+    for fd in fds:
+      lhs_values = tuple(user[attr] for attr in fd.lhs)
+      rhs_value = user[fd.rhs]
+      tuples.append(((fd.id, lhs_values, rhs_value), 1))
+    return tuples
   return anon
 
 
-def tuple_to_dict(tup: 'tuple[tuple[tuple[DataValue, ...], DataValue], int]'):
-  (lhs_values, rhs_value), count = tup
-  return (lhs_values, {rhs_value: count})
+def tuple_to_dict(tup: 'tuple[tuple[str, tuple[DataValue, ...], DataValue], int]'):
+  (fd_id, lhs_values, rhs_value), count = tup
+  return ((fd_id, lhs_values), {rhs_value: count})
 
 
-def counts_to_prob(values: 'tuple[tuple[DataValue, ...], dict[DataValue, int]]'):
+def counts_to_prob(values: 'tuple[tuple[str, tuple[DataValue, ...]], dict[DataValue, int]]'):
   """
   Given the RHS values and their counts for each set of LHS values, computes the
   probability that two records with the same LHS have the same RHS.
   """
-  _, rhs_value_counts = values
+  (fd_id, _), rhs_value_counts = values
   rhs_counts = rhs_value_counts.values() # confusing: gets values from dict, which are the counts in this case
 
   total = sum(rhs_counts)
@@ -95,6 +100,7 @@ def counts_to_prob(values: 'tuple[tuple[DataValue, ...], dict[DataValue, int]]')
   # Avoid divisions by zero
   if total == 1:
     return {
+      'fd_id': fd_id,
       'prob': 1.0,
       'total': total
     }
@@ -104,37 +110,42 @@ def counts_to_prob(values: 'tuple[tuple[DataValue, ...], dict[DataValue, int]]')
     prob += (count / total) * ((count - 1) / (total - 1))
 
   return {
+    'fd_id': fd_id,
     'prob': prob,
     'total': total
   }
 
 
-def map_to_boolean_by_difference(fd: FunctionalDependency):
-  def anon(values: 'tuple[tuple[DataValue, ...], dict[DataValue, int]]'):
-    lhs, rhs_value_counts = values
+def map_to_boolean_by_difference(fds: 'list[FunctionalDependency]'):
+  fds_by_id = {fd.id: fd for fd in fds}
+
+  def anon(values: 'tuple[tuple[str, tuple[DataValue, ...]], dict[DataValue, int]]'):
+    (fd_id, _), rhs_value_counts = values
     rhs_values = rhs_value_counts.keys()
-    
+    fd = fds_by_id[fd_id]
+
+    is_delta = True
     if fd.rhs in string_attrs:
       print('doing string comparisons')
       # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
       for a, b in combinations(rhs_values, 2):
         if stringDifference(a, b) > DELTA_THRESHOLD:
-          return False
+          is_delta = False
     else:
       # For these types, we only need to compare the min and max because the difference
       # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
       mini = min(rhs_values)  # type: ignore
       maxi = max(rhs_values)  # type: ignore
-      return difference(mini, maxi, value_ranges[fd.rhs]) <= DELTA_THRESHOLD
+      is_delta = difference(mini, maxi, value_ranges[fd.rhs]) <= DELTA_THRESHOLD
 
-    return True
+    return (fd_id, is_delta)
 
   return anon
 
 
-def common_part(rdd: RDD, fd: FunctionalDependency):
+def common_part(rdd: RDD, fds: 'list[FunctionalDependency]'):
   # Count RHS values by LHS value 
-  rdd = rdd.map(attrs_to_tuple(fd.lhs, fd.rhs)) # 1 in the report
+  rdd = rdd.flatMap(attrs_to_tuple(fds)) # 1 in the report
   rdd = rdd.reduceByKey(operator.add) # 2 in the report
   rdd = rdd.map(tuple_to_dict) # 3 in the report
  
@@ -149,38 +160,42 @@ def hard_soft_part(rdd: RDD):
 
   # Compute weighted average of probabilites
   # 6 in the report
-  rdd = rdd.map(lambda d: {
+  rdd = rdd.map(lambda d: (d['fd_id'], {
     'weighted_prob': d['prob'] * d['total'],
     'total': d['total']
-  })
+  }))
   # 7 in the report
-  d = rdd.reduce(lambda d1, d2: {
+  rdd = rdd.reduceByKey(lambda d1, d2: {
     'weighted_prob': d1['weighted_prob'] + d2['weighted_prob'],
     'total': d1['total'] + d2['total']
   })
-  # 8 in the report
-  return d['weighted_prob'] / d['total']
+  rdd = rdd.map(lambda d: {
+    d[0]: d[1]['weighted_prob'] / d[1]['total']
+  })
+  return rdd.reduce(lambda d1, d2: {**d1, **d2})
 
 
-def delta_part(rdd: RDD, fd: FunctionalDependency) -> bool:
-  rdd = rdd.map(map_to_boolean_by_difference(fd)) # 5 in the report
-  return rdd.reduce(operator.and_) # 6 in the report
+def delta_part(rdd: RDD, fds: 'list[FunctionalDependency]'):
+  rdd = rdd.filter(lambda x: x[0][0] in [f.id for f in fds])
+  rdd = rdd.map(map_to_boolean_by_difference(fds)) # 5 in the report
+  rdd = rdd.reduceByKey(operator.and_) # 6 in the report
+  rdd = rdd.map(lambda x: {
+    x[0]: x[1]
+  })
+  return rdd.reduce(lambda d1, d2: {**d1, **d2})
 
 
-def generate_deps(attributes: 'list[AttrName]'):
+def generate_deps(attributes: 'list[AttrName]', n: int):
   """
-  Generates A -> B dependencies, where A has up to 3 attributes and B one attribute.
+  Generates A -> B dependencies, where A has n attributes and B one attribute.
   """
   lhs_attrs = set(attributes) - IGNORED_LHS_ATTRS
   rhs_attrs = set(attributes)
 
-  lhs_combos = chain(
-    combinations(lhs_attrs, 1),
-    combinations(lhs_attrs, 2),
-    combinations(lhs_attrs, 3)
-  )
+  lhs_combos = combinations(lhs_attrs, n)
 
   deps: list[FunctionalDependency] = []
+
   for lhs_attrs in lhs_combos:
     for rhs_attr in rhs_attrs:
       if rhs_attr not in lhs_attrs:
@@ -189,7 +204,7 @@ def generate_deps(attributes: 'list[AttrName]'):
   return deps
 
 
-def purge_non_minimal_deps(candidate_deps: 'list[FunctionalDependency]', fd: 'FunctionalDependency'):
+def purge_non_minimal_deps(candidate_deps: 'list[FunctionalDependency]', fd: FunctionalDependency):
   """
   Given a list of candidate dependencies, purge all non-minimal dependencies
   regarding given fd.
@@ -271,7 +286,6 @@ users = users.filter(~isnull('long'))
 string_attrs = {attr for attr, dtype in users.dtypes if dtype == 'string'}
 users = users.fillna('', subset=list(string_attrs))
 
-
 # %% Compute attribute value ranges
 print("Computing attribute value ranges")
 value_ranges = {}
@@ -280,49 +294,70 @@ for attr in set(users.columns) - string_attrs:
   maximum = users.agg({attr: 'max'}).collect()[0][0]
   value_ranges[attr] = (minimum, maximum)
 
-# %% Generate candidates
-print("Generating candidate FDs")
-candidate_deps = generate_deps(users.columns)
+def chunks(lst, n=None):
+  """
+  Yield successive n-sized chunks from a list. The last chunk may be smaller.
+  """
+  if n is None:
+    yield lst
+  else:
+    for i in range(0, len(lst), n):
+      yield lst[i:i+n]
 
 # %% Check FDs
-discovered_deps: 'list[FunctionalDependency]' = []
-while len(candidate_deps) > 0:
-  fd = candidate_deps.pop(0)
-  print("=" * 60)
-  print(f'Checking FD ({len(candidate_deps)} left): {fd}')
+discovered_deps = []
+CHUNKS_SIZE = None
 
-  common_result = common_part(users.rdd, fd)
-  fd.probability = hard_soft_part(common_result)
-
-  # Classify FD as soft, hard or neither
-  if fd.probability == 1:
-    fd.classification = Classification.HARD
-  elif fd.probability > SOFT_THRESHOLD:
-      fd.classification = Classification.SOFT
-  else:
-    fd.classification = Classification.NO_HARD_SOFT_FD
-
-  # Classify FD as delta or not
-  if fd.classification == Classification.HARD:
-    fd.delta = True
-  else:
-    fd.delta = delta_part(common_result, fd)
-
-  print(f'Probability = {fd.probability}, {fd.classification}')
-  print("Delta-FD is found") if fd.delta else print("No Delta-FD")
-  discovered_deps.append(fd)
+# From 1 to 3 LHS elements.
+for n in range(1, 4):
+  print(f'Generating FDs with {n} LHS elements...')
+  candidates = generate_deps(users.columns, n)
+  delta_candidates: 'list[FunctionalDependency]' = []
 
   # We purge as we go because candidate_deps is sorted from the smallest to the
   # largest candidate FDs. Thus, the first time we see a soft or hard FD it is
   # already minimal.
-  candidate_deps, purged = purge_non_minimal_deps(candidate_deps, fd)
-  if len(purged) > 0:
-    print(f'\tPurged {len(purged)} FDs:')
-    for fd in purged:
-      print(f'\t\t{fd}')
+  print(f'Purging non-minimal FDs...')
+  for fd in discovered_deps:
+    candidates, purged = purge_non_minimal_deps(candidates, fd)
+    for fd in purged: print(f'\t{fd} purged')
+  
+  # It will be useful to access candidates by ID.
+  candidates_by_id = {fd.id: fd for fd in candidates}
+
+  print(f'Calculating probabilities...')
+  for chunk in chunks(candidates, CHUNKS_SIZE):
+    common_result = common_part(users.rdd, chunk)
+    ps = hard_soft_part(common_result)
+
+    for id, p in ps.items():
+      fd = candidates_by_id[id]
+
+      classification = Classification.NO_HARD_SOFT_FD
+      if p == 1:
+        classification = Classification.HARD
+        fd.delta = True
+      else:
+        if p > SOFT_THRESHOLD:
+          classification = Classification.SOFT
+        delta_candidates.append(fd)
+
+      print(f'Checked FD {fd}: prob {p:.5f} class {classification}')
+
+      fd.probability = p
+      fd.classification = classification
+      discovered_deps.append(fd)
+
+    print('Delta part')
+    delta_result = delta_part(common_result, delta_candidates)
+
+    for id, result in delta_result.items():
+      fd = candidates_by_id[id]
+      print(f'Checked Delta FD {fd}: {result}')
+      fd.delta = result
 
 # %% Write results
-print(f'Found {len(discovered_deps)} FDs')
+print(f'Checked {len(discovered_deps)} FDs')
 
 file_name = f"results for tau {SOFT_THRESHOLD} and delta {DELTA_THRESHOLD}.csv"
 with open(file_name, mode='w') as file:
