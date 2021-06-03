@@ -12,12 +12,12 @@ from typing import Hashable
 from pyspark import SparkFiles
 from pyspark.rdd import RDD
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import udf
+from pyspark.sql.functions import udf, isnull
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
 
 SOFT_THRESHOLD = 0.9  # probablity is at least this much
-DELTA_THRESHOLD = 0.5  # values differ at most this much
+DELTA_THRESHOLD = 0.05  # values differ at most this much
 
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
@@ -82,7 +82,7 @@ def tuple_to_dict(tup: 'tuple[tuple[tuple[DataValue, ...], DataValue], int]'):
   return (lhs_values, {rhs_value: count})
 
 
-def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
+def counts_to_prob(values: 'tuple[tuple[DataValue, ...], dict[DataValue, int]]'):
   """
   Given the RHS values and their counts for each set of LHS values, computes the
   probability that two records with the same LHS have the same RHS.
@@ -110,22 +110,14 @@ def counts_to_prob(values: 'tuple[DataValue, dict[DataValue, int]]'):
 
 
 def map_to_boolean_by_difference(fd: FunctionalDependency):
-  def anon(values: 'tuple[DataValue, dict[DataValue, int]]'):
-    _, rhs_value_counts = values
+  def anon(values: 'tuple[tuple[DataValue, ...], dict[DataValue, int]]'):
+    lhs, rhs_value_counts = values
     rhs_values = rhs_value_counts.keys()
-
-    if None in rhs_values:
-      # If at least one value is None, but not all of them, then we say they
-      # are too different.
-      # If all values are None then they are not too different
-      return len(rhs_values) == 1
     
-    if fd.rhs in STRING_ATTRS:
+    if fd.rhs in string_attrs:
+      print('doing string comparisons')
       # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
       for a, b in combinations(rhs_values, 2):
-        # if a != b and (a is None or b is None):
-        #   # If one is None and the other is not, we say it's too different
-        #   return False
         if stringDifference(a, b) > DELTA_THRESHOLD:
           return False
     else:
@@ -133,9 +125,6 @@ def map_to_boolean_by_difference(fd: FunctionalDependency):
       # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
       mini = min(rhs_values)  # type: ignore
       maxi = max(rhs_values)  # type: ignore
-      # if mini != maxi and (mini is None or maxi is None):
-      #   # If one is None and the other is not, we say it's too different
-      #   return False
       return difference(mini, maxi, value_ranges[fd.rhs]) <= DELTA_THRESHOLD
 
     return True
@@ -252,17 +241,6 @@ schema = StructType([
   StructField("city", StringType()),
   StructField("location", StringType()),
 ])
-# TODO: hardcoded, maybe we can do this programatically
-STRING_ATTRS = {
-  'login',
-  'company',
-  'type',
-  'country_code',
-  'country',  # note: not in schema
-  'state',
-  'city',
-  'location'
-}
 users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
 
 # %% Preprocessing
@@ -282,12 +260,22 @@ def get_country_name(code: str):
     return None
 
 # Add column "country" with the country name based on the country code.
-users = users.withColumn('country', get_country_name(users.country_code))
+users = users.withColumn('country', get_country_name(users.country_code))  # type: ignore
 
-# %%
+# Remove users that have null value for lat/long
+# ~ means not
+users = users.filter(~isnull('lat'))
+users = users.filter(~isnull('long'))
+
+# For string attributes, replace null values with the empty string
+string_attrs = {attr for attr, dtype in users.dtypes if dtype == 'string'}
+users = users.fillna('', subset=list(string_attrs))
+
+
+# %% Compute attribute value ranges
 print("Computing attribute value ranges")
 value_ranges = {}
-for attr in set(users.columns) - STRING_ATTRS:
+for attr in set(users.columns) - string_attrs:
   minimum = users.agg({attr: 'min'}).collect()[0][0]
   maximum = users.agg({attr: 'max'}).collect()[0][0]
   value_ranges[attr] = (minimum, maximum)
@@ -318,7 +306,6 @@ while len(candidate_deps) > 0:
   if fd.classification == Classification.HARD:
     fd.delta = True
   else:
-    # TODO: it never seems to find a delta FD
     fd.delta = delta_part(common_result, fd)
 
   print(f'Probability = {fd.probability}, {fd.classification}')
