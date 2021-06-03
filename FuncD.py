@@ -1,4 +1,5 @@
 # %%
+import argparse
 import csv
 import operator
 import sys
@@ -16,12 +17,13 @@ from pyspark.sql.functions import udf, isnull
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
 
-SOFT_THRESHOLD = 0.9  # probablity is at least this much
-DELTA_THRESHOLD = 0.05  # values differ at most this much
-
-# USERS_DATA_PATH = "data/users.csv"
-USERS_DATA_PATH = "data/subset_users.csv"
-TEST_DATA_PATH = "data/test_data.csv"
+parser = argparse.ArgumentParser(description='Discover functional dependencies in the GHTorrent dataset.')
+parser.add_argument('data_path', nargs='?', default='data/subset_users.csv', help='Path to CSV data file.')
+parser.add_argument('-s', '--soft_threshold', default=0.9, help='Probability must be least this large to be a soft FD.')
+parser.add_argument('-d', '--delta_threshold', default=0.05, help='Difference must be at most this large to be a delta FD.')
+parser.add_argument('--approx', action='store_true', help='Whether to use an approximate algorithm for string comparisons. Uses an exact algortihm by default.')
+parser.add_argument('--out', '-o', default='results.csv', help='Path to results output file. Defaults to results.csv.')
+args = parser.parse_args()
 
 IGNORED_LHS_ATTRS = {
   'id',
@@ -65,7 +67,11 @@ def difference(a, b, value_range) -> float:
   return abs(a - b) / (value_range[1] - value_range[0])
 
 def stringDifference(a, b):
-  return 1 - SequenceMatcher(a=a, b=b, autojunk=False).ratio()
+  s = SequenceMatcher(a=a, b=b, autojunk=False)
+  if args.approx:
+    return 1 - s.real_quick_ratio()
+  else:
+    return 1 - s.ratio()
 
 def attrs_to_tuple(fds: 'list[FunctionalDependency]'):
   """
@@ -127,7 +133,7 @@ def map_to_boolean_by_difference(fds: 'list[FunctionalDependency]'):
     if fd.rhs in string_attrs:
       # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
       for a, b in combinations(rhs_values, 2):
-        if stringDifference(a, b) > DELTA_THRESHOLD:
+        if stringDifference(a, b) > args.delta_threshold:
           is_delta = False
           break
     else:
@@ -135,7 +141,7 @@ def map_to_boolean_by_difference(fds: 'list[FunctionalDependency]'):
       # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
       mini = min(rhs_values)  # type: ignore
       maxi = max(rhs_values)  # type: ignore
-      is_delta = difference(mini, maxi, value_ranges[fd.rhs]) <= DELTA_THRESHOLD
+      is_delta = difference(mini, maxi, value_ranges[fd.rhs]) <= args.delta_threshold
 
     return (fd_id, is_delta)
 
@@ -255,7 +261,8 @@ schema = StructType([
   StructField("city", StringType()),
   StructField("location", StringType()),
 ])
-users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
+print(f'Reading data from {args.data_path}')
+users = spark.read.csv(args.data_path, schema, nullValue='\\N')
 
 # %% Preprocessing
 print("Preprocessing")
@@ -337,7 +344,7 @@ for n in range(1, 4):
         classification = Classification.HARD
         fd.delta = True
       else:
-        if p > SOFT_THRESHOLD:
+        if p > args.soft_threshold:
           classification = Classification.SOFT
         delta_candidates.append(fd)
 
@@ -360,8 +367,8 @@ for n in range(1, 4):
 # %% Write results
 print(f'Checked {len(discovered_deps)} FDs')
 
-file_name = f"results for tau {SOFT_THRESHOLD} and delta {DELTA_THRESHOLD}.csv"
-with open(file_name, mode='w') as file:
+print(f'Writing result to {args.out}')
+with open(args.out, mode='w') as file:
   results = [[fd.lhs, fd.rhs, fd.probability, fd.classification, fd.delta] for fd in discovered_deps]
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
   wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification', 'Delta'])
