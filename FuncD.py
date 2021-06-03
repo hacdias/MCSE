@@ -1,41 +1,33 @@
 # %%
 import csv
 import datetime
+import operator
 import sys
 import uuid
+from difflib import SequenceMatcher
 from enum import Enum
 from itertools import chain, combinations
-from operator import add
+from timeit import default_timer as timer
 from typing import Hashable
 
 from pyspark import SparkFiles
 from pyspark.rdd import RDD
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import udf
+from pyspark.sql.functions import udf, isnull
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
-from strsimpy.damerau import Damerau
-from timeit import default_timer as timer
 
-damerau = Damerau() # distance
-
-SOFT_THRESHOLD = 0.9
-
-DELTA_NUM = 1000 # random
-DELTA_DATE = 86400*365 # seconds in 24 hours * 365days
-DELTA_STR = 10.0 # random
+SOFT_THRESHOLD = 0.9  # probablity is at least this much
+DELTA_THRESHOLD = 0.05  # values differ at most this much
 
 # USERS_DATA_PATH = "data/users.csv"
 USERS_DATA_PATH = "data/subset_users.csv"
 TEST_DATA_PATH = "data/test_data.csv"
 
-IGNORED_ATTRIBUTES = {
+IGNORED_LHS_ATTRS = {
   'id',
   'login',
   'created_at',
-  'deleted',
-  'fake',
-  'type',
   'long',
   'lat'
 }
@@ -45,7 +37,7 @@ DataValue = Hashable # must be hashable because it is used as dict key
 AttrName = str
 
 class Classification(Enum):
-  NO_FD = 'No Hard/Soft FD'
+  NO_HARD_SOFT_FD = 'No Hard/Soft FD'
   HARD = 'Hard'
   SOFT = 'Soft'
 
@@ -65,22 +57,16 @@ class FunctionalDependency:
     return f'({",".join(self.lhs)}) -> {self.rhs}'
 
 
-def isDifferenceMoreThanDelta(a, b) -> 'bool':
+def difference(a, b, value_range) -> float:
   """
-  Returns True if the absolute difference between two values is more than delta, False otherwise
-  Different metrics are used depending on the types of values (see implementation).
+  The difference between two non-string values, relative to the full range of
+  possible values. Returns 0.0 if values are equal, and returns 1.0 if values
+  are completely different.
   """
-  if type(a) is not type(b):
-    raise TypeError(f'Arguments to be compared must be of the same type. Got types: {type(a)} and {type(b)}.')
-  if type(a) is int or type(a) is float:
-    return abs(a - b) > DELTA_NUM
-  if type(a) is datetime.datetime:
-    return abs((a - b).total_seconds()) > DELTA_DATE
-  if type(a) is str:
-    return damerau.distance(a, b) > DELTA_STR
-  else:
-    raise NotImplementedError(f'Comparison of arguments of type {type(a)} not implemented.')
+  return abs(a - b) / (value_range[1] - value_range[0])
 
+def stringDifference(a, b):
+  return 1 - SequenceMatcher(a=a, b=b, autojunk=False).ratio()
 
 def attrs_to_tuple(fds: 'list[FunctionalDependency]'):
   """
@@ -89,8 +75,8 @@ def attrs_to_tuple(fds: 'list[FunctionalDependency]'):
   def anon(user):
     tuples = []
     for fd in fds:
-      lhs_values = tuple(str(user[attr]) for attr in fd.lhs)
-      rhs_value = str(user[fd.rhs])
+      lhs_values = tuple(user[attr] for attr in fd.lhs)
+      rhs_value = user[fd.rhs]
       tuples.append(((fd.id, lhs_values, rhs_value), 1))
     return tuples
   return anon
@@ -101,7 +87,7 @@ def tuple_to_dict(tup: 'tuple[tuple[str, tuple[DataValue, ...], DataValue], int]
   return ((fd_id, lhs_values), {rhs_value: count})
 
 
-def counts_to_prob(values: 'tuple[tuple[str, DataValue], dict[DataValue, int]]'):
+def counts_to_prob(values: 'tuple[tuple[str, tuple[DataValue, ...]], dict[DataValue, int]]'):
   """
   Given the RHS values and their counts for each set of LHS values, computes the
   probability that two records with the same LHS have the same RHS.
@@ -130,29 +116,37 @@ def counts_to_prob(values: 'tuple[tuple[str, DataValue], dict[DataValue, int]]')
   }
 
 
-def map_to_boolean_by_distance(values: 'tuple[tuple[str, DataValue], dict[DataValue, int]]'):
-  (fd_id, _), rhs_value_counts = values
-  answer = True
+def map_to_boolean_by_difference(fds: 'list[FunctionalDependency]'):
+  fds_by_id = {fd.id: fd for fd in fds}
 
-  if {type(value) for value in rhs_value_counts} <= {int, float, datetime.datetime}:
-    # For these types, we only need to compare the min and max because the difference
-    # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
-    if isDifferenceMoreThanDelta(min(rhs_value_counts), max(rhs_value_counts)): 
-      answer = False
-  else:
-    all_b = rhs_value_counts.keys()
-    for pair in combinations(all_b, 2): # this is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
-      if isDifferenceMoreThanDelta(*pair):
-        answer = False
-        break
+  def anon(values: 'tuple[tuple[str, tuple[DataValue, ...]], dict[DataValue, int]]'):
+    (fd_id, _), rhs_value_counts = values
+    rhs_values = rhs_value_counts.keys()
+    fd = fds_by_id[fd_id]
 
-  return (fd_id, answer)
+    is_delta = True
+    if fd.rhs in string_attrs:
+      # This is a bottleneck in terms of complexity: if the type is str then we cannot just find min and max in one loop
+      for a, b in combinations(rhs_values, 2):
+        if stringDifference(a, b) > DELTA_THRESHOLD:
+          is_delta = False
+          break
+    else:
+      # For these types, we only need to compare the min and max because the difference
+      # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
+      mini = min(rhs_values)  # type: ignore
+      maxi = max(rhs_values)  # type: ignore
+      is_delta = difference(mini, maxi, value_ranges[fd.rhs]) <= DELTA_THRESHOLD
+
+    return (fd_id, is_delta)
+
+  return anon
 
 
-def common_part(fds: 'list[FunctionalDependency]'):
+def common_part(rdd: RDD, fds: 'list[FunctionalDependency]'):
   # Count RHS values by LHS value 
-  rdd = users.rdd.flatMap(attrs_to_tuple(fds)) # 1 in the report
-  rdd = rdd.reduceByKey(add) # 2 in the report
+  rdd = rdd.flatMap(attrs_to_tuple(fds)) # 1 in the report
+  rdd = rdd.reduceByKey(operator.add) # 2 in the report
   rdd = rdd.map(tuple_to_dict) # 3 in the report
  
   # Merge dictionaries assuming keys are unique 
@@ -183,32 +177,34 @@ def hard_soft_part(rdd: RDD):
 
 def delta_part(rdd: RDD, fds: 'list[FunctionalDependency]'):
   rdd = rdd.filter(lambda x: x[0][0] in [f.id for f in fds])
-  rdd = rdd.map(map_to_boolean_by_distance) # 5 in the report
-  rdd = rdd.reduceByKey(lambda x1, x2: x1 and x2) # 6 in the report
+  rdd = rdd.map(map_to_boolean_by_difference(fds)) # 5 in the report
+  rdd = rdd.reduceByKey(operator.and_) # 6 in the report
   rdd = rdd.map(lambda x: {
     x[0]: x[1]
   })
   return rdd.reduce(lambda d1, d2: {**d1, **d2})
 
 
-def generate_deps(attributes: 'list[AttrName]', n: 'int'):
+def generate_deps(attributes: 'list[AttrName]', n: int):
   """
   Generates A -> B dependencies, where A has n attributes and B one attribute.
   """
-  attrs = set(attributes) - IGNORED_ATTRIBUTES
-  lhs_combos = combinations(attrs, n)
+  lhs_attrs = set(attributes) - IGNORED_LHS_ATTRS
+  rhs_attrs = set(attributes)
+
+  lhs_combos = combinations(lhs_attrs, n)
 
   deps: list[FunctionalDependency] = []
 
   for lhs_attrs in lhs_combos:
-    for rhs_attr in attrs:
+    for rhs_attr in rhs_attrs:
       if rhs_attr not in lhs_attrs:
         deps.append(FunctionalDependency(lhs_attrs, rhs_attr))
 
   return deps
 
 
-def purge_non_minimal_deps(candidate_deps: 'list[FunctionalDependency]', fd: 'FunctionalDependency'):
+def purge_non_minimal_deps(candidate_deps: 'list[FunctionalDependency]', fd: FunctionalDependency):
   """
   Given a list of candidate dependencies, purge all non-minimal dependencies
   regarding given fd.
@@ -263,9 +259,11 @@ schema = StructType([
 users = spark.read.csv(USERS_DATA_PATH, schema, nullValue='\\N')
 
 # %% Preprocessing
+print("Preprocessing")
 
 # Remove fake users
 users = users.filter(users.fake == 0)
+users = users.drop('fake')
 
 @udf
 def get_country_name(code: str):
@@ -277,7 +275,24 @@ def get_country_name(code: str):
     return None
 
 # Add column "country" with the country name based on the country code.
-users = users.withColumn('country', get_country_name(users.country_code))
+users = users.withColumn('country', get_country_name(users.country_code))  # type: ignore
+
+# Remove users that have null value for lat/long
+# ~ means not
+users = users.filter(~isnull('lat'))
+users = users.filter(~isnull('long'))
+
+# For string attributes, replace null values with the empty string
+string_attrs = {attr for attr, dtype in users.dtypes if dtype == 'string'}
+users = users.fillna('', subset=list(string_attrs))
+
+# %% Compute attribute value ranges
+print("Computing attribute value ranges")
+value_ranges = {}
+for attr in set(users.columns) - string_attrs:
+  minimum = users.agg({attr: 'min'}).collect()[0][0]
+  maximum = users.agg({attr: 'max'}).collect()[0][0]
+  value_ranges[attr] = (minimum, maximum)
 
 def chunks(lst, n=None):
   """
@@ -287,9 +302,7 @@ def chunks(lst, n=None):
     yield lst
   else:
     for i in range(0, len(lst), n):
-      start = i
-      end = min(i + n, len(lst) - 1)
-      yield lst[start:end]
+      yield lst[i:i+n]
 
 # %% Check FDs
 discovered_deps = []
@@ -314,20 +327,20 @@ for n in range(1, 4):
 
   print(f'Calculating probabilities...')
   for chunk in chunks(candidates, CHUNKS_SIZE):
-    common_result = common_part(chunk)
+    common_result = common_part(users.rdd, chunk)
     ps = hard_soft_part(common_result)
 
     for id, p in ps.items():
       fd = candidates_by_id[id]
 
-      classification = Classification.NO_FD
+      classification = Classification.NO_HARD_SOFT_FD
       if p == 1:
         classification = Classification.HARD
         fd.delta = True
       else:
-        delta_candidates.append(fd)
         if p > SOFT_THRESHOLD:
           classification = Classification.SOFT
+        delta_candidates.append(fd)
 
       print(f'Checked FD {fd}: prob {p:.5f} class {classification}')
 
@@ -335,15 +348,20 @@ for n in range(1, 4):
       fd.classification = classification
       discovered_deps.append(fd)
 
-    print('Delta part')
-    delta_result = delta_part(common_result, delta_candidates)
+    delta_result = {}
+    if len(delta_candidates) > 0:
+      print('Checking delta FDs...')
+      delta_result = delta_part(common_result, delta_candidates)
 
     for id, result in delta_result.items():
       fd = candidates_by_id[id]
+      print(f'Checked delta FD {fd}: {result}')
       fd.delta = result
 
 # %% Write results
-file_name = f"results for {SOFT_THRESHOLD}, {DELTA_NUM}, {DELTA_DATE}, {DELTA_STR}.csv"
+print(f'Checked {len(discovered_deps)} FDs')
+
+file_name = f"results for tau {SOFT_THRESHOLD} and delta {DELTA_THRESHOLD}.csv"
 with open(file_name, mode='w') as file:
   results = [[fd.lhs, fd.rhs, fd.probability, fd.classification, fd.delta] for fd in discovered_deps]
   wr = csv.writer(file, quoting=csv.QUOTE_ALL)
@@ -351,7 +369,7 @@ with open(file_name, mode='w') as file:
   wr.writerows(results)
 
 t1 = timer() - t
-print("Elapsed time: {:.2f}".format(t1), "sec")
+print(f'Elapsed time: {t1:.2f} sec')
 
 # %%
 spark.stop()
