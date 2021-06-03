@@ -66,7 +66,7 @@ def difference(a, b, value_range) -> float:
   return abs(a - b) / (value_range[1] - value_range[0])
 
 def stringDifference(a, b):
-  return 1 - SequenceMatcher(a=a, b=b, autojunk=False).real_quick_ratio()
+  return 1 - SequenceMatcher(a=a, b=b, autojunk=False).ratio()
 
 def attrs_to_tuple(fds: 'list[FunctionalDependency]'):
   """
