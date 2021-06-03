@@ -130,6 +130,7 @@ def map_to_boolean_by_difference(fds: 'list[FunctionalDependency]'):
       for a, b in combinations(rhs_values, 2):
         if stringDifference(a, b) > DELTA_THRESHOLD:
           is_delta = False
+          break
     else:
       # For these types, we only need to compare the min and max because the difference
       # function is 'transitive', i.e. d(a, b) + d(b, c) = d(a, c)
