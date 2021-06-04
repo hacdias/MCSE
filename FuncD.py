@@ -20,8 +20,7 @@ from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
 
 parser = argparse.ArgumentParser(description='Discover functional dependencies in the GHTorrent dataset.')
-# parser.add_argument('data_path', nargs='?', default='data/subset_users.csv', help='Path to CSV data file.')
-parser.add_argument('data_path', nargs='?', default='data/users.csv', help='Path to CSV data file.')
+parser.add_argument('data_path', nargs='?', default='data/subset_users.csv', help='Path to CSV data file.')
 parser.add_argument('-s', '--soft_threshold', default=0.9, help='Probability must be least this large to be a soft FD.')
 parser.add_argument('-d', '--delta_threshold', default=0.05, help='Difference must be at most this large to be a delta FD.')
 parser.add_argument('--approx', action='store_true', help='Whether to use an approximate algorithm for string comparisons. Uses an exact algortihm by default.')
@@ -447,7 +446,7 @@ sampling_candidates_deps = []
 
 for x in range(1,4):
   discovered_deps = []
-  sample = users.sample(True,SAMPLE_SIZE)
+  sample = users.sample(False,SAMPLE_SIZE)
   sample_dependencies(sample)
   deps = [[fd.lhs, fd.rhs] for fd in discovered_deps]
   sampling_candidates_deps.append(deps)
