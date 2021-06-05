@@ -390,7 +390,7 @@ def write_results(discovered_deps):
 
   print(f'Checked {len(discovered_deps)} FDs')
   print(f'Writing result to {args.out}')
-  with open("Results.csv", mode='w') as file:
+  with open(args.out, mode='w') as file:
     results = [[fd.lhs, fd.rhs, fd.probability, fd.classification, fd.delta] for fd in discovered_deps]
     wr = csv.writer(file, quoting=csv.QUOTE_ALL)
     wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification', 'Delta'])
