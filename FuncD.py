@@ -320,65 +320,8 @@ def chunks(lst, n=None):
 discovered_deps = []
 CHUNKS_SIZE = None
 
-# From 1 to 3 LHS elements.
-def sample_dependencies(users: RDD):
-  
-  print("Sampled Users, Number of records: {} " .format(users.count()))
-  
-  for n in range(1, 4):
-      print(f'Generating FDs with {n} LHS elements...')
-      candidates = generate_deps(users.columns, n)
-      delta_candidates: 'list[FunctionalDependency]' = []
-      # We purge as we go because candidate_deps is sorted from the smallest to the
-      # largest candidate FDs. Thus, the first time we see a soft or hard FD it is
-      # already minimal.
-      print(f'Purging non-minimal FDs...')
-      for fd in discovered_deps:
-        candidates, purged = purge_non_minimal_deps(candidates, fd)
-        # for fd in purged: print(f'\t{fd} purged')
-      
-      # It will be useful to access candidates by ID.
-      candidates_by_id = {fd.id: fd for fd in candidates}
 
-      print(f'Calculating probabilities...')
-      for chunk in chunks(candidates, CHUNKS_SIZE):
-        common_result = common_part(users.rdd, chunk)
-        ps = hard_soft_part(common_result)
-
-        for id, p in ps.items():
-          fd = candidates_by_id[id]
-
-          classification = Classification.NO_HARD_SOFT_FD
-          if p == 1:
-            classification = Classification.HARD
-            fd.delta = True
-          else:
-            if p > args.soft_threshold:
-              classification = Classification.SOFT
-            delta_candidates.append(fd)
-
-          # print(f'Checked FD {fd}: prob {p:.5f} class {classification}')
-
-          if (p > sample_Threshold):
-            fd.probability = p
-            fd.classification = classification
-            discovered_deps.append(fd)
-
-        delta_result = {}
-        if len(delta_candidates) > 0:
-          # print('Checking delta FDs...')
-          delta_result = delta_part(common_result, delta_candidates)
-
-        for id, result in delta_result.items():
-          fd = candidates_by_id[id]
-          # print(f'Checked delta FD {fd}: {result}')
-          fd.delta = result
-
-# %% Write results
-print(f'Checked {len(discovered_deps)} FDs')
-
-def discover_dependencies(users: RDD, common_candidates: 'list'):
-  
+def discover_dependencies(users: RDD, common_candidates: 'list', sampling: bool):
   
   for n in range(1, 4):
       print(f'Generating FDs with {n} LHS elements...')
@@ -390,18 +333,23 @@ def discover_dependencies(users: RDD, common_candidates: 'list'):
       for fd in discovered_deps:
         candidates, purged = purge_non_minimal_deps(candidates, fd)
 
-      for cand in candidates:
-        for sample_cand in common_candidates:
-          if (cand.lhs == sample_cand[0]):
-            if (cand.rhs == sample_cand[1]):
-              shared_candidates.append(cand)
+      # If we are not in sampling mode then we have to use the shared candidates produced
+      # by the intersection of the sampling candidate sets
+      print(f'Sampling mode? --> {sampling}')
+      if (not sampling) and (common_candidates):
+          for cand in candidates:
+            for sample_cand in common_candidates:
+              if (cand.lhs == sample_cand[0]):
+                if (cand.rhs == sample_cand[1]):
+                  shared_candidates.append(cand)
+          candidates = shared_candidates
 
 
-      candidates_by_id = {fd.id: fd for fd in shared_candidates}
-      print("Final list of candidates checked: ", len(shared_candidates))
+      candidates_by_id = {fd.id: fd for fd in candidates}
+      print(f'Final list of lhs = {n} candidates checked: {len(candidates)}')
       # if n == 3 : spark.stop()
       print(f'Calculating probabilities...')
-      for chunk in chunks(shared_candidates, CHUNKS_SIZE):
+      for chunk in chunks(candidates, CHUNKS_SIZE):
         
         common_result = common_part(users.rdd, chunk)
         ps = hard_soft_part(common_result)
@@ -417,12 +365,16 @@ def discover_dependencies(users: RDD, common_candidates: 'list'):
             if p > args.soft_threshold:
               classification = Classification.SOFT
             delta_candidates.append(fd)
-
-          # print(f'Checked FD {fd}: prob {p:.5f} class {classification}')
-
-          fd.probability = p
-          fd.classification = classification
-          discovered_deps.append(fd)
+          #Again if sampling, then discard the candidates with a probability that is 50% or lower
+          if (sampling):
+            if (p > sample_Threshold):
+              fd.probability = p
+              fd.classification = classification
+              discovered_deps.append(fd)
+          else:
+              fd.probability = p
+              fd.classification = classification
+              discovered_deps.append(fd)
 
         delta_result = {}
         if len(delta_candidates) > 0:
@@ -433,6 +385,7 @@ def discover_dependencies(users: RDD, common_candidates: 'list'):
           fd = candidates_by_id[id]
           # print(f'Checked delta FD {fd}: {result}')
           fd.delta = result 
+
 def write_results(discovered_deps):
 
   print(f'Checked {len(discovered_deps)} FDs')
@@ -442,12 +395,13 @@ def write_results(discovered_deps):
     wr = csv.writer(file, quoting=csv.QUOTE_ALL)
     wr.writerow(['Left-hand Side', 'Right-hand side', 'Probability', 'Classification', 'Delta'])
     wr.writerows(results)
+
 sampling_candidates_deps = []
 
 for x in range(1,4):
   discovered_deps = []
   sample = users.sample(False,SAMPLE_SIZE)
-  sample_dependencies(sample)
+  discover_dependencies(sample, None, True)
   deps = [[fd.lhs, fd.rhs] for fd in discovered_deps]
   sampling_candidates_deps.append(deps)
 
@@ -458,7 +412,7 @@ print("Common Candidates between the samples: ", len(common_candidates))
 
 
 discovered_deps = []
-discover_dependencies(users, common_candidates)
+discover_dependencies(users, common_candidates, False)
 write_results(discovered_deps)
 t1 = timer() - t
 print(f'Elapsed time for sampling and discovering: {t1:.2f} sec')
