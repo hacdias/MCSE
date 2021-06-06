@@ -14,7 +14,7 @@ from typing import Hashable
 
 from pyspark import SparkFiles
 from pyspark.rdd import RDD
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import udf, isnull
 from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
@@ -327,7 +327,7 @@ discovered_deps = []
 CHUNKS_SIZE = None
 
 
-def discover_dependencies(users: RDD, common_candidates: 'list', sampling: bool):
+def discover_dependencies(users: DataFrame, common_candidates: 'list | None', sampling: bool):
   
   for n in range(1, 4):
       print(f'Generating FDs with {n} LHS elements...')
