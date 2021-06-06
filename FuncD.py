@@ -20,7 +20,7 @@ from pyspark.sql.types import (DecimalType, IntegerType, StringType,
                                StructField, StructType, TimestampType)
 
 parser = argparse.ArgumentParser(description='Discover functional dependencies in the GHTorrent dataset.')
-parser.add_argument('data_path', nargs='?', default='data/subset_users.csv', help='Path to CSV data file.')
+parser.add_argument('data_path', nargs='?', default='data/subset_users.csv', help='Path to CSV data file. Defaults to data/subset_users.csv.')
 parser.add_argument('-s', '--soft_threshold', type=float, default=0.75, help='Probability must be least this large to be a soft FD.')
 parser.add_argument('-d', '--delta_threshold', type=float, default=0.4, help='Difference must be at most this large to be a delta FD.')
 parser.add_argument('-t', '--sample_threshold', type=float, default=0.3, help='Decide which FDs will be dropped after sampling.')
