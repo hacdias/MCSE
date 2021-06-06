@@ -182,7 +182,10 @@ def hard_soft_part(rdd: RDD):
   rdd = rdd.map(lambda d: {
     d[0]: d[1]['weighted_prob'] / d[1]['total']
   })
-  return rdd.reduce(lambda d1, d2: {**d1, **d2})
+  if rdd.isEmpty():
+    return {}
+  else:
+    return rdd.reduce(lambda d1, d2: {**d1, **d2})
 
 
 def delta_part(rdd: RDD, fds: 'list[FunctionalDependency]'):
@@ -192,7 +195,10 @@ def delta_part(rdd: RDD, fds: 'list[FunctionalDependency]'):
   rdd = rdd.map(lambda x: {
     x[0]: x[1]
   })
-  return rdd.reduce(lambda d1, d2: {**d1, **d2})
+  if rdd.isEmpty():
+    return {}
+  else:
+    return rdd.reduce(lambda d1, d2: {**d1, **d2})
 
 
 def generate_deps(attributes: 'list[AttrName]', n: int):
