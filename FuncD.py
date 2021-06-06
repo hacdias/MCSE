@@ -29,6 +29,10 @@ parser.add_argument('--approx', action='store_true', help='Whether to use an app
 parser.add_argument('--out', '-o', default='results.csv', help='Path to results output file. Defaults to results.csv.')
 args = parser.parse_args()
 
+# Make sure we have write access to the output file
+f = open(args.out, 'w')
+f.close()
+
 IGNORED_LHS_ATTRS = {
   'id',
   'login',
