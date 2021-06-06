@@ -23,6 +23,8 @@ parser = argparse.ArgumentParser(description='Discover functional dependencies i
 parser.add_argument('data_path', nargs='?', default='data/subset_users.csv', help='Path to CSV data file.')
 parser.add_argument('-s', '--soft_threshold', type=float, default=0.9, help='Probability must be least this large to be a soft FD.')
 parser.add_argument('-d', '--delta_threshold', type=float, default=0.05, help='Difference must be at most this large to be a delta FD.')
+parser.add_argument('-t', '--sample_threshold', type=float, default=0.3, help='Decide which FDs will be dropped after sampling.')
+parser.add_argument('-z', '--sample_size', type=float, default=0.03, help='Percentage of the dataset which is going to be included in the sample.')
 parser.add_argument('--approx', action='store_true', help='Whether to use an approximate algorithm for string comparisons. Uses an exact algortihm by default.')
 parser.add_argument('--out', '-o', default='results.csv', help='Path to results output file. Defaults to results.csv.')
 args = parser.parse_args()
@@ -40,8 +42,7 @@ sampling = True
 # Type aliases to give types some semantic meaning
 DataValue = Hashable # must be hashable because it is used as dict key
 AttrName = str
-sample_Threshold = 0.5 # Decide which FDs will be dropped after sampling
-SAMPLE_SIZE = 0.03 # Percentage of the dataset which is going to be included in the sample
+
 class Classification(Enum):
   NO_HARD_SOFT_FD = 'No Hard/Soft FD'
   HARD = 'Hard'
@@ -373,7 +374,7 @@ def discover_dependencies(users: DataFrame, common_candidates: 'list | None', sa
             delta_candidates.append(fd)
           #Again if sampling, then discard the candidates with a probability that is 50% or lower
           if (sampling):
-            if (p > sample_Threshold):
+            if (p > args.sample_threshold):
               fd.probability = p
               fd.classification = classification
               discovered_deps.append(fd)
@@ -406,7 +407,7 @@ sampling_candidates_deps = []
 
 for x in range(1,4):
   discovered_deps = []
-  sample = users.sample(False,SAMPLE_SIZE)
+  sample = users.sample(False, args.sample_size)
   discover_dependencies(sample, None, True)
   deps = [[fd.lhs, fd.rhs] for fd in discovered_deps]
   sampling_candidates_deps.append(deps)
