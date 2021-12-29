@@ -58,5 +58,7 @@ public class LwM2mDemoConstant {
             "10346.xml", "10347.xml", "10348.xml", "10349.xml", "10350.xml", "10351.xml", "10352.xml", "10353.xml",
             "10354.xml", "10355.xml", "10356.xml", "10357.xml", "10358.xml", "10359.xml", "10360.xml", "10361.xml",
             "10362.xml", "10363.xml", "10364.xml", "10365.xml", "10366.xml", "10368.xml", "10369.xml", "10371.xml",
-            "10374.xml", "10375.xml", "18830.xml", "18831.xml" };
+            "10374.xml", "10375.xml", "18830.xml", "18831.xml",
+            // Parking lot files.
+            "32800.xml", "32801.xml", "32802.xml" };
 }
