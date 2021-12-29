@@ -2,6 +2,14 @@
 
 The files in [diagrams](diagrams/) and [objects](objects/), as well as [lwm2m-client.jar](lwm2m-client.jar) are provided by the lecturers.
 
+## Server
+
+```
+cd server
+mvn clean install
+java -jar leshan-server-demo/target/leshan-server-demo-2.0.0-SNAPSHOT-jar-with-dependencies.jar
+```
+
 ## Runnning the Client
 
 LwM2M client implementation based on Leshan client demo. To start it, use a command line like:
