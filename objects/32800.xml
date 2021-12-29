@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<LWM2M  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://openmobilealliance.org/tech/profiles/LWM2M.xsd">
+	<Object ObjectType="MODefinition">
+		<Name>Parking Spot</Name>
+		<Description1>This custom object is used to represent some details of a parking spot.  A parking spot might contain a sensor to detect its occupancy.  This sensor might be accessible through a different object.</Description1>
+		<ObjectID>32800</ObjectID>
+		<ObjectURN>urn:oma:lwm2m:x:32800</ObjectURN>
+		<LWM2MVersion>1.0</LWM2MVersion>
+                <ObjectVersion>1.0</ObjectVersion>
+		<MultipleInstances>Single</MultipleInstances>
+		<Mandatory>Mandatory</Mandatory>
+		<Resources>
+			<Item ID="32700">
+				<Name>Parking Spot ID</Name>
+				<Operations>R</Operations>
+				<MultipleInstances>Single</MultipleInstances>
+				<Mandatory>Mandatory</Mandatory>
+				<Type>String</Type>
+				<RangeEnumeration></RangeEnumeration>
+				<Units></Units>
+				<Description>Identity of the parking spot, based on the host name. When multiple LwM2M clients run on the same host, used a "-N" sequence number to make the distinction.</Description>
+			</Item>
+			<Item ID="32701">
+				<Name>Parking Spot State</Name>
+				<Operations>RW</Operations>
+				<MultipleInstances>Single</MultipleInstances>
+				<Mandatory>Mandatory</Mandatory>
+				<Type>String</Type>
+				<RangeEnumeration>Free,Reserved,Occupied</RangeEnumeration>
+				<Units></Units>
+				<Description>Is the parking spot free, reserved or occupied? The state might be reflected in a status LED if it exits</Description>
+			</Item>
+			<Item ID="32702">
+				<Name>Vehicle ID</Name>
+				<Operations>RW</Operations>
+				<MultipleInstances>Single</MultipleInstances>
+				<Mandatory>Mandatory</Mandatory>
+				<Type>String</Type>
+				<RangeEnumeration></RangeEnumeration>
+				<Units></Units>
+				<Description>The ID of the vehicle that reserved the spot.</Description>
+			</Item>
+			<Item ID="32706">
+				<Name>Lot name</Name>
+				<Operations>RW</Operations>
+				<MultipleInstances>Single</MultipleInstances>
+				<Mandatory>Mandatory</Mandatory>
+				<Type>String</Type>
+				<RangeEnumeration></RangeEnumeration>
+				<Units></Units>
+				<Description>The name of the parking lot where the parking spot belongs to. The value should be non-volatile, such that after a restart, it will connect to the matching parking lot server</Description>
+			</Item>
+		</Resources>
+		<Description2></Description2>
+	</Object>
+</LWM2M>
