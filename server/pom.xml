@@ -45,16 +45,10 @@ Contributors:
         <module>leshan-server-core</module>
         <module>leshan-server-cf</module>
         <module>leshan-server-redis</module>
-        <module>leshan-client-core</module>
-        <module>leshan-client-cf</module>
-
-        <module>leshan-integration-tests</module> 
 
         <module>leshan-core-demo</module>
-        <module>leshan-client-demo</module>
         <module>leshan-server-core-demo</module>
         <module>leshan-server-demo</module>
-        <module>leshan-bsserver-demo</module>
     </modules>
 
     <scm>
@@ -587,17 +581,7 @@ Contributors:
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>leshan-client-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>leshan-server-cf</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>leshan-client-cf</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
