@@ -6,7 +6,7 @@ The files in [diagrams](diagrams/) and [objects](objects/), as well as [lwm2m-cl
 
 ```
 cd server
-mvn clean install
+mvn clean install (-DskipTests)
 java -jar leshan-server-demo/target/leshan-server-demo-2.0.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
