@@ -1,6 +1,6 @@
 # 2IMN15 - IoT Parking System
 
-The files in [diagrams](diagrams/) and [objects](objects/), as well as [lwm2m-client.jar](lwm2m-client.jar) are provided by the lecturers.
+The files in [diagrams](diagrams/) and [lwm2m-client.jar](lwm2m-client.jar) are provided by the lecturers.
 
 ## Server
 
