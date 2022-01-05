@@ -57,7 +57,7 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <div className='pa2'>
+      <div className='pa2 mw7 center'>
         <h1>Parking System</h1>
 
         {this.state.parkingLots.map(pl => <ParkingLot key={pl.id} {...pl} />)}
