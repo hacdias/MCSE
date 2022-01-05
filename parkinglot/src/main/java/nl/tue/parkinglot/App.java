@@ -9,6 +9,10 @@ public class App {
 
         System.out.println(lot.status());
 
-        lot.start();
+        try {
+            lot.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
