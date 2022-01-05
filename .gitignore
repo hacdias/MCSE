@@ -1,5 +1,5 @@
-# Leshan config files #
-leshan-core/ddffiles
+src/main/resources/webapp
+
 **/Californium.properties
 **/Californium3.properties
 **/Californium3.bsserver.properties
