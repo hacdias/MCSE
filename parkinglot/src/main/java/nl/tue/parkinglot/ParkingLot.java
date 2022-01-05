@@ -7,7 +7,6 @@ public class ParkingLot {
   final String id, name;
   final double rate;
   final LwM2MServer server;
-  final WebServer webServer;
 
   public ParkingLot(String name, double rate) {
     String id;
@@ -22,7 +21,6 @@ public class ParkingLot {
     this.rate = rate;
 
     this.server = new LwM2MServer(name);
-    this.webServer = new WebServer(this, "127.0.0.1", 8080);
   };
 
   public String getId() {
@@ -65,12 +63,11 @@ public class ParkingLot {
     return rate;
   }
 
-  public Status getStatus() {
-    return new Status(getId(), getName(), getRate(), getCapacity(), getReservations(), getVehicles());
+  public ParkingLotStatus getStatus() {
+    return new ParkingLotStatus(getId(), getName(), getRate(), getCapacity(), getReservations(), getVehicles());
   }
 
-  public void start() throws Exception {
+  public void start() {
     server.start();
-    webServer.start();
   }
 }

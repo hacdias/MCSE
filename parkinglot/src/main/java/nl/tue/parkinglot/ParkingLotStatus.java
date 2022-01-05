@@ -1,11 +1,11 @@
 package nl.tue.parkinglot;
 
-public class Status {
+public class ParkingLotStatus {
   private String id, name;
   private double rate;
   private int capacity, reservations, vehicles;
 
-  public Status(String id, String name, double rate, int capacity, int reservations, int vehicles) {
+  public ParkingLotStatus(String id, String name, double rate, int capacity, int reservations, int vehicles) {
     this.id = id;
     this.name = name;
     this.rate = rate;

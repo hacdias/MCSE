@@ -1,4 +1,4 @@
-package nl.tue.parkinglot;
+package nl.tue.parkinglot.webserver;
 
 import java.net.InetSocketAddress;
 
@@ -7,20 +7,18 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-import nl.tue.parkinglot.handlers.StatusHandler;
+import nl.tue.parkinglot.App;
+import nl.tue.parkinglot.ParkingSystem;
 
 public class WebServer {
-  final ParkingLot parkingLot;
+  final ParkingSystem parkingSystem;
   final Server server;
 
-  // TODO: support multiple parking lots.
-  // final Collection<ParkingLot> parkingLots = new ArrayList<>();
-
-  public WebServer(ParkingLot parkingLot, String hostname, int port) {
+  public WebServer(ParkingSystem parkingSystem, String hostname, int port) {
     InetSocketAddress addr = new InetSocketAddress(hostname, port);
 
     this.server = new Server(addr);
-    this.parkingLot = parkingLot;
+    this.parkingSystem = parkingSystem;
 
     WebAppContext staticFiles = new WebAppContext();
     staticFiles.setContextPath("/");
@@ -28,7 +26,7 @@ public class WebServer {
     staticFiles.setParentLoaderPriority(true);
 
     ContextHandler status = new ContextHandler("/status");
-    status.setHandler(new StatusHandler(parkingLot));
+    status.setHandler(new StatusHandler(parkingSystem));
 
     HandlerCollection handlers = new HandlerCollection();
     handlers.addHandler(status);
