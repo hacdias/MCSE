@@ -64,7 +64,8 @@ public class ParkingLot {
   }
 
   public ParkingLotStatus getStatus() {
-    return new ParkingLotStatus(getId(), getName(), getRate(), getCapacity(), getReservations(), getVehicles());
+    return new ParkingLotStatus(getId(), getName(), getRate(), getCapacity(), getReservations(), getVehicles(),
+        server.getParkingSpots());
   }
 
   public void start() {
