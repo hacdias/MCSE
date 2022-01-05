@@ -2,9 +2,15 @@ package nl.tue.parkinglot;
 
 public class App {
     public static void main(String[] args) {
-        ParkingSystem parkingSystem = new ParkingSystem();
+        // TODO: make this customizable via CLI arguments.
+        String hostname = "127.0.0.1";
+        Integer port = 8080;
 
-        parkingSystem.addParkingLot("P1", new ParkingLot("P1", 5.0));
+        ParkingSystem parkingSystem = new ParkingSystem(hostname, port);
+
+        // Add one parking lot to the system. Theoretically, the system
+        // supports multiple parking lots.
+        parkingSystem.addParkingLot(new ParkingLot("P1", 5.0));
 
         for (ParkingLot pl : parkingSystem.getParkingLots()) {
             // Start LwM2M servers for each parking lot.

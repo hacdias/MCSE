@@ -13,7 +13,7 @@ public class ParkingLot {
     try {
       id = InetAddress.getLocalHost().getHostName() + "-lot";
     } catch (UnknownHostException e) {
-      id = "unknown-device-lot";
+      id = name.toLowerCase() + "-lot";
     }
 
     this.id = id;

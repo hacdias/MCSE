@@ -11,12 +11,12 @@ public class ParkingSystem {
   final Map<String, ParkingLot> parkingLots = new HashMap<>();
   final WebServer server;
 
-  public ParkingSystem() {
-    this.server = new WebServer(this, "127.0.0.1", 8080);
+  public ParkingSystem(String hostname, Integer port) {
+    this.server = new WebServer(this, hostname, port);
   }
 
-  public void addParkingLot(String name, ParkingLot pl) {
-    parkingLots.put(name, pl);
+  public void addParkingLot(ParkingLot pl) {
+    parkingLots.put(pl.getName(), pl);
   }
 
   public ParkingLot getParkingLot(String name) {
