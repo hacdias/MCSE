@@ -8,6 +8,8 @@ function StatusIndicator ({ title, text }) {
 }
 
 export default class App extends React.Component {
+  intervalId = null;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -20,10 +22,30 @@ export default class App extends React.Component {
     };
   }
 
+  fetchData = async () => {
+    const url = "/status/";
+    const response = await fetch(url);
+    const data = await response.json();
+    this.setState(data);
+  }
+
+  async componentDidMount(){
+   await this.fetchData();
+
+   this.intervalId = setInterval(() => {
+      this.fetchData();
+   }, 1000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.intervalId)
+  }
+
   render() {
     return <div className='pa2'>
       <header>
-        <h1>Parking Lot {this.state.name} (<code>{this.state.id}</code>)</h1>
+        <h1>Parking Lot {this.state.name}</h1>
+        <p>id: <code>{this.state.id}</code></p>
       </header>
 
       <div className='flex'>

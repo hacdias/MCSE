@@ -7,8 +7,6 @@ public class App {
 
         ParkingLot lot = new ParkingLot(name, rate);
 
-        System.out.println(lot.status());
-
         try {
             lot.start();
         } catch (Exception e) {

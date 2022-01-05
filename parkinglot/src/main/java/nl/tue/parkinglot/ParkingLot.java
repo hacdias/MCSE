@@ -41,7 +41,7 @@ public class ParkingLot {
     int reservations = 0;
 
     for (ParkingSpot ps : server.getParkingSpots()) {
-      if (ps.getState() == "Reserved") {
+      if (ps.getState().equals("Reserved")) {
         reservations++;
       }
     }
@@ -53,7 +53,7 @@ public class ParkingLot {
     int occupations = 0;
 
     for (ParkingSpot ps : server.getParkingSpots()) {
-      if (ps.getState() == "Occupied") {
+      if (ps.getState().equals("Occupied")) {
         occupations++;
       }
     }
@@ -61,21 +61,12 @@ public class ParkingLot {
     return occupations;
   }
 
-  public int getFree() {
-    return this.getCapacity() - this.getReservations() - this.getVehicles();
-  }
-
   public double getRate() {
     return rate;
   }
 
-  public String status() {
-    return "Parking Lot Status:\n"
-        + "\tID: " + getId() + "\n"
-        + "\tName: " + getName() + "\n"
-        + "\tCapacity: " + getCapacity() + "\n"
-        + "\tReservations: " + getReservations() + "\n"
-        + "\tVehicles: " + getVehicles();
+  public Status getStatus() {
+    return new Status(getId(), getName(), getRate(), getCapacity(), getReservations(), getVehicles());
   }
 
   public void start() throws Exception {
