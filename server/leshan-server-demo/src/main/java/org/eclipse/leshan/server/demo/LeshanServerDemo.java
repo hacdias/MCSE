@@ -1,19 +1,19 @@
 /*******************************************************************************
  * Copyright (c) 2013-2015 Sierra Wireless and others.
- * 
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
+ *
  * The Eclipse Public License is available at
  *    http://www.eclipse.org/legal/epl-v20.html
  * and the Eclipse Distribution License is available at
  *    http://www.eclipse.org/org/documents/edl-v10.html.
- * 
+ *
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *     Bosch Software Innovations - added Redis URL support with authentication
- *     Firis SA - added mDNS services registering 
+ *     Firis SA - added mDNS services registering
  *******************************************************************************/
 package org.eclipse.leshan.server.demo;
 
@@ -23,6 +23,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.List;
 
 import javax.jmdns.JmDNS;
@@ -41,6 +42,7 @@ import org.eclipse.leshan.core.demo.LwM2mDemoConstant;
 import org.eclipse.leshan.core.demo.cli.ShortErrorMessageHandler;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
+import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.server.californium.LeshanServer;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.core.demo.json.servlet.SecurityServlet;
@@ -53,6 +55,9 @@ import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.model.VersionedModelProvider;
 import org.eclipse.leshan.server.redis.RedisRegistrationStore;
 import org.eclipse.leshan.server.redis.RedisSecurityStore;
+import org.eclipse.leshan.server.registration.Registration;
+import org.eclipse.leshan.server.registration.RegistrationListener;
+import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.eclipse.leshan.server.security.EditableSecurityStore;
 import org.eclipse.leshan.server.security.FileSecurityStore;
 import org.slf4j.Logger;
@@ -90,6 +95,20 @@ public class LeshanServerDemo {
         try {
             // Create LWM2M Server
             LeshanServer lwm2mServer = createLeshanServer(cli);
+
+            lwm2mServer.getRegistrationService().addListener(new RegistrationListener() {
+                public void registered(Registration registration, Registration previousReg, Collection<Observation> previousObsersations) {
+                    System.out.println("new device: " + registration.getEndpoint());
+                }
+
+                public void updated(RegistrationUpdate update, Registration updatedReg, Registration previousReg) {
+                    System.out.println("device is still here: " + updatedReg.getEndpoint());
+                }
+
+                public void unregistered(Registration registration, Collection<Observation> observations, boolean expired, Registration newReg) {
+                    System.out.println("device left: " + registration.getEndpoint());
+                }
+            });
 
             // Create Web Server
             Server webServer = createJettyServer(cli, lwm2mServer);

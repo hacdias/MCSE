@@ -27,3 +27,12 @@ object, which can be used to adjust resource values to test your
 server modifications. Some resource values within an object are
 updated together, for example, changing 'Last Plate' also increments
 'Vehicle Counter'.
+
+## Web Interface
+
+- Overview
+  - Name of parking lot
+  - Capacity
+  - Reservations
+  - Vehicles
+  - Rate
