@@ -22,15 +22,15 @@ import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationListener;
 import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
-import org.eclipse.leshan.core.request.CancelObservationRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.WriteRequest;
 
 public class LwM2MServer {
-  ConcurrentHashMap<Registration, ParkingSpot> parkingSpots = new ConcurrentHashMap<>();
-  ConcurrentHashMap<Registration, VehicleCounter> vehicleCounters = new ConcurrentHashMap<>();
+  ConcurrentHashMap<String, String> regToParkingId = new ConcurrentHashMap<>();
+  ConcurrentHashMap<String, String> regToVehicleCounterId = new ConcurrentHashMap<>();
 
-  // TODO: add maps by ID too because they'll be needed.
+  ConcurrentHashMap<String, ParkingSpot> parkingSpots = new ConcurrentHashMap<>();
+  ConcurrentHashMap<String, VehicleCounter> vehicleCounters = new ConcurrentHashMap<>();
 
   final String parkingLotName;
   final LeshanServer server;
@@ -46,6 +46,10 @@ public class LwM2MServer {
 
   public Collection<ParkingSpot> getParkingSpots() {
     return parkingSpots.values();
+  }
+
+  public Collection<VehicleCounter> getVehicleCounters() {
+    return vehicleCounters.values();
   }
 
   private LeshanServer buildServer() {
@@ -81,34 +85,34 @@ public class LwM2MServer {
     }
 
     public void updated(RegistrationUpdate update, Registration updatedReg, Registration previousReg) {
-      if (updatedReg == previousReg) {
-        // No changes.
-        return;
-      }
+      String prevRegId = previousReg.getId();
+      String regId = updatedReg.getId();
 
-      Map<Integer, String> supportedObjects = updatedReg.getSupportedObject();
-
-      if (supportedObjects.containsKey(32800)) {
-        removeParkingSpotRegistration(previousReg, null);
-        addParkingSpotRegistration(updatedReg);
-      }
-
-      if (supportedObjects.containsKey(32801)) {
-        removeVehicleCounterRegistration(previousReg, null);
-        addVehicleCounterRegistration(updatedReg);
+      if (!regId.equals(prevRegId)) {
+        // TODO: do something?
+        System.out.println("Registration changed ID from " + prevRegId + " to " + regId);
+        System.out.println(update.getAdditionalAttributes());
       }
     }
 
     public void unregistered(Registration registration, Collection<Observation> observations, boolean expired,
         Registration newReg) {
-      Map<Integer, String> supportedObjects = registration.getSupportedObject();
+      // NOTE: observations are passively canceled.
 
-      if (supportedObjects.containsKey(32800)) {
-        removeParkingSpotRegistration(registration, observations);
+      String regId = registration.getId();
+
+      ParkingSpot ps = getParkingSpot(registration);
+      if (ps != null) {
+        regToParkingId.remove(regId);
+        parkingSpots.remove(ps.getId());
+        System.out.println("Removed parking spot from " + registration.getEndpoint() + ": " + ps.getId());
       }
 
-      if (supportedObjects.containsKey(32801)) {
-        removeVehicleCounterRegistration(registration, observations);
+      VehicleCounter vc = getVehicleCounter(registration);
+      if (vc != null) {
+        regToVehicleCounterId.remove(regId);
+        vehicleCounters.remove(vc.getId());
+        System.out.println("Removed vehicle counter from " + registration.getEndpoint() + ": " + vc.getId());
       }
     }
   };
@@ -159,7 +163,9 @@ public class LwM2MServer {
       ps.setState(state);
       ps.setVehicle(vehicle);
 
-      parkingSpots.put(reg, ps);
+      parkingSpots.put(ps.getId(), ps);
+      regToParkingId.put(reg.getId(), ps.getId());
+
       System.out.println("Added parking spot from " + reg.getEndpoint() + ": " + ps.getId());
 
       ObserveResponse ores = server.send(reg, new ObserveRequest(32800, 0));
@@ -177,25 +183,14 @@ public class LwM2MServer {
     }
   }
 
-  private void removeParkingSpotRegistration(Registration reg, Collection<Observation> observations) {
-    parkingSpots.remove(reg);
-
-    if (observations != null) {
-      for (Observation obs : observations) {
-        if (!obs.getPath().toString().startsWith("/32800")) {
-          // Not a vehicle counter
-          continue;
-        }
-        try {
-          server.send(reg, new CancelObservationRequest(obs));
-        } catch (InterruptedException e) {
-          System.out.println("Failed to cancel observation");
-          e.printStackTrace();
-        }
-      }
+  private ParkingSpot getParkingSpot(Registration reg) {
+    String regId = reg.getId();
+    String psId = regToParkingId.get(regId);
+    if (psId == null) {
+      return null;
     }
 
-    System.out.println("Removed parking spot from " + reg.getEndpoint());
+    return parkingSpots.get(psId);
   }
 
   private void updateParkingSpot(Registration reg, ObserveResponse response) {
@@ -206,7 +201,7 @@ public class LwM2MServer {
     String state = (String) i.getResource(32701).getValue();
     String vehicle = (String) i.getResource(32702).getValue();
 
-    ParkingSpot ps = parkingSpots.get(reg);
+    ParkingSpot ps = getParkingSpot(reg);
     if (ps == null) {
       System.out.println("Parking spot not found for observation.");
       return;
@@ -239,7 +234,9 @@ public class LwM2MServer {
       vc.setLastPlate(lastPlate);
       vc.setDirection(direction);
 
-      vehicleCounters.put(reg, vc);
+      vehicleCounters.put(vc.getId(), vc);
+      regToVehicleCounterId.put(reg.getId(), vc.getId());
+
       System.out.println("Added vehicle counter from " + reg.getEndpoint() + ": " + vc.getId());
 
       ObserveResponse ores = server.send(reg, new ObserveRequest(32801, 0));
@@ -257,25 +254,14 @@ public class LwM2MServer {
     }
   }
 
-  private void removeVehicleCounterRegistration(Registration reg, Collection<Observation> observations) {
-    vehicleCounters.remove(reg);
-
-    if (observations != null) {
-      for (Observation obs : observations) {
-        if (!obs.getPath().toString().startsWith("/32801")) {
-          // Not a vehicle counter
-          continue;
-        }
-        try {
-          server.send(reg, new CancelObservationRequest(obs));
-        } catch (InterruptedException e) {
-          System.out.println("Failed to cancel observation");
-          e.printStackTrace();
-        }
-      }
+  private VehicleCounter getVehicleCounter(Registration reg) {
+    String regId = reg.getId();
+    String vcId = regToVehicleCounterId.get(regId);
+    if (vcId == null) {
+      return null;
     }
 
-    System.out.println("Removed vehicle counter from " + reg.getEndpoint());
+    return vehicleCounters.get(vcId);
   }
 
   private void updateVehicleRegistration(Registration reg, ObserveResponse response) {
@@ -287,7 +273,7 @@ public class LwM2MServer {
     String lastPlate = (String) i.getResource(32704).getValue();
     Long direction = (Long) i.getResource(32705).getValue();
 
-    VehicleCounter vc = vehicleCounters.get(reg);
+    VehicleCounter vc = getVehicleCounter(reg);
     if (vc == null) {
       System.out.println("Vehicle counter not found for observation.");
       return;

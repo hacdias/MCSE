@@ -1,4 +1,5 @@
 import React from 'react'
+import VehicleCounter from './VehicleCounter'
 import ParkingSpot from './ParkingSpot'
 
 function StatusIndicator({ title, text }) {
@@ -8,7 +9,7 @@ function StatusIndicator({ title, text }) {
   </div>
 }
 
-export default function ParkingLot({ name, id, capacity, vehicles, reservations, rate, parkingSpots }) {
+export default function ParkingLot({ name, id, capacity, vehicles, reservations, rate, parkingSpots, vehicleCounters }) {
   return (
     <div className='pa2 ba b--gray'>
       <header>
@@ -26,6 +27,10 @@ export default function ParkingLot({ name, id, capacity, vehicles, reservations,
       <h3>Parking Spots</h3>
 
       {parkingSpots.map(ps => <ParkingSpot key={ps.id} {...ps} />)}
+
+      <h3>Vehicle Counters</h3>
+
+      {vehicleCounters.map(vc => <VehicleCounter key={vc.id} {...vc} />)}
     </div>
   )
 }

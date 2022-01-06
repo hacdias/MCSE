@@ -29,6 +29,20 @@ export default class App extends React.Component {
               "id": "ps-3",
               "state": "Occupied",
               "vehicle": ""
+            },
+          ],
+          "vehicleCounters": [
+            {
+              "id": "vc-1",
+              "lastPlate": "",
+              "counter": 0,
+              "direction": 0
+            },
+            {
+              "id": "vc-2",
+              "lastPlate": "AA-11-22",
+              "counter": 12,
+              "direction": 1
             }
           ]
         }

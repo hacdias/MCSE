@@ -7,8 +7,9 @@ public class ParkingLotStatus {
   private double rate;
   private int capacity, reservations, vehicles;
   private Collection<ParkingSpot> parkingSpots;
-
-  public ParkingLotStatus(String id, String name, double rate, int capacity, int reservations, int vehicles, Collection<ParkingSpot> parkingSpots) {
+  private Collection<VehicleCounter> vehicleCounters;
+  
+  public ParkingLotStatus(String id, String name, double rate, int capacity, int reservations, int vehicles, Collection<ParkingSpot> parkingSpots, Collection<VehicleCounter> vehicleCounters) {
     this.id = id;
     this.name = name;
     this.rate = rate;
@@ -16,6 +17,7 @@ public class ParkingLotStatus {
     this.reservations = reservations;
     this.vehicles = vehicles;
     this.parkingSpots = parkingSpots;
+    this.vehicleCounters = vehicleCounters;
   }
 
   public String getId() {
@@ -44,5 +46,9 @@ public class ParkingLotStatus {
 
   public Collection<ParkingSpot> getParkingSpots() {
     return parkingSpots;
+  }
+
+  public Collection<VehicleCounter> getVehicleCounters() {
+    return vehicleCounters;
   }
 }
