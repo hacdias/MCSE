@@ -142,12 +142,27 @@ public class LwM2MServer {
     }
   };
 
+  private Double[] getCoordinates(Registration reg) throws InterruptedException {
+    Double[] coordinates = new Double[2];
+
+    ReadResponse res = server.send(reg, new ReadRequest(6, 0));
+    if (!res.isSuccess()) {
+      System.out.println("Read request was not successfull");
+      return null;
+    }
+
+    LwM2mObjectInstance i = (LwM2mObjectInstance) res.getContent();
+
+    coordinates[0] = (Double) i.getResource(0).getValue();
+    coordinates[1] = (Double) i.getResource(1).getValue();
+
+    return coordinates;
+  }
+
   private void addParkingSpotRegistration(Registration reg) {
-    ReadResponse res;
-
     try {
-      res = server.send(reg, new ReadRequest(32800, 0));
-
+      // Fetch parking lot properties
+      ReadResponse res = server.send(reg, new ReadRequest(32800, 0));
       if (!res.isSuccess()) {
         System.out.println("Read request was not successfull");
         return;
@@ -159,20 +174,30 @@ public class LwM2MServer {
       String state = (String) i.getResource(32701).getValue();
       String vehicle = (String) i.getResource(32702).getValue();
 
+      // Fetch location properties
+      Double[] coordinates = getCoordinates(reg);
+      if (coordinates == null) {
+        return;
+      }
+
       ParkingSpot ps = new ParkingSpot(id);
       ps.setState(state);
       ps.setVehicle(vehicle);
+      ps.setX(coordinates[0]);
+      ps.setY(coordinates[1]);
 
       parkingSpots.put(ps.getId(), ps);
       regToParkingId.put(reg.getId(), ps.getId());
 
       System.out.println("Added parking spot from " + reg.getEndpoint() + ": " + ps.getId());
 
+      // Observe parking lot properties
       ObserveResponse ores = server.send(reg, new ObserveRequest(32800, 0));
       if (!ores.isSuccess()) {
         System.out.println("Starting observations not successfull.");
       }
 
+      // Update parking lot name
       WriteResponse wres = server.send(reg, new WriteRequest(ContentFormat.TEXT, 32800, 0, 32706, parkingLotName));
       if (!wres.isSuccess()) {
         System.out.println("Writing parking lot name request was not successfull.");
@@ -212,11 +237,9 @@ public class LwM2MServer {
   }
 
   private void addVehicleCounterRegistration(Registration reg) {
-    ReadResponse res;
-
     try {
-      res = server.send(reg, new ReadRequest(32801, 0));
-
+      // Fetch vehicle counter properties
+      ReadResponse res = server.send(reg, new ReadRequest(32801, 0));
       if (!res.isSuccess()) {
         System.out.println("Read request was not successfull");
         return;
@@ -229,21 +252,31 @@ public class LwM2MServer {
       String lastPlate = (String) i.getResource(32704).getValue();
       Long direction = (Long) i.getResource(32705).getValue();
 
+      // Fetch location properties
+      Double[] coordinates = getCoordinates(reg);
+      if (coordinates == null) {
+        return;
+      }
+
       VehicleCounter vc = new VehicleCounter(id);
       vc.setCounter(counter);
       vc.setLastPlate(lastPlate);
       vc.setDirection(direction);
+      vc.setX(coordinates[0]);
+      vc.setY(coordinates[1]);
 
       vehicleCounters.put(vc.getId(), vc);
       regToVehicleCounterId.put(reg.getId(), vc.getId());
 
       System.out.println("Added vehicle counter from " + reg.getEndpoint() + ": " + vc.getId());
 
+      // Observe vehicle counter properties
       ObserveResponse ores = server.send(reg, new ObserveRequest(32801, 0));
       if (!ores.isSuccess()) {
         System.out.println("Starting observations not successfull.");
       }
 
+      // Update parking lot name
       WriteResponse wres = server.send(reg, new WriteRequest(ContentFormat.TEXT, 32801, 0, 32706, parkingLotName));
       if (!wres.isSuccess()) {
         System.out.println("Writing parking lot name request was not successfull.");

@@ -5,6 +5,7 @@ public class VehicleCounter {
 
   private String lastPlate;
   private Long counter, direction;
+  private Double x, y;
 
   public VehicleCounter(String id) {
     this.id = id;
@@ -36,5 +37,21 @@ public class VehicleCounter {
 
   public void setCounter(Long counter) {
     this.counter = counter;
+  }
+
+  public Double getX() {
+    return x;
+  }
+
+  public void setX(Double x) {
+    this.x = x;
+  }
+
+  public Double getY() {
+    return y;
+  }
+
+  public void setY(Double y) {
+    this.y = y;
   }
 }
