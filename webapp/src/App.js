@@ -18,17 +18,23 @@ export default class App extends React.Component {
             {
               "id": "ps-1",
               "state": "Occupied",
-              "vehicle": "AA-BB-11"
+              "vehicle": "AA-BB-11",
+              "x": 3,
+              "y": 4
             },
             {
               "id": "ps-2",
               "state": "Free",
-              "vehicle": ""
+              "vehicle": "",
+              "x": 3,
+              "y": 4
             },
             {
               "id": "ps-3",
-              "state": "Occupied",
-              "vehicle": ""
+              "state": "Reserved",
+              "vehicle": "11-CC-22",
+              "x": 3,
+              "y": 4
             },
           ],
           "vehicleCounters": [
@@ -36,13 +42,17 @@ export default class App extends React.Component {
               "id": "vc-1",
               "lastPlate": "",
               "counter": 0,
-              "direction": 0
+              "direction": 0,
+              "x": 3,
+              "y": 4
             },
             {
               "id": "vc-2",
               "lastPlate": "AA-11-22",
               "counter": 12,
-              "direction": 1
+              "direction": 1,
+              "x": 3,
+              "y": 4
             }
           ]
         }
