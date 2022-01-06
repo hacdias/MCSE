@@ -1,14 +1,16 @@
 # 2IMN15 - IoT Parking System
 
-The files in [diagrams](diagrams/) and [objects](objects/), as well as [lwm2m-client.jar](lwm2m-client.jar) are provided by the lecturers.
+The files in [diagrams](diagrams/) and [lwm2m-client.jar](lwm2m-client.jar) are provided by the lecturers.
 
 ## Server
 
 ```
 cd server
-mvn clean install (-DskipTests)
-java -jar leshan-server-demo/target/leshan-server-demo-2.0.0-SNAPSHOT-jar-with-dependencies.jar
+mvn clean install
+java -jar target/parkinglot-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
+
+WebServer available at: http://localhost:8080
 
 ## Runnning the Client
 
@@ -27,3 +29,19 @@ object, which can be used to adjust resource values to test your
 server modifications. Some resource values within an object are
 updated together, for example, changing 'Last Plate' also increments
 'Vehicle Counter'.
+
+## Frontend Development
+
+Node.js application in `webapp/`. Requires [Node.js](https://nodejs.org/) to be installed.
+
+1. Install dependencies:
+
+```
+npm install
+```
+
+2. Run development server:
+
+```
+npm start
+```
