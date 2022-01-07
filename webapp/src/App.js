@@ -1,7 +1,7 @@
 import React from 'react'
 import { HashRouter as Router, Routes, Route, NavLink } from 'react-router-dom'
 import ParkingLots from './Dashboard'
-// import Reservations from './Reservations'
+import Reservations from './Reservations'
 
 // This data is only used for the demo while in development mode.
 import exampleData from './example-data'
@@ -46,7 +46,7 @@ export default class App extends React.Component {
 
           <Routes>
             <Route path='/' element={<ParkingLots parkingLots={this.state.parkingLots} />} />
-            {/* <Route path='/reservations' element={<Reservations parkingLots={this.state.parkingLots} />} /> */}
+            <Route path='/reservations' element={<Reservations parkingLots={this.state.parkingLots} />} />
           </Routes>
         </Router>
       </div>
