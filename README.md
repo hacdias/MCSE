@@ -4,44 +4,34 @@ The files in [diagrams](diagrams/) and [lwm2m-client.jar](lwm2m-client.jar) are 
 
 ## Server
 
-```
-cd server
+```bash
+# Build the server
 mvn clean install
+
+# Run the server
 java -jar target/parkinglot-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
-WebServer available at: http://localhost:8080
+A web server will be available at http://localhost:8080.
 
-## Runnning the Client
+## Client
 
 LwM2M client implementation based on Leshan client demo. To start it, use a command line like:
 
-```
-java -jar lwm2m-client.jar -u 127.0.0.1:5683 -pos "3.0:4.0" -parkingspot -vehiclecounter
+```bash
+java -jar lwm2m-client.jar -u 127.0.0.1:5683 -pos "3.0:4.0" -parkingspot -vehiclecounter -n [endpoint-name]
 ```
 
-By running the standard leshan-server-demo application on the
-same machine, the client will connect to that server and you
-can interact with the client through the provided website (on http://127.0.0.1:8080/ )
-
-The lwm2m-client applications opens a number of windows, one for each
-object, which can be used to adjust resource values to test your
-server modifications. Some resource values within an object are
-updated together, for example, changing 'Last Plate' also increments
-'Vehicle Counter'.
+To run multiple clients, a different `endpoint-name` is required for each client.
 
 ## Frontend Development
 
 Node.js application in `webapp/`. Requires [Node.js](https://nodejs.org/) to be installed.
 
-1. Install dependencies:
-
-```
+```bash
+# Install dependencies
 npm install
-```
 
-2. Run development server:
-
-```
+# Start development server
 npm start
 ```
