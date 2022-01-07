@@ -1,10 +1,12 @@
 import React from 'react'
-import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, NavLink } from 'react-router-dom'
 import ParkingLots from './Dashboard'
 // import Reservations from './Reservations'
 
 // This data is only used for the demo while in development mode.
 import exampleData from './example-data'
+
+const navLinkClass = ({ isActive }) => `mr2 link pointer blue ${(isActive ? 'underline' : '')}`
 
 export default class App extends React.Component {
   constructor (props) {
@@ -36,15 +38,10 @@ export default class App extends React.Component {
     return (
       <div className='pa2 mw7 center'>
         <Router>
-          <nav>
-            <ul>
-              <li>
-                <Link to='/'>Dashboard</Link>
-              </li>
-              <li>
-                <Link to='/reservations'>Reservations</Link>
-              </li>
-            </ul>
+          <nav className='bb b--gray pv3'>
+            <span className='mr2 b'>Parking System</span>
+            <NavLink className={navLinkClass} to='/'>Dashboard</NavLink>
+            <NavLink className={navLinkClass} to='/reservations'>Reservations</NavLink>
           </nav>
 
           <Routes>
