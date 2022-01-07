@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Coordinates({ x, y }) {
+export default function Coordinates ({ x, y }) {
   x = parseFloat(x).toFixed(1)
   y = parseFloat(y).toFixed(1)
 

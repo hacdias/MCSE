@@ -1,90 +1,57 @@
 import React from 'react'
-import ParkingLot from './ParkingLot'
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import ParkingLots from './Dashboard'
+// import Reservations from './Reservations'
+
+// This data is only used for the demo while in development mode.
+import exampleData from './example-data'
+
 export default class App extends React.Component {
-  intervalId = null;
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      parkingLots: [
-        {
-          "id": "example-parking-lot",
-          "name": "P1",
-          "rate": 5.24,
-          "capacity": 3,
-          "reservations": 1,
-          "vehicles": 1,
-          "parkingSpots": [
-            {
-              "id": "ps-1",
-              "state": "Occupied",
-              "vehicle": "AA-BB-11",
-              "x": 3,
-              "y": 4
-            },
-            {
-              "id": "ps-2",
-              "state": "Free",
-              "vehicle": "",
-              "x": 3,
-              "y": 4
-            },
-            {
-              "id": "ps-3",
-              "state": "Reserved",
-              "vehicle": "11-CC-22",
-              "x": 3,
-              "y": 4
-            },
-          ],
-          "vehicleCounters": [
-            {
-              "id": "vc-1",
-              "lastPlate": "",
-              "counter": 0,
-              "direction": 0,
-              "x": 3,
-              "y": 4
-            },
-            {
-              "id": "vc-2",
-              "lastPlate": "AA-11-22",
-              "counter": 12,
-              "direction": 1,
-              "x": 3,
-              "y": 4
-            }
-          ]
-        }
-      ]
-    };
+  constructor (props) {
+    super(props)
+    this.state = exampleData
+    this.intervalId = null
   }
 
-  fetchData = async () => {
-    const url = "/status/";
-    const response = await fetch(url);
-    const parkingLots = await response.json();
-    this.setState({ parkingLots });
+  async fetchData () {
+    const url = '/status/'
+    const response = await window.fetch(url)
+    const parkingLots = await response.json()
+    this.setState({ parkingLots })
   }
 
-  async componentDidMount() {
-    await this.fetchData();
+  async componentDidMount () {
+    await this.fetchData()
 
     this.intervalId = setInterval(() => {
-      this.fetchData();
+      this.fetchData()
     }, 1000)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     clearInterval(this.intervalId)
   }
 
-  render() {
+  render () {
     return (
       <div className='pa2 mw7 center'>
-        <h1>Parking System</h1>
+        <Router>
+          <nav>
+            <ul>
+              <li>
+                <Link to='/'>Dashboard</Link>
+              </li>
+              <li>
+                <Link to='/reservations'>Reservations</Link>
+              </li>
+            </ul>
+          </nav>
 
-        {this.state.parkingLots.map(pl => <ParkingLot key={pl.id} {...pl} />)}
+          <Routes>
+            <Route path='/' element={<ParkingLots parkingLots={this.state.parkingLots} />} />
+            {/* <Route path='/reservations' element={<Reservations parkingLots={this.state.parkingLots} />} /> */}
+          </Routes>
+        </Router>
       </div>
     )
   }

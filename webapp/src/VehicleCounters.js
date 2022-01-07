@@ -1,33 +1,30 @@
 import React from 'react'
 import Coordinates from './Coordinates'
+import { Table, DataCell, HeaderCell, Row } from './Table'
 
-const tdClass = 'pv2 ph3 tl'
-
-function VehicleCounter({ id, lastPlate, counter, direction, x, y }) {
+function VehicleCounter ({ id, lastPlate, counter, direction, x, y }) {
   return (
-    <tr className='striped--light-gray '>
-      <td className={tdClass}><span className={`h1 mr1 w2 tc b dib bg-black-10 br2 pa1`} title='Counter'>{counter}</span></td>
-      <td className={tdClass}><code>{id}</code></td>
-      <td className={tdClass}><Coordinates x={x} y={y} /></td>
-      <td className={tdClass}>{direction === 0 ? 'exit' : 'enter'}</td>
-      <td className={tdClass}>{lastPlate}</td>
-    </tr>
+    <Row>
+      <DataCell><span className='h1 mr1 w2 tc b dib bg-black-10 br2 pa1' title='Counter'>{counter}</span></DataCell>
+      <DataCell><code>{id}</code></DataCell>
+      <DataCell><Coordinates x={x} y={y} /></DataCell>
+      <DataCell>{direction === 0 ? 'exit' : 'enter'}</DataCell>
+      <DataCell>{lastPlate}</DataCell>
+    </Row>
   )
 }
 
-export default function VehicleCounters({ vehicleCounters }) {
+export default function VehicleCounters ({ vehicleCounters }) {
   return (
-    <table className='collapse ba b--moon-gray w-100'>
-      <tbody>
-        <tr className='striped--light-gray '>
-          <th className={tdClass}>Counter</th>
-          <th className={tdClass}>ID</th>
-          <th className={tdClass}>Position</th>
-          <th className={tdClass}>Direction</th>
-          <th className={tdClass}>Vehicle</th>
-        </tr>
-        {vehicleCounters.map(vc => <VehicleCounter key={vc.id} {...vc} />)}
-      </tbody>
-    </table>
+    <Table>
+      <Row>
+        <HeaderCell>Counter</HeaderCell>
+        <HeaderCell>ID</HeaderCell>
+        <HeaderCell>Position</HeaderCell>
+        <HeaderCell>Direction</HeaderCell>
+        <HeaderCell>Vehicle</HeaderCell>
+      </Row>
+      {vehicleCounters.map(vc => <VehicleCounter key={vc.id} {...vc} />)}
+    </Table>
   )
 }
