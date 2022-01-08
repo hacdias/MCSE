@@ -16,11 +16,11 @@ public class ParkingSystem {
   }
 
   public void addParkingLot(ParkingLot pl) {
-    parkingLots.put(pl.getName(), pl);
+    parkingLots.put(pl.getId(), pl);
   }
 
-  public ParkingLot getParkingLot(String name) {
-    return parkingLots.get(name);
+  public ParkingLot getParkingLot(String id) {
+    return parkingLots.get(id);
   }
 
   public Collection<ParkingLot> getParkingLots() {

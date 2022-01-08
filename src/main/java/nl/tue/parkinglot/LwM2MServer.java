@@ -48,6 +48,10 @@ public class LwM2MServer {
     return parkingSpots.values();
   }
 
+  public Map<String, ParkingSpot> getParkingSpotsAsMap() {
+    return parkingSpots;
+  }
+
   public Collection<VehicleCounter> getVehicleCounters() {
     return vehicleCounters.values();
   }

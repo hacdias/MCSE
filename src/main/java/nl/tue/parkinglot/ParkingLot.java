@@ -2,11 +2,16 @@ package nl.tue.parkinglot;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 
 public class ParkingLot {
   final String id, name;
   final double rate;
   final LwM2MServer server;
+
+  public Map<String, ParkingSpot> getParkingSpots(){
+    return server.getParkingSpotsAsMap();
+  }
 
   public ParkingLot(String name, double rate) {
     String id;

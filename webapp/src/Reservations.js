@@ -66,9 +66,28 @@ export default function Reservations ({ parkingLots }) {
     const pl = parkingLot.id
     const ps = parkingSpot ? parkingSpot.id : null
 
-    // TODO: submit data to the server and say if it worked.
+    const data = {"plate" : plate, "parkingLot" : pl, "parkingSpot" : ps}
+
+    fetch('http://localhost:8080/reservations/', {
+      body: JSON.stringify(data),
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'POST',
+      mode: 'cors',
+      redirect: 'follow',
+      referrer: 'no-referrer',
+    })
+      .then(function (response) {
+        console.log(response);
+        if (response.status === 200) {
+          alert('Successfully Reserved.');
+        } else {
+          alert('Error occurred while reserving.');
+        }
+      });
+
     console.log(plate, pl, ps)
-    window.alert('TODO')
   }
 
   return (
