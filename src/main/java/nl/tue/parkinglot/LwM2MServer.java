@@ -254,8 +254,6 @@ public class LwM2MServer {
   }
 
   private void updateParkingSpot(Registration reg, ObserveResponse response) {
-    // TODO: investigate which fields we actually need and add observations only for
-    // those.
     LwM2mObjectInstance i = (LwM2mObjectInstance) response.getContent();
 
     String state = (String) i.getResource(32701).getValue();
@@ -333,8 +331,6 @@ public class LwM2MServer {
   }
 
   private void updateVehicleRegistration(Registration reg, ObserveResponse response) {
-    // TODO: investigate which fields we actually need and add observations only for
-    // those.
     LwM2mObjectInstance i = (LwM2mObjectInstance) response.getContent();
 
     Long counter = (Long) i.getResource(32703).getValue();
