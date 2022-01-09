@@ -1,12 +1,24 @@
 package nl.tue.parkinglot;
 
+import com.google.gson.annotations.Expose;
+
+import org.eclipse.leshan.server.registration.Registration;
+
 public class ParkingSpot {
+  private Registration registration;
+
+  @Expose
   private final String id;
+
+  @Expose
   private String state, vehicle;
+
+  @Expose
   private Double x, y;
 
-  public ParkingSpot(String id) {
+  public ParkingSpot(String id, Registration registration) {
     this.id = id;
+    this.registration = registration;
   }
 
   public String getId() {
@@ -43,5 +55,13 @@ public class ParkingSpot {
 
   public void setY(Double y) {
     this.y = y;
+  }
+
+  public Registration getRegistration() {
+    return registration;
+  }
+
+  public void setRegistration(Registration registration) {
+    this.registration = registration;
   }
 }

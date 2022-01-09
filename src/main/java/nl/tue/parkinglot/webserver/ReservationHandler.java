@@ -10,15 +10,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import nl.tue.parkinglot.ParkingSystem;
-
 import java.util.Map;
 import java.util.stream.*;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import nl.tue.parkinglot.ParkingLot;
-import nl.tue.parkinglot.ParkingSpot;
 
 public class ReservationHandler extends AbstractHandler {
   final ParkingSystem parkingSystem;
@@ -41,13 +37,10 @@ public class ReservationHandler extends AbstractHandler {
         System.out.println(e.getId());
       }
 
-      ParkingSpot parkingSpot = parkingSystem
-          .getParkingLot(reservationMap.get("parkingLot"))
-          .getParkingSpots()
-          .get(reservationMap.get("parkingSpot"));
-
-      parkingSpot.setState("Reserved");
-      parkingSpot.setVehicle(reservationMap.get("plate"));
+      parkingSystem.reserveParkingSpot(
+          reservationMap.get("parkingLot"),
+          reservationMap.get("plate"),
+          reservationMap.get("parkingSpot"));
     }
 
     response.setContentType("application/json; charset=utf-8");

@@ -73,6 +73,10 @@ public class ParkingLot {
         server.getParkingSpots(), server.getVehicleCounters());
   }
 
+  public void reserveParkingSpot(String plate, String parkingSpot) {
+    this.server.reserveParkingSpot(plate, parkingSpot);
+  }
+
   public void start() {
     server.start();
   }

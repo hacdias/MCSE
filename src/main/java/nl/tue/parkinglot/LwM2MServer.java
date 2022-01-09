@@ -56,6 +56,37 @@ public class LwM2MServer {
     return vehicleCounters.values();
   }
 
+  public void reserveParkingSpot(String plate, String parkingSpot) {
+    if (parkingSpot == null) {
+      // TODO: we are supposed to be able to reserve a parking spot without saying
+      // which one specifically.
+
+      throw new Error("Not implemented!");
+    }
+
+    ParkingSpot ps = parkingSpots.get(parkingSpot);
+    if (ps == null) {
+      throw new Error("parking spot does not exist");
+    }
+
+    Registration reg = ps.getRegistration();
+
+    try {
+      WriteResponse res = server.send(reg, new WriteRequest(32800, 0, 32701, "Reserved"));
+      if (!res.isSuccess()) {
+        throw new Error("writing to parking spot was unsuccessfull");
+      }
+
+      res = server.send(reg, new WriteRequest(32800, 0, 32702, plate));
+      if (!res.isSuccess()) {
+        throw new Error("writing to parking spot was unsuccessfull");
+      }
+
+    } catch (InterruptedException e) {
+      throw new Error(e);
+    }
+  }
+
   private LeshanServer buildServer() {
     LeshanServerBuilder builder = new LeshanServerBuilder();
 
@@ -184,7 +215,7 @@ public class LwM2MServer {
         return;
       }
 
-      ParkingSpot ps = new ParkingSpot(id);
+      ParkingSpot ps = new ParkingSpot(id, reg);
       ps.setState(state);
       ps.setVehicle(vehicle);
       ps.setX(coordinates[0]);
@@ -262,7 +293,7 @@ public class LwM2MServer {
         return;
       }
 
-      VehicleCounter vc = new VehicleCounter(id);
+      VehicleCounter vc = new VehicleCounter(id, reg);
       vc.setCounter(counter);
       vc.setLastPlate(lastPlate);
       vc.setDirection(direction);

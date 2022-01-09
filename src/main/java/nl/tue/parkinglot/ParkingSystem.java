@@ -37,6 +37,11 @@ public class ParkingSystem {
     return statuses;
   }
 
+  public void reserveParkingSpot(String parkingLot, String plate, String parkingSpot) {
+    ParkingLot pl = this.getParkingLot(parkingLot);
+    pl.reserveParkingSpot(plate, parkingSpot);
+  }
+
   public void start() throws Exception {
     server.start();
   }

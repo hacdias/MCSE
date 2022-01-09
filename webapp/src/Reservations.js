@@ -83,7 +83,9 @@ export default function Reservations ({ parkingLots }) {
       })
 
       setSuccess(res.status === 200)
-      console.error('unexpected status: ' + res.statusText)
+      if (res.status !== 200) {
+        console.error('unexpected status: ' + res.statusText)
+      }
     } catch (e) {
       setSuccess(false)
       console.error(e)
