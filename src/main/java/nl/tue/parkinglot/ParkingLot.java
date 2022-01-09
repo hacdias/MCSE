@@ -9,7 +9,7 @@ public class ParkingLot {
   final double rate;
   final LwM2MServer server;
 
-  public Map<String, ParkingSpot> getParkingSpots(){
+  public Map<String, ParkingSpot> getParkingSpots() {
     return server.getParkingSpotsAsMap();
   }
 
