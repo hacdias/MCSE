@@ -16,11 +16,11 @@ public class ParkingSystem {
   }
 
   public void addParkingLot(ParkingLot pl) {
-    parkingLots.put(pl.getName(), pl);
+    parkingLots.put(pl.getId(), pl);
   }
 
-  public ParkingLot getParkingLot(String name) {
-    return parkingLots.get(name);
+  public ParkingLot getParkingLot(String id) {
+    return parkingLots.get(id);
   }
 
   public Collection<ParkingLot> getParkingLots() {
@@ -35,6 +35,11 @@ public class ParkingSystem {
     }
 
     return statuses;
+  }
+
+  public void reserveParkingSpot(String parkingLot, String plate, String parkingSpot) {
+    ParkingLot pl = this.getParkingLot(parkingLot);
+    pl.reserveParkingSpot(plate, parkingSpot);
   }
 
   public void start() throws Exception {

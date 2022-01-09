@@ -28,9 +28,14 @@ public class WebServer {
     ContextHandler status = new ContextHandler("/status");
     status.setHandler(new StatusHandler(parkingSystem));
 
+    ContextHandler reservation = new ContextHandler("/reservations");
+    reservation.setHandler(new ReservationHandler(parkingSystem));
+    
     HandlerCollection handlers = new HandlerCollection();
     handlers.addHandler(status);
+    handlers.addHandler(reservation);
     handlers.addHandler(staticFiles);
+   
 
     this.server.setHandler(handlers);
   }

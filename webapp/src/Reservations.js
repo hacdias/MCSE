@@ -50,6 +50,7 @@ export default function Reservations ({ parkingLots }) {
   const [vehiclePlate, setVehiclePlate] = useState('')
   const [parkingLot, setParkingLot] = useState(null)
   const [parkingSpot, setParkingSpot] = useState(null)
+  const [success, setSuccess] = useState(null)
 
   const updateVehiclePlate = (event) => {
     setVehiclePlate(event.target.value)
@@ -59,44 +60,71 @@ export default function Reservations ({ parkingLots }) {
     setVehiclePlate('')
     setParkingLot(null)
     setParkingSpot(null)
+    setSuccess(null)
   }
 
-  const reserve = () => {
+  const reserve = async () => {
     const plate = vehiclePlate
     const pl = parkingLot.id
     const ps = parkingSpot ? parkingSpot.id : null
 
-    // TODO: submit data to the server and say if it worked.
-    console.log(plate, pl, ps)
-    window.alert('TODO')
+    const data = { plate: plate, parkingLot: pl, parkingSpot: ps }
+
+    try {
+      const res = await window.fetch('/reservations/', {
+        body: JSON.stringify(data),
+        headers: {
+          'content-type': 'application/json'
+        },
+        method: 'POST',
+        mode: 'cors',
+        redirect: 'follow',
+        referrer: 'no-referrer'
+      })
+
+      setSuccess(res.status === 200)
+      if (res.status !== 200) {
+        console.error('unexpected status: ' + res.statusText)
+      }
+    } catch (e) {
+      setSuccess(false)
+      console.error(e)
+    }
   }
 
   return (
     <>
       <h1>Reservations</h1>
 
-      <h2>1. Insert Your Vehicle Plate</h2>
-
-      <input className='ba b--moon-gray pa2' type='text' value={vehiclePlate} onChange={updateVehiclePlate} placeholder='AA-11-BB' />
-
-      <h2>2. Choose a Parking Lot</h2>
-
-      {vehiclePlate && !parkingLot && <ChooseParkingLot parkingLots={parkingLots} onParkingLot={setParkingLot} />}
-
-      {vehiclePlate && parkingLot && <p>Parking lot: {parkingLot.name}</p>}
-
-      <h2>3. Choose a Parking Spot (Optional)</h2>
-
-      {parkingLot && !parkingSpot &&
+      {success === null &&
         <>
-          <p>The parking lot provides vehicle counters at the entrances and exits. Thus, it is optional to choose a specific parking lot.</p>
-          <ChooseParkingSpot {...parkingLot} onParkingSpot={setParkingSpot} />
+          <h2>1. Insert Your Vehicle Plate</h2>
+
+          <input className='ba b--moon-gray pa2' type='text' value={vehiclePlate} onChange={updateVehiclePlate} placeholder='AA-11-BB' />
+
+          <h2>2. Choose a Parking Lot</h2>
+
+          {vehiclePlate && !parkingLot && <ChooseParkingLot parkingLots={parkingLots} onParkingLot={setParkingLot} />}
+
+          {vehiclePlate && parkingLot && <p>Parking lot: {parkingLot.name}</p>}
+
+          <h2>3. Choose a Parking Spot (Optional)</h2>
+
+          {parkingLot && !parkingSpot &&
+            <>
+              <p>The parking lot provides vehicle counters at the entrances and exits. Thus, it is optional to choose a specific parking lot.</p>
+              <ChooseParkingSpot {...parkingLot} onParkingSpot={setParkingSpot} />
+            </>}
+
+          {parkingSpot && <p>Parking spot: {parkingSpot.id}</p>}
         </>}
 
-      {parkingSpot && <p>Parking spot: {parkingSpot.id}</p>}
+      {success === true && <p className='pa2 bg-green white'>Reservation was successfull.</p>}
+
+      {success === false && <p className='pa2 bg-red white'>Reservation failed. Please check the developer's console for more details.</p>}
 
       <div className='mt3'>
-        {parkingLot && <Button className='mr2' onClick={reserve}>Confirm Reservation</Button>}
+        {success === null && parkingLot && <Button className='mr2' onClick={reserve}>Confirm Reservation</Button>}
 
         <Button onClick={reset} color='red'>Start Over</Button>
       </div>
