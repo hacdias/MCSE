@@ -32,10 +32,6 @@ public class App {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (db != null) {
-                db.close();
-            }
         }
     }
 }

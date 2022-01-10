@@ -61,7 +61,9 @@ public class ParkingLot {
       }
     }
 
-    return occupations;
+    // Get the max of occupied parking spots and cars inside the park. That'll give
+    // the number of occupied spots.
+    return Math.max(occupations, server.getCarsInPark());
   }
 
   public double getRate() {

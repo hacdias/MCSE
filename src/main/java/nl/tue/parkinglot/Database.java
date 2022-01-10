@@ -7,13 +7,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Database {
-  final Connection conn;
+  final String database;
 
   public Database(String path) throws SQLException {
-    this.conn = DriverManager.getConnection("jdbc:sqlite:" + path);
+    this.database = "jdbc:sqlite:" + path;
     initialize();
-
-    insertParkAtLot("lt1", "AA-BB-CC");
   }
 
   private void initialize() throws SQLException {
@@ -32,39 +30,40 @@ public class Database {
         + "	timestamp integer NOT NULL\n"
         + ");";
 
+    Connection conn = DriverManager.getConnection(this.database);
     Statement stmt = conn.createStatement();
     stmt.execute(sqlPS);
     stmt.execute(sqlPL);
+
+    conn.close();
   }
 
   public void insertParkAtSpot(String lotID, String spotID, String vehicleID) throws SQLException {
     long unixTime = System.currentTimeMillis() / 1000L;
     String sql = "INSERT INTO parking_spots(lot_id, spot_id, vehicle_id, timestamp) VALUES(?, ?, ?, ?)";
 
+    Connection conn = DriverManager.getConnection(this.database);
     PreparedStatement pstmt = conn.prepareStatement(sql);
     pstmt.setString(1, lotID);
     pstmt.setString(2, spotID);
     pstmt.setString(3, vehicleID);
     pstmt.setLong(4, unixTime);
     pstmt.executeUpdate();
+
+    conn.close();
   }
 
   public void insertParkAtLot(String lotID, String vehicleID) throws SQLException {
     long unixTime = System.currentTimeMillis() / 1000L;
     String sql = "INSERT INTO parking_lots(lot_id, vehicle_id, timestamp) VALUES(?, ?, ?)";
 
+    Connection conn = DriverManager.getConnection(this.database);
     PreparedStatement pstmt = conn.prepareStatement(sql);
     pstmt.setString(1, lotID);
     pstmt.setString(2, vehicleID);
     pstmt.setLong(3, unixTime);
     pstmt.executeUpdate();
-  }
 
-  public void close() {
-    try {
-      conn.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
+    conn.close();
   }
 }

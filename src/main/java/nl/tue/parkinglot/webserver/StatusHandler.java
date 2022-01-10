@@ -27,7 +27,7 @@ public class StatusHandler extends AbstractHandler {
   public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
 
-    String statusJsonString = gson.toJson(parkingSystem.getStatuses());
+  String statusJsonString = gson.toJson(parkingSystem.getStatuses());
 
     response.setContentType("application/json; charset=utf-8");
     response.setStatus(HttpServletResponse.SC_OK);

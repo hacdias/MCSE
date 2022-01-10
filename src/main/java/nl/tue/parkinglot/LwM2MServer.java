@@ -37,6 +37,9 @@ public class LwM2MServer {
   final LeshanServer server;
   final Database db;
 
+  // Counter for the 'enters' and 'exits' for the vehicle counters.
+  int carsInPark = 0;
+
   public LwM2MServer(String parkingLotId, String parkingLotName, Database db) {
     this.parkingLotId = parkingLotId;
     this.parkingLotName = parkingLotName;
@@ -58,6 +61,10 @@ public class LwM2MServer {
 
   public Collection<VehicleCounter> getVehicleCounters() {
     return vehicleCounters.values();
+  }
+
+  public int getCarsInPark() {
+    return carsInPark;
   }
 
   public void reserveParkingSpot(String plate, String parkingSpot) {
@@ -356,11 +363,25 @@ public class LwM2MServer {
       return;
     }
 
+    if (vc.getCounter().equals(counter)) {
+      // If the counter hasn't changed, don't update anything else.
+      return;
+    }
+
     vc.setCounter(counter);
     vc.setLastPlate(lastPlate);
     vc.setDirection(direction);
 
-    if (direction == 1 && !lastPlate.equals("")) {
+    if (lastPlate.equals("")) {
+      // Ignore if the plate isn't set.
+      return;
+    }
+
+    if (direction == 0) {
+      carsInPark--;
+    } else {
+      carsInPark++;
+
       try {
         db.insertParkAtLot(parkingLotId, lastPlate);
       } catch (SQLException e) {
