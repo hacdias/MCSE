@@ -13,7 +13,7 @@ public class ParkingLot {
     return server.getParkingSpotsAsMap();
   }
 
-  public ParkingLot(String name, double rate) {
+  public ParkingLot(String name, double rate, Database db) {
     String id;
     try {
       id = InetAddress.getLocalHost().getHostName() + "-lot";
@@ -25,7 +25,7 @@ public class ParkingLot {
     this.name = name;
     this.rate = rate;
 
-    this.server = new LwM2MServer(name);
+    this.server = new LwM2MServer(id, name, db);
   };
 
   public String getId() {

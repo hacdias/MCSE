@@ -10,9 +10,11 @@ import nl.tue.parkinglot.webserver.WebServer;
 public class ParkingSystem {
   final Map<String, ParkingLot> parkingLots = new HashMap<>();
   final WebServer server;
+  final Database db;
 
-  public ParkingSystem(String hostname, Integer port) {
+  public ParkingSystem(String hostname, Integer port, Database db) {
     this.server = new WebServer(this, hostname, port);
+    this.db = db;
   }
 
   public void addParkingLot(ParkingLot pl) {

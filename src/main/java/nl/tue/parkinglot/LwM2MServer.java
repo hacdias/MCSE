@@ -1,5 +1,6 @@
 package nl.tue.parkinglot;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +33,15 @@ public class LwM2MServer {
   ConcurrentHashMap<String, ParkingSpot> parkingSpots = new ConcurrentHashMap<>();
   ConcurrentHashMap<String, VehicleCounter> vehicleCounters = new ConcurrentHashMap<>();
 
-  final String parkingLotName;
+  final String parkingLotName, parkingLotId;
   final LeshanServer server;
+  final Database db;
 
-  public LwM2MServer(String parkingLotName) {
+  public LwM2MServer(String parkingLotId, String parkingLotName, Database db) {
+    this.parkingLotId = parkingLotId;
     this.parkingLotName = parkingLotName;
     this.server = buildServer();
+    this.db = db;
   }
 
   public void start() {
@@ -267,6 +271,15 @@ public class LwM2MServer {
 
     ps.setState(state);
     ps.setVehicle(vehicle);
+
+    if (state.equals("Occupied") && !vehicle.equals("")) {
+      try {
+        db.insertParkAtSpot(parkingLotId, ps.getId(), vehicle);
+      } catch (SQLException e) {
+        System.out.println("Failed to insert parking at spot in database.");
+        e.printStackTrace();
+      }
+    }
   }
 
   private void addVehicleCounterRegistration(Registration reg) {
@@ -346,5 +359,14 @@ public class LwM2MServer {
     vc.setCounter(counter);
     vc.setLastPlate(lastPlate);
     vc.setDirection(direction);
+
+    if (direction == 1 && !lastPlate.equals("")) {
+      try {
+        db.insertParkAtLot(parkingLotId, lastPlate);
+      } catch (SQLException e) {
+        System.out.println("Failed to insert parking at lot in database.");
+        e.printStackTrace();
+      }
+    }
   }
 }
