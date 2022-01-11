@@ -67,7 +67,6 @@ public class LwM2MServer {
 
     if (parkingSpot == null) {
       for (ParkingSpot p : getParkingSpots()) {
-        System.out.println(p + "\n");
         if(p.getState().equals("Free")) {
           ps = p;
           break;
