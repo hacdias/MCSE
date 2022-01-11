@@ -13,7 +13,7 @@ public class ParkingLot {
     return server.getParkingSpotsAsMap();
   }
 
-  public ParkingLot(String name, double rate) {
+  public ParkingLot(String name, double rate, Database db) {
     String id;
     try {
       id = InetAddress.getLocalHost().getHostName() + "-lot";
@@ -25,7 +25,7 @@ public class ParkingLot {
     this.name = name;
     this.rate = rate;
 
-    this.server = new LwM2MServer(name);
+    this.server = new LwM2MServer(id, name, db);
   };
 
   public String getId() {
@@ -61,7 +61,9 @@ public class ParkingLot {
       }
     }
 
-    return occupations;
+    // Get the max of occupied parking spots and cars inside the park. That'll give
+    // the number of occupied spots.
+    return Math.max(occupations, server.getCarsInPark());
   }
 
   public double getRate() {
