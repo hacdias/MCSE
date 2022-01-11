@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import Coordinates from './Coordinates'
 import { Table, DataCell, HeaderCell, Row } from './Table'
 
-function Button ({ children, className, color = 'blue', ...props }) {
-  return <button className={`pointer ba b--${color} link dim ph3 pv2 dib white bg-${color} b0 ${className}`} {...props}>{children}</button>
+function Button ({ children, disabled = false, className, color = 'blue', ...props }) {
+  return <button disabled={disabled} className={`ba b--${color} link ph3 pv2 dib white bg-${color} b0 ${disabled ? 'o-50' : 'dim pointer'} ${className}`} {...props}>{children}</button>
 }
 
 function ChooseParkingLot ({ parkingLots, onParkingLot }) {
@@ -17,8 +17,8 @@ function ChooseParkingLot ({ parkingLots, onParkingLot }) {
       {parkingLots.map(pl => (
         <Row key={pl.id}>
           <DataCell>{pl.name}</DataCell>
-          <DataCell>{pl.capacity - pl.reservations - pl.vehicles}</DataCell>
-          <DataCell><Button onClick={() => onParkingLot(pl)}>Reserve</Button></DataCell>
+          <DataCell>{pl.free}</DataCell>
+          <DataCell><Button disabled={pl.free === 0} onClick={() => onParkingLot(pl)}>Reserve</Button></DataCell>
         </Row>
       ))}
     </Table>
