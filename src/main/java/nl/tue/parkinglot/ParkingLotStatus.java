@@ -11,7 +11,7 @@ public class ParkingLotStatus {
   private double rate;
 
   @Expose
-  private int capacity, reservations, vehicles;
+  private int capacity, reservations, vehicles, free;
 
   @Expose
   private Collection<ParkingSpot> parkingSpots;
@@ -29,6 +29,7 @@ public class ParkingLotStatus {
     this.vehicles = vehicles;
     this.parkingSpots = parkingSpots;
     this.vehicleCounters = vehicleCounters;
+    this.free = capacity - reservations - vehicles;
   }
 
   public String getId() {
