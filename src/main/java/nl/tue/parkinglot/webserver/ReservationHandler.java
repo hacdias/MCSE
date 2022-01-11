@@ -15,11 +15,13 @@ import java.util.stream.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import nl.tue.parkinglot.ParkingLot;
+import nl.tue.parkinglot.ParkingLotException;
 
 public class ReservationHandler extends AbstractHandler {
   final ParkingSystem parkingSystem;
   private final Gson gson;
-  private final Type mapType = new TypeToken<Map<String, String>>() {}.getType();
+  private final Type mapType = new TypeToken<Map<String, String>>() {
+  }.getType();
 
   public ReservationHandler(ParkingSystem parkingSystem) {
     this.parkingSystem = parkingSystem;
@@ -37,15 +39,20 @@ public class ReservationHandler extends AbstractHandler {
         System.out.println(e.getId());
       }
 
-      parkingSystem.reserveParkingSpot(
-          reservationMap.get("parkingLot"),
-          reservationMap.get("plate"),
-          reservationMap.get("parkingSpot"));
-    }
+      try {
+        parkingSystem.reserveParkingSpot(
+            reservationMap.get("parkingLot"),
+            reservationMap.get("plate"),
+            reservationMap.get("parkingSpot"));
 
-    response.setContentType("application/json; charset=utf-8");
-    response.setStatus(HttpServletResponse.SC_OK);
-    baseRequest.setHandled(true);
-    response.getWriter().println("");
+        response.setContentType("application/json; charset=utf-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+      } catch (ParkingLotException e1) {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
+
+      baseRequest.setHandled(true);
+      response.getWriter().println("");
+    }
   }
 }
