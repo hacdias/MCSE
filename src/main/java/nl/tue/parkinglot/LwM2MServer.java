@@ -25,6 +25,7 @@ import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.WriteRequest;
+import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 
 
 public class LwM2MServer {
@@ -252,6 +253,8 @@ public class LwM2MServer {
       if (!wres.isSuccess()) {
         System.out.println("Writing parking lot name request was not successfull.");
       }
+
+      updateDisplayWithState(reg, ps);
     } catch (InterruptedException e) {
       System.out.println("Read request was not successfull.");
       e.printStackTrace();
@@ -283,6 +286,13 @@ public class LwM2MServer {
     ps.setState(state);
     ps.setVehicle(vehicle);
 
+    try {
+      updateDisplayWithState(reg, ps);
+    } catch (InvalidRequestException | InterruptedException e) {
+      System.out.println("Failed to update display.");
+      e.printStackTrace();
+    }
+
     if (state.equals("Occupied") && !vehicle.equals("")) {
       try {
         db.insertParkAtSpot(parkingLotId, ps.getId(), vehicle);
@@ -290,6 +300,25 @@ public class LwM2MServer {
         System.out.println("Failed to insert parking at spot in database.");
         e.printStackTrace();
       }
+    }
+  }
+
+  private void updateDisplayWithState(Registration reg, ParkingSpot ps)
+      throws InvalidRequestException, InterruptedException {
+    String color = "green";
+
+    switch (ps.getState()) {
+      case "Reserved":
+        color = "orange";
+        break;
+      case "Occupied":
+        color = "red";
+        break;
+    }
+
+    WriteResponse wres = server.send(reg, new WriteRequest(ContentFormat.TEXT, 3341, 0, 5527, color));
+    if (!wres.isSuccess()) {
+      throw new Error("updating display failed");
     }
   }
 
