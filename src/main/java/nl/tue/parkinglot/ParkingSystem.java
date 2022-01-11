@@ -39,7 +39,7 @@ public class ParkingSystem {
     return statuses;
   }
 
-  public void reserveParkingSpot(String parkingLot, String plate, String parkingSpot) {
+  public void reserveParkingSpot(String parkingLot, String plate, String parkingSpot) throws ParkingLotException {
     ParkingLot pl = this.getParkingLot(parkingLot);
     pl.reserveParkingSpot(plate, parkingSpot);
   }
