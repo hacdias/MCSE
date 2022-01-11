@@ -54,16 +54,24 @@ public class ParkingLot {
 
   public int getVehicles() {
     int occupations = 0;
-
     for (ParkingSpot ps : server.getParkingSpots()) {
       if (ps.getState().equals("Occupied")) {
         occupations++;
       }
     }
 
+    int carsInPark = 0;
+    for (VehicleCounter vh : server.getVehicleCounters()) {
+      if (vh.getDirection() == 0) {
+        carsInPark -= vh.getCounter();
+      } else {
+        carsInPark += vh.getCounter();
+      }
+    }
+
     // Get the max of occupied parking spots and cars inside the park. That'll give
     // the number of occupied spots.
-    return Math.max(occupations, server.getCarsInPark());
+    return Math.max(occupations, carsInPark);
   }
 
   public double getRate() {
