@@ -83,7 +83,7 @@ public class ParkingLot {
         server.getParkingSpots(), server.getVehicleCounters());
   }
 
-  public void reserveParkingSpot(String plate, String parkingSpot) {
+  public void reserveParkingSpot(String plate, String parkingSpot) throws ParkingLotException {
     this.server.reserveParkingSpot(plate, parkingSpot);
   }
 
