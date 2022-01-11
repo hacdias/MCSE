@@ -26,21 +26,72 @@ function ChooseParkingLot ({ parkingLots, onParkingLot }) {
 }
 
 function ChooseParkingSpot ({ parkingSpots, onParkingSpot }) {
+  const [x, setX] = useState(null)
+  const [y, setY] = useState(null)
+
+  const reset = () => {
+    setX(null)
+    setY(null)
+  }
+
+  const updateFilter = (event) => {
+    let val = event.target.value
+    if (!val) {
+      reset()
+      return
+    }
+
+    val = val.replace('(', '')
+    val = val.replace(')', '')
+    const xy = val.split(',')
+
+    if (xy.length !== 2) {
+      reset()
+      return
+    }
+
+    const x = parseFloat(xy[0])
+    const y = parseFloat(xy[1])
+
+    if (isNaN(x) || isNaN(y)) {
+      reset()
+      return
+    }
+
+    setX(x)
+    setY(y)
+  }
+
+  const filteredSpots = () => {
+    if (x === null || y === null) {
+      return parkingSpots
+    }
+
+    return parkingSpots.filter(ps => {
+      // 1 meters of distance
+      return Math.hypot(ps.x - x, ps.y - y) <= 1
+    })
+  }
+
   return (
-    <Table>
-      <Row>
-        <HeaderCell>ID</HeaderCell>
-        <HeaderCell>Position</HeaderCell>
-        <HeaderCell />
-      </Row>
-      {parkingSpots.map(ps => ps.state === 'Free' && (
-        <Row key={ps.id}>
-          <DataCell>{ps.id}</DataCell>
-          <DataCell><Coordinates x={ps.x} y={ps.y} /></DataCell>
-          <DataCell><Button onClick={() => onParkingSpot(ps)}>Reserve</Button></DataCell>
+    <>
+      <input className='ba b--moon-gray pa2 w-100 mb2' type='text' onChange={updateFilter} placeholder='Filter by coordinates: format is (x, y)' />
+
+      <Table>
+        <Row>
+          <HeaderCell>ID</HeaderCell>
+          <HeaderCell>Position</HeaderCell>
+          <HeaderCell />
         </Row>
-      ))}
-    </Table>
+        {filteredSpots().map(ps => ps.state === 'Free' && (
+          <Row key={ps.id}>
+            <DataCell>{ps.id}</DataCell>
+            <DataCell><Coordinates x={ps.x} y={ps.y} /></DataCell>
+            <DataCell><Button onClick={() => onParkingSpot(ps)}>Reserve</Button></DataCell>
+          </Row>
+        ))}
+      </Table>
+    </>
   )
 }
 
