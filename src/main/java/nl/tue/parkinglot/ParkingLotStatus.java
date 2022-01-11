@@ -30,6 +30,13 @@ public class ParkingLotStatus {
     this.parkingSpots = parkingSpots;
     this.vehicleCounters = vehicleCounters;
     this.free = capacity - reservations - vehicles;
+    if (this.free < 0) {
+      // This accounts for the situation where some car entered the park (via vehicle
+      // counters), but the park does not have any free space. it can happen when a vehicle
+      // enters and it has a reservation, or a vehicle enters to look for spots even when the
+      // counter says 0.
+      this.free = 0;
+    }
   }
 
   public String getId() {
