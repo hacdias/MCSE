@@ -30,6 +30,11 @@ public class ParkingLotStatus {
     this.parkingSpots = parkingSpots;
     this.vehicleCounters = vehicleCounters;
     this.free = capacity - reservations - vehicles;
+    if (this.free < 0) {
+      // This accounts for the situation where some car entered the park (via vehicle
+      // counters), but the park is all occupied.
+      this.free = 0;
+    }
   }
 
   public String getId() {
