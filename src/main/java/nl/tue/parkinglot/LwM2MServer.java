@@ -27,6 +27,7 @@ import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 
+
 public class LwM2MServer {
   ConcurrentHashMap<String, String> regToParkingId = new ConcurrentHashMap<>();
   ConcurrentHashMap<String, String> regToVehicleCounterId = new ConcurrentHashMap<>();
@@ -62,16 +63,25 @@ public class LwM2MServer {
   }
 
   public void reserveParkingSpot(String plate, String parkingSpot) throws ParkingLotException {
-    if (parkingSpot == null) {
-      // TODO: we are supposed to be able to reserve a parking spot without saying
-      // which one specifically.
+    ParkingSpot ps = null;
 
-      throw new ParkingLotException("not implemented");
+    if (parkingSpot == null) {
+      for (ParkingSpot p : getParkingSpots()) {
+        if(p.getState().equals("Free")) {
+          ps = p;
+          break;
+        }
+      }
+      if(ps == null){
+        throw new ParkingLotException("No available parking spot at the moment.");
+      }
     }
 
-    ParkingSpot ps = parkingSpots.get(parkingSpot);
-    if (ps == null) {
-      throw new ParkingLotException("parking spot does not exist");
+    else {
+      ps = parkingSpots.get(parkingSpot);
+      if (ps == null) {
+        throw new ParkingLotException("parking spot does not exist");
+      }
     }
 
     Registration reg = ps.getRegistration();
