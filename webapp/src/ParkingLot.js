@@ -11,7 +11,7 @@ function StatusIndicator ({ title, text }) {
   )
 }
 
-export default function ParkingLot ({ name, id, capacity, vehicles, reservations, rate, parkingSpots, vehicleCounters }) {
+export default function ParkingLot ({ name, id, capacity, vehicles, reservations, free, rate, parkingSpots, vehicleCounters }) {
   return (
     <div className='pa2 ba b--silver'>
       <header>
@@ -22,7 +22,7 @@ export default function ParkingLot ({ name, id, capacity, vehicles, reservations
         <StatusIndicator title='Capacity' text={capacity} />
         <StatusIndicator title='Reservations' text={reservations} />
         <StatusIndicator title='Vehicles' text={vehicles} />
-        <StatusIndicator title='Free Spots' text={capacity - reservations - vehicles} />
+        <StatusIndicator title='Free Spots' text={free} />
         <StatusIndicator title='Rate' text={`${parseFloat(rate).toFixed(2)} € per hour`} />
       </div>
 
