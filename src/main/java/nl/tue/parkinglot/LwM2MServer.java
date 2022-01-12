@@ -36,13 +36,12 @@ public class LwM2MServer {
   ConcurrentHashMap<String, ParkingSpot> parkingSpots = new ConcurrentHashMap<>();
   ConcurrentHashMap<String, VehicleCounter> vehicleCounters = new ConcurrentHashMap<>();
 
-  final String parkingLotName, parkingLotId;
   final LeshanServer server;
   final Database db;
+  final ParkingLot parkingLot;
 
-  public LwM2MServer(String parkingLotId, String parkingLotName, Database db) {
-    this.parkingLotId = parkingLotId;
-    this.parkingLotName = parkingLotName;
+  public LwM2MServer(Database db, ParkingLot pl) {
+    this.parkingLot = pl;
     this.server = buildServer();
     this.db = db;
   }
@@ -61,6 +60,19 @@ public class LwM2MServer {
 
   public Collection<VehicleCounter> getVehicleCounters() {
     return vehicleCounters.values();
+  }
+
+  public void printStatusOnLotDisplay() {
+    int free = this.parkingLot.getCapacity() - this.parkingLot.getReservations() - this.parkingLot.getVehicles();
+    if (free < 0) {
+      free = 0;
+    }
+
+    System.out.println("Parking Lot Status for: " + this.parkingLot.getName());
+    System.out.println("Capacity: " + this.parkingLot.getCapacity());
+    System.out.println("Free: " + free);
+    System.out.println("Reservations: " + this.parkingLot.getReservations());
+    System.out.println("Vehicles: " + this.parkingLot.getVehicles());
   }
 
   public void reserveParkingSpot(String plate, String parkingSpot) throws ParkingLotException {
@@ -274,12 +286,15 @@ public class LwM2MServer {
       }
 
       // Update parking lot name
-      WriteResponse wres = server.send(reg, new WriteRequest(ContentFormat.TEXT, 32800, 0, 32706, parkingLotName));
+      WriteResponse wres = server.send(reg,
+          new WriteRequest(ContentFormat.TEXT, 32800, 0, 32706, this.parkingLot.getName()));
       if (!wres.isSuccess()) {
         throw new ParkingLotException("writing parking lot name request was unsuccessfull");
       }
 
       updateDisplayWithState(reg, ps);
+
+      printStatusOnLotDisplay();
 
       return ps;
     } catch (InterruptedException e) {
@@ -317,9 +332,11 @@ public class LwM2MServer {
       throw new ParkingLotException("failed to update display", e);
     }
 
+    printStatusOnLotDisplay();
+
     if (state.equals("Occupied") && !vehicle.equals("")) {
       try {
-        db.insertParkAtSpot(parkingLotId, ps.getId(), vehicle);
+        db.insertParkAtSpot(this.parkingLot.getId(), ps.getId(), vehicle);
       } catch (SQLException e) {
         throw new ParkingLotException("failed to insert parking at spot in database", e);
       }
@@ -402,7 +419,8 @@ public class LwM2MServer {
       }
 
       // Update parking lot name
-      WriteResponse wres = server.send(reg, new WriteRequest(ContentFormat.TEXT, 32801, 0, 32706, parkingLotName));
+      WriteResponse wres = server.send(reg,
+          new WriteRequest(ContentFormat.TEXT, 32801, 0, 32706, this.parkingLot.getName()));
       if (!wres.isSuccess()) {
         throw new ParkingLotException("writing parking lot name request was unsuccessfull");
       }
@@ -451,10 +469,12 @@ public class LwM2MServer {
 
     if (direction == 1) {
       try {
-        db.insertParkAtLot(parkingLotId, lastPlate);
+        db.insertParkAtLot(this.parkingLot.getId(), lastPlate);
       } catch (SQLException e) {
         throw new ParkingLotException("failed to insert parking at lot in database", e);
       }
     }
+
+    printStatusOnLotDisplay();
   }
 }

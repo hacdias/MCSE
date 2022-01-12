@@ -25,7 +25,7 @@ public class ParkingLot {
     this.name = name;
     this.rate = rate;
 
-    this.server = new LwM2MServer(id, name, db);
+    this.server = new LwM2MServer(db, this);
   };
 
   public String getId() {
