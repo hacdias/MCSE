@@ -1,5 +1,6 @@
 package nl.tue.parkinglot;
 
+import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
@@ -23,10 +24,10 @@ import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationListener;
 import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
+import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
-
 
 public class LwM2MServer {
   ConcurrentHashMap<String, String> regToParkingId = new ConcurrentHashMap<>();
@@ -67,12 +68,12 @@ public class LwM2MServer {
 
     if (parkingSpot == null) {
       for (ParkingSpot p : getParkingSpots()) {
-        if(p.getState().equals("Free")) {
+        if (p.getState().equals("Free")) {
           ps = p;
           break;
         }
       }
-      if(ps == null){
+      if (ps == null) {
         throw new ParkingLotException("No available parking spot at the moment.");
       }
     }
@@ -203,6 +204,14 @@ public class LwM2MServer {
           e.printStackTrace();
         }
       }
+
+      if (path.startsWith("/3345/")) {
+        try {
+          updateSpotStateFromJoystick(registration, response);
+        } catch (ParkingLotException e) {
+          e.printStackTrace();
+        }
+      }
     }
 
     public void onError(Observation observation, Registration registration, Exception error) {
@@ -255,6 +264,12 @@ public class LwM2MServer {
       // Observe parking lot properties
       ObserveResponse ores = server.send(reg, new ObserveRequest(32800, 0));
       if (!ores.isSuccess()) {
+        throw new ParkingLotException("could not send observation request");
+      }
+
+      // Observe joystick properties
+      ObserveResponse oresp = server.send(reg, new ObserveRequest(3345, 0, 5703));
+      if (!oresp.isSuccess()) {
         throw new ParkingLotException("could not send observation request");
       }
 
@@ -327,6 +342,28 @@ public class LwM2MServer {
     WriteResponse wres = server.send(reg, new WriteRequest(ContentFormat.TEXT, 3341, 0, 5527, color));
     if (!wres.isSuccess()) {
       throw new ParkingLotException("updating display failed");
+    }
+  }
+
+  private void updateSpotStateFromJoystick(Registration reg, ObserveResponse response) throws ParkingLotException {
+    LwM2mSingleResource i = (LwM2mSingleResource) response.getContent();
+    byte[] rawY = (byte[]) i.getValue();
+    Double y = ByteBuffer.wrap(rawY).getDouble();
+
+    try {
+      if (y == 100) {
+        WriteResponse res = server.send(reg, new WriteRequest(32800, 0, 32701, "Occupied"));
+        if (!res.isSuccess()) {
+          throw new ParkingLotException("writing to parking spot was unsuccessfull");
+        }
+      } else if (y == -100) {
+        WriteResponse wres = server.send(reg, new WriteRequest(32800, 0, 32701, "Free"));
+        if (!wres.isSuccess()) {
+          throw new ParkingLotException("updating display failed");
+        }
+      }
+    } catch (InterruptedException e) {
+      throw new ParkingLotException("read request was not successfull", e);
     }
   }
 
