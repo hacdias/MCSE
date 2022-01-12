@@ -39,8 +39,10 @@ public class LwM2MServer {
   final String parkingLotName, parkingLotId;
   final LeshanServer server;
   final Database db;
+  final ParkingLot parkingLot;
 
-  public LwM2MServer(String parkingLotId, String parkingLotName, Database db) {
+  public LwM2MServer(String parkingLotId, String parkingLotName, Database db, ParkingLot pl) {
+    this.parkingLot = pl;
     this.parkingLotId = parkingLotId;
     this.parkingLotName = parkingLotName;
     this.server = buildServer();
@@ -61,6 +63,19 @@ public class LwM2MServer {
 
   public Collection<VehicleCounter> getVehicleCounters() {
     return vehicleCounters.values();
+  }
+
+  public void printStatusOnLotDisplay(){
+    int free = this.parkingLot.getCapacity() - this.parkingLot.getReservations() - this.parkingLot.getVehicles();
+    if(free < 0) {
+      free = 0;
+    }
+      
+    System.out.println("Parking Lot Status for: " + this.parkingLotName);
+    System.out.println("Capacity: " + this.parkingLot.getCapacity());
+    System.out.println("Free: " + free);
+    System.out.println("Reservations: " + this.parkingLot.getReservations());
+    System.out.println("Vehicles: " + this.parkingLot.getVehicles());
   }
 
   public void reserveParkingSpot(String plate, String parkingSpot) throws ParkingLotException {
@@ -281,6 +296,8 @@ public class LwM2MServer {
 
       updateDisplayWithState(reg, ps);
 
+      printStatusOnLotDisplay();
+
       return ps;
     } catch (InterruptedException e) {
       throw new ParkingLotException("read request was not successfull", e);
@@ -316,6 +333,8 @@ public class LwM2MServer {
     } catch (InvalidRequestException | InterruptedException e) {
       throw new ParkingLotException("failed to update display", e);
     }
+
+    printStatusOnLotDisplay();
 
     if (state.equals("Occupied") && !vehicle.equals("")) {
       try {
@@ -456,5 +475,7 @@ public class LwM2MServer {
         throw new ParkingLotException("failed to insert parking at lot in database", e);
       }
     }
+
+    printStatusOnLotDisplay();
   }
 }
