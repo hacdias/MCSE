@@ -23,6 +23,7 @@ import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationListener;
 import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
+import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
@@ -203,6 +204,13 @@ public class LwM2MServer {
           e.printStackTrace();
         }
       }
+      if (path.startsWith("/3345/")) {
+        try {
+          updateSpotStateFromJoystick(registration, response);
+        } catch (ParkingLotException e) {
+          e.printStackTrace();
+        }
+      }
     }
 
     public void onError(Observation observation, Registration registration, Exception error) {
@@ -255,6 +263,12 @@ public class LwM2MServer {
       // Observe parking lot properties
       ObserveResponse ores = server.send(reg, new ObserveRequest(32800, 0));
       if (!ores.isSuccess()) {
+        throw new ParkingLotException("could not send observation request");
+      }
+
+      //Observe joystick properties
+      ObserveResponse oresp = server.send(reg, new ObserveRequest(3345, 0, 5703));
+      if (!oresp.isSuccess()) {
         throw new ParkingLotException("could not send observation request");
       }
 
@@ -328,6 +342,30 @@ public class LwM2MServer {
     if (!wres.isSuccess()) {
       throw new ParkingLotException("updating display failed");
     }
+  }
+
+  private void updateSpotStateFromJoystick(Registration reg, ObserveResponse response) throws ParkingLotException {
+    LwM2mSingleResource i = (LwM2mSingleResource) response.getContent();
+    int yValue = 100;
+    System.out.println("Response: " +  i.getValue());
+
+    try {
+      if(yValue == 100) {
+        WriteResponse res = server.send(reg, new WriteRequest(32800, 0, 32701, "Occupied"));
+        if (!res.isSuccess()) {
+          throw new ParkingLotException("writing to parking spot was unsuccessfull");
+        }
+      }
+      else if(yValue == -100) {
+        WriteResponse wres = server.send(reg, new WriteRequest(32800, 0, 32701, "Free"));
+        if (!wres.isSuccess()) {
+          throw new ParkingLotException("updating display failed");
+        }
+      }
+    }
+    catch (InterruptedException e) {
+      throw new ParkingLotException("read request was not successfull", e);
+  }
   }
 
   private VehicleCounter addVehicleCounterRegistration(Registration reg) throws ParkingLotException {
