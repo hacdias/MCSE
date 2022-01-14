@@ -161,7 +161,6 @@ public class LwM2MServer {
       String regId = updatedReg.getId();
 
       if (!regId.equals(prevRegId)) {
-        // TODO: do something?
         System.out.println("Registration changed ID from " + prevRegId + " to " + regId);
         System.out.println(update.getAdditionalAttributes());
       }
