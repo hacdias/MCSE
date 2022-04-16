@@ -1,14 +1,35 @@
-\documentclass[12pt,a4paper,footinclude=true,twoside,headinclude=true]{report}
+\documentclass[12pt,a4paper,oneside]{book}
+\usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
-
+\usepackage[nottoc]{tocbibind}
+\usepackage{amssymb}
+\usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+
+\fancyhf{}
+\fancyfoot[L]{\thepage}
+\fancyfoot[R]{\leftmark}
+\fancyfoot[C]{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.5pt}
+
+\fancypagestyle{plain}{%
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \fancyfoot[L,R]{}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0.5pt}
+}
 
 \begin{document}
+\pagenumbering{roman}
 
-%%% Title page
 \begin{titlepage}
 \centering
-\includegraphics[width=0.7\linewidth]{tue-logo.png}\par
+\includegraphics[width=0.7\linewidth]{graphics/tue-logo.png}\par
 Department of Mathematics and Computer Science
 
 \vspace{3cm}
@@ -29,61 +50,43 @@ Your third committee member (usually the external member)\par
 
 \end{titlepage}
 
-\begin{abstract}
-
-\end{abstract}
+\chapter*{Abstract}\label{chapter:abstract}
+\input{abstract}
 
 \tableofcontents
 
+\listoffigures
 
-%%% ===============================================================================
-\chapter{Introduction}\label{sec:introduction}
-%%% ===============================================================================
+\listoftables
 
-\cite{8894364}
+\chapter{Introduction}\label{chapter:introduction}
+\pagenumbering{arabic}
+\input{introduction}
 
-%%% ===============================================================================
-\chapter{Background (SM1)}\label{sec:background}
-%%% ===============================================================================
+\chapter{Related Work}\label{chapter:relatedWork}
+\input{related_work.tex}
 
-%%% ===============================================================================
-\chapter{Problem Exposition (optional)}\label{sec:problem-exposition}
-%%% ===============================================================================
+\chapter{Background}\label{chapter:background}
+\input{background}
 
-%%% ===============================================================================
-\chapter{First Real Chapter addressing first Research Problem}\label{sec:problem1}
-%%% ===============================================================================
+\chapter{Methodology}\label{chapter:methodology}
+\input{methodology}
 
-%%% ===============================================================================
-\chapter{Second Real Chapter}\label{sec:sub-problem2}
-%%% ===============================================================================
+\chapter{Implementation}\label{chapter:implementation}
+\input{implementation}
 
-%%% ===============================================================================
-\chapter{Evaluation}\label{sec:evaluation}
-%%% ===============================================================================
+\chapter{Evaluation}\label{chapter:evaluation}
+\input{evaluation}
 
-%%% ===============================================================================
-\chapter{Conclusion}\label{sec:conclusion}
-%%% ===============================================================================
+\chapter{Conclusion}\label{chapter:conclusion}
+\input{conclusion}
 
-
-%%% ===============================================================================
-%%% Bibliography
-%%% ===============================================================================
-\bibliographystyle{IEEEtran}
+\bibliographystyle{acm}
 \bibliography{literature}
 
-
-%%% ===============================================================================
 \appendix 
-\addcontentsline{toc}{chapter}{APPENDICES}
+\addcontentsline{toc}{chapter}{Appendix}
 
-\listoffigures
-\listoftables
-%%% ===============================================================================
-
-%%% ===============================================================================
-\chapter{My first appendix}\label{sec:appendix1}
-%%% ===============================================================================
+\chapter{One Appendix}\label{chapter:oneappendix}
 
 \end{document}
