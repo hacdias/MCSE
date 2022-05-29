@@ -8,6 +8,7 @@
 \usepackage{graphicx}
 \usepackage{fancyhdr}
 \usepackage{multirow}
+\usepackage{caption}
 
 \pagestyle{fancy}
 
@@ -65,11 +66,11 @@ Your third committee member (usually the external member)\par
 \pagenumbering{arabic}
 \input{introduction}
 
+\chapter{Preliminaries}\label{chapter:preliminaries}
+\input{preliminaries}
+
 \chapter{Related Work}\label{chapter:relatedWork}
 \input{related_work.tex}
-
-\chapter{Background}\label{chapter:background}
-\input{background}
 
 \chapter{Methodology}\label{chapter:methodology}
 \input{methodology}

@@ -1,6 +1,38 @@
+% \section{Consensus Mechanisms}
+
+% \begin{itemize}
+%     \item Proof of Work (PoW)
+%     \begin{itemize}
+%         \item Advantages: simple algorithm, high destruction cost \cite{li_blockchain_2021} used by large public blockchains like Bitcoin and Ethereum and thus it is proven to work.
+%         \item Drawbacks: one of the most energy heavy consensus algorithms \cite{?}, difficult to reduce confirmation time (low block rate) \cite{li_blockchain_2021}
+%     \end{itemize}
+%     \item Proof of Stake (PoS)
+%     \begin{itemize}
+%         \item Advantages: low performance requirements for nodes, short consensus time, low energy consumption depending on the underlying algorithm, validators are incentivized to behave correctly as they are penalized if they don't \cite{li_blockchain_2021}
+%         \item Drawbacks: validators with larger equities can have excessive influence on transaction verification \cite{li_blockchain_2021}
+%     \end{itemize}
+%     \item Proof of Authority (PoA)
+%     \begin{itemize}
+%         \item It is based on trustful validator nodes and is commonly used in private blockchain networks.
+%         \item Advantages: speed
+%         \item Drawbacks:
+%     \end{itemize}
+%     \item Byzantine Fault Tolerance (BFT)
+%     \begin{itemize}
+%         \item Advantages: high consensus efficiency for high frequency trading \cite{li_blockchain_2021}
+%         \item Drawbacks: system will stop if only 33\% of the nodes are running, cryptocurrency and incentive mechanism can create a Matthew effect \cite{li_blockchain_2021}
+%     \end{itemize}
+%     \item Committee Based Consensus
+%     \item Proof of Federated Learning (PoFL) \cite{9347812, 10.48550/arxiv.2007.15145}: novel consensus mechanisms that aim at reducing the resource consumption by integrating with the training process mechanism. This usually involve custom blockchain implementations or the modification of an existing one.
+%     \item Proof of Quality (PQ) \cite{8843900}: novel consensus algorithm
+% \end{itemize}
+
+% Can be seen in \autoref{tab:consensus_mechanisms}.
+
 \begin{table}[ht]
 \centering
-
+\caption{Consensus Mechanisms}
+\label{tab:consensus_mechanisms}
 \begin{tabular}{c|c|c|c|c|c|c|c|c}
 \hline \hline
                                     & PoW           & PoA           & PoS           & PoFL          & PoQ           & (p)BFT        & Committee     & Other         \\ \hline \hline
@@ -39,14 +71,12 @@
 \cite{9170559}                      &               &               & \checkmark    &               &               & \checkmark    &               &               \\ \hline
 \cite{pirate}                       &               &               &               &               &               &               & \checkmark    &               \\ \hline
 \end{tabular}
-
-\caption{Consensus Mechanisms Used By Blockchain-based FL}
-\label{tab:consensus_mechanisms}
-
 \end{table}
 
 \begin{table}[ht]
 \centering
+\caption{Blockchain Platforms}
+\label{tab:blockchain_platforms}
 \begin{tabular}{c|c|c|c|c|c}
 \hline \hline
                                     & Ethereum      & Hyperledger   & EOS           & MultiChain    & Custom        \\ \hline \hline
@@ -78,8 +108,58 @@
 \cite{demo}                         &               & \checkmark    &               &               &               \\ \hline
 \cite{9233457}                      & \checkmark    &               &               &               &               \\ \hline
 \end{tabular}
+\end{table}
 
-\caption{Blockchain Platforms Used By Blockchain-based FL}
-\label{tab:blockchain_platforms}
-
+\begin{table}[ht]
+\centering
+\caption{Data Distribution, Data Partition and Datasets}
+\label{tab:data_distribution}
+\begin{tabular}{c|c|c|c}
+\hline \hline
+                                    & Data Distribution & Data Partition & Dataset                            \\ \hline \hline
+\cite{10.1145/3319535.3363256}      & I                 & H              & Breast Cancer Dataset              \\ \hline
+\cite{8905038}                      & N                 & H              &                                    \\ \hline
+% \cite{10.48550/arxiv.2011.07516}    & --                & --             & MNIST                              \\ \hline
+\cite{9524833}                      & N                 & --             & --                                 \\ \hline
+\cite{9127823}                      & I                 & H              & MNIST, CIFAR10                     \\ \hline
+\cite{10.48550/arxiv.2101.03300}    & --                & H              & MNIST                              \\ \hline
+\cite{9159643}                      & I                 & H              & MovieLens                          \\ \hline
+\cite{10.1145/3422337.3447837}      & I, N              & --             & --                                 \\ \hline
+\cite{9223754}                      & I                 & H              & MNIST                              \\ \hline
+\cite{FANG20221}                    & --                & H              & CIFAR10                            \\ \hline
+\cite{9399813}                      & I                 & H              & MNIST                              \\ \hline
+\cite{9184854}                      & --                & H              & --                                 \\ \hline
+\cite{8851649}                      & I                 & H              & MNIST                              \\ \hline
+\cite{8994206}                      & I                 & H              & MNIST                              \\ \hline
+\cite{8733825}                      & I                 & H              & --                                 \\ \hline
+\cite{8893114}                      & N                 & H              & MNIST                              \\ \hline
+\cite{9274451}                      & N                 & H              & MNIST                              \\ \hline
+\cite{9293091}                      & I                 & H              & FEMNIST                            \\ \hline
+\cite{8843900}                      & I                 & H              & Reuters, 20News                    \\ \hline
+\cite{8998397}                      & I                 & H              & Uber Pickups, MNIST                \\ \hline
+\cite{9311394}                      & I                 & H              & MNIST                              \\ \hline
+\cite{9170905}                      & I                 & H              & CIFAR10                            \\ \hline
+\cite{10.48550/arxiv.2009.09338}    & --                & H              & --                                 \\ \hline
+\cite{8892848}                      & I, N              & H              & --                                 \\ \hline
+\cite{8945913}                      & --                & H              & MNIST                              \\ \hline
+\cite{10.48550/arxiv.2202.02817}    & N                 & H              & MNIST, CIFAR10                     \\ \hline
+\cite{10.48550/arxiv.2007.03856}    & --                & H              & --                                 \\ \hline
+\cite{10.48550/arxiv.1912.04859}    & I, N              & H,V            & --                                 \\ \hline
+\cite{10.48550/arxiv.1910.12603}    & I, N              & H              & --                                 \\ \hline
+\cite{9321132}                      & I                 & H              & MNIST                              \\ \hline
+\cite{Peyvandi2022}                 & N                 & H              & --                                 \\ \hline
+\cite{9079513}                      & I                 & H              & --                                 \\ \hline
+\cite{app8122663}                   & I                 & H              & CICIDS 2017                        \\ \hline
+\cite{9347812}                      & I                 & H              & CIFAR10                            \\ \hline
+\cite{9134967}                      & I, N              & H              & MNIST, CIFAR10                     \\ \hline
+\cite{baffle}                       & I                 & H              & NYC 2018 Taxi                      \\ \hline
+\cite{9210531}                      & I                 & H              & LFW, MNIST, CelebA, CASIA          \\ \hline
+\cite{8894364}                      & --                & H              & MNIST                              \\ \hline
+\cite{10.48550/arxiv.2112.07938}    & --                & H              & --                                 \\ \hline
+\cite{demo}                         & I                 & H              & MNIST                              \\ \hline
+\cite{9233457}                      & I                 & H              & Air-Conditioning                   \\ \hline
+\cite{9170559}                      & I                 & H              & MNIST                              \\ \hline
+\cite{pirate}                       & I                 & H              & --                                 \\ \hline
+\end{tabular}
+\caption*{I: IID, N: Non-IID, H: Horizontal, V: Vertical}
 \end{table}
