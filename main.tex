@@ -9,6 +9,7 @@
 \usepackage{fancyhdr}
 \usepackage{multirow}
 \usepackage{caption}
+\usepackage{xcolor}
 
 \pagestyle{fancy}
 
@@ -26,6 +27,12 @@
     \renewcommand{\headrulewidth}{0pt}
     \renewcommand{\footrulewidth}{0.5pt}
 }
+
+\usepackage[skip=10pt, indent=0pt]{parskip}
+
+\newskip\bigskipamount \bigskipamount =20pt plus 4pt minus 4pt
+
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 
 \begin{document}
 \pagenumbering{roman}

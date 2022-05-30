@@ -2,33 +2,92 @@ In this chapter, the different concepts and definitions regarding Machine Learni
 
 \section{Machine Learning}
 
-Machine Learning (ML) is a sub-field of Artificial Intelligence that uses algorithms and statistical models in order to detect relevant patterns based on prior experience \cite{geron_2019}. By giving models data, they can learn and adapt without explicit instructions. The data is usually structured as vectors in a multi-dimensional space, such that each vector is an \textit{instance} and each dimension is a \textit{feature}.
-
-The remaining of this sub-section will shortly introduce the main categories of Machine Learning and the problem formulation of classification problems.
+Machine Learning (ML) is a sub-field of Artificial Intelligence that uses algorithms and statistical models in order to detect relevant patterns based on prior experience \cite{geron_2019}. By giving models data, they can learn and adapt without explicit instructions. The data is usually structured as vectors in a multi-dimensional space, such that each vector is an \textit{instance} and each dimension is a \textit{feature}. The remaining of this section will shortly introduce the main categories of Machine Learning.
 
 \subsection{Categories of Machine Learning}
 
 There are three main categories of Machine Learning algorithms: supervised learning, unsupervised learning and reinforcement learning \cite{geron_2019}. Each category performs different tasks in different types of data.
 
-\paragraph{Supervised Learning} In supervised learning, algorithms build mathematical models using a set of input samples, which are vectors from a feature space, and expected outputs for each sample. This type of data is known as labeled data, as there is a label for each sample. During a process called training, algorithms feed the model the input samples and improve the model by comparing the model output with the expected outputs. Supervised learning problems can be divided into \textit{regression problems}, if the output is a continuous variable, or \textit{classification problems}, if the output is a discreet variable.
+\subsubsection{Supervised Learning}
 
-\paragraph{Unsupervised Learning} In unsupervised learning, in contrast to supervised learning, algorithms build mathematical models using unlabeled data. Therefore, there are no expected outputs that can be directly compared to the model's output. Some common problems solved by unsupervised learning are \textit{clustering}, \textit{dimensionality reduction} and \textit{anomaly detection}.
+In supervised learning, algorithms build mathematical models using a set of input samples, which are vectors from a feature space, and expected outputs for each sample. This type of data is known as labeled data, as there is a label for each sample. During a process called training, algorithms feed the model the input samples and improve the model by comparing the model output with the expected outputs. Supervised learning problems can be divided into \textit{regression problems}, if the output is a continuous variable, or \textit{classification problems}, if the output is a discreet variable.
 
-\paragraph{Reinforcement Learning} In reinforcement learning, models must learn the best action to take according to the current environment, receiving either \textit{rewards} or \textit{penalties} if they perform a good, or bad action, respectively.
+\subsubsection{Unsupervised Learning}
 
-\subsection{Classification Problems}
+In unsupervised learning, in contrast to supervised learning, algorithms build mathematical models using unlabeled data. Therefore, there are no expected outputs that can be directly compared to the model's output. Some common problems solved by unsupervised learning are \textit{clustering}, \textit{dimensionality reduction} and \textit{anomaly detection}.
 
-TODO
+\subsubsection{Reinforcement Learning}
+
+In reinforcement learning, models must learn the best action to take according to the current environment, receiving either \textit{rewards} or \textit{penalties} if they perform a good, or bad action, respectively.
+
+\bigskip
+
+This study focuses solely on classification problems in supervised learning settings. Therefore, we always have a labeled data set available.
 
 \section{Federated Learning}
 
-Federated Learning (FL) is a Machine Learning technique where a set of decentralised devices, each one with their own resources and data sets, collaborate on training a model, under the orchestration of a central server. During the training process, the local data sets are never shared between parties, only some representation of the weights of the model. This is a concept introduced by Google researchers in 2016 \cite{10.48550/arxiv.1602.05629}.
+Federated Learning (FL) is a Machine Learning technique where different clients collaboratively train a model under the supervision of an orchestrator. The clients are distributed devices with their own computing resources and data, while the orchestrator is a centralized device that is accessible to all the clients. During the training process, the raw data is never exchanged between clients, nor with the central server: only a representation of model, such as model parameters, is exchanged between devices.
+
+The concept of Federated Learning was introduced by Google researchers in 2016 \cite{10.48550/arxiv.1602.05629}, as an attempt build communication-efficient deep networks in decentralized data settings. Among others, there are different motivations behind building FL systems:
+
+\begin{itemize}
+    \item \textit{The central server does not require large computing resources.} The data is produced locally at each client and it is never shared with a central server. In addition, the amount of data at each client is much smaller than the aggregation of all client's data. Since the model is trained at the client's device with their own data, the client's device does not require as many computing resources as a central server would if it trained a model over the aggregation of all client's data.
+    
+    \item \textit{Models can be trained on sensitive data.} Since the data is produced locally and never shared, a model can be trained over different sensitive data sets without the risk of exposing the sensitive information the data may contain.
+    
+    \item \textit{There is less data being transported over the network.} During training, only model parameters are required to be shared between devices in order to produce a final model. In addition, model parameters are usually much smaller than the data itself. Therefore, since model parameters are exchanged, there is less data being transported over the network. This can be useful in settings where there is costly or limited network bandwidth.
+\end{itemize}
+
+\subsection{Characteristics and Restrictions}
+
+As with any technology, Federated Learning has its own characteristics, restrictions and challenges. Since FL is a novel technology and term, there are various interpretations in the literature of what it actually is. The characteristics and restrictions presented below are based on the survey by Li et al. in 2020 \cite{9084352}.
+
+\begin{itemize}
+    \item \textit{Data Locality.} The data is decentralized and distributed across the many clients. Each client is responsible for producing and maintaining their own data, which is never exchanged with other clients, nor the orchestrator. Due to the distributed and decentralized nature of the clients and data, the data is assumed to be not independent or not identically distributed (\textit{non-iid}) across the different clients.
+    
+    \item \textit{Central Orchestration.} Clients communicate exclusively with the central orchestrator and they never communicate between themselves. The orchestrator takes care of the whole process and never has access to any raw data produced by any client.
+    
+    \item \textit{System Heterogeneity.} The clients can be heterogeneous in terms of storage, communication and computation capabilities. Therefore, it is imperative that new methods that are developed must take into account that different clients can have different amounts of data, different resources available and take different amounts of processing time.
+    
+    \item \textit{Privacy Guarantees.} In Federated Learning settings, raw data is never shared between clients and/or with the central orchestrator. However, parameter updates, such as weights, can be target of inference attacks and leak secret information \cite{10.1145/3298981}. Consequently, new innovations must be compatible with techniques that guarantee privacy, such as differential privacy, homomorphic encryption, secure multiparty computation or other cryptographic protocols.
+    
+    \item \textit{Communication.} Communication can be costly and is volatile. Since clients can be distributed across the globe, the communication latencies can vary. In addition, some clients might be operating in constrained networks with either low or limited bandwidth. Therefore, it is important that FL techniques ensure that communication is minimized.
+
+\end{itemize}
 
 \subsection{Categories of Federated Learning}
 
-\section{Blockchain}
+Federated Learning can be broadly divided into three main categories \cite{10.1145/3298981, 10.1145/3412357} that regard, for the most part, to the different data partition among the clients: Horizontal Federated Learning, Vertical Federated Learning and Federated Transfer Learning.
 
-\cite{nakamoto2009bitcoin}
+\subsubsection{Horizontal Federated Learning}
+
+\begin{figure}
+    \centering
+    % \includegraphics{}
+    \todo{Make HFL diagram} 
+    \caption{Horizontal Federated Learning Architecture}
+    \label{fig:hfl_arch}
+\end{figure}
+
+In Horizontal Federated Learning (HFL), clients with the same data structure collaboratively build a single model. In other words, the different data sets in each client share the same feature space, but have a different samples space. For example, two different banks may have very different target user groups (sample space), but their businesses are very similar (feature space). In HFL settings there are usually tens to hundreds of parties and the data is more likely to be equally distributed across the involved parties. A classic system architecture of HFL can be seen in \autoref{fig:hfl_arch}.
+
+\subsubsection{Vertical Federated Learning}
+
+\begin{figure}
+    \centering
+    % \includegraphics{}
+    \todo{Make VFL diagram} 
+    \caption{Vertical Federated Learning Architecture}
+    \label{fig:vfl_arch}
+\end{figure}
+
+In Vertical Federated Learning (VFL), clients share an intersecting sample space, but different feature spaces. For example, two companies that operate in the same city have more or less the same client base. However, each company focuses on different areas. In VFL settings, there are usually few parties and the data is more likely to be non-iid. A classic system architecture of VFL can be seen in \autoref{fig:vfl_arch}.
+
+\subsubsection{Federated Transfer Learning}
+
+In Federated Transfer Learning (FTL), clients do not share a sample space, nor a feature space. This technique is similar to regular transfer learning, where a model is previously trained on a data set and then applied to a new similar, but different, data set. For example, two different companies that operate in different countries across the world have a different feature and sample space. However, it may be useful to transfer knowledge between different domains.
+
+\section{Blockchain}
 
 % - **Consensus Mechanism**: ****the mechanisms used by the network to reach a consensus on the current state.
 % - **Permission Types**
@@ -40,6 +99,11 @@ Federated Learning (FL) is a Machine Learning technique where a set of decentral
 %     - Hyperledger Fabric
 %     - EOS
 %     - Others
-    
-    
+
+\cite{nakamoto2009bitcoin}
+
+\todo{Finish section} 
+
 \section{Blockchain-enabled Federated Learning}
+
+\todo{Finish section} 
