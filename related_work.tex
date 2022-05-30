@@ -1,27 +1,82 @@
-\section{Consensus Mechanism}
+\section{Federated Learning Optimization Algorithms}
 
-\input{tables/consensus_mechanisms}
+\section{Blockchain-enabled Federated Learning}
 
-\subsection{Conclusions}
+% \section{Blockchain Consensus Mechanism}
 
-\section{Blockchain Platforms}
+% \input{tables/consensus_mechanisms}
+
+% \subsection{Conclusions}
+
+% \section{Blockchain Platforms}
+
+% 
+
+% \subsection{Conclusions}
+
+% \section{Model Parameter Storage}
+
+% \subsection{Conclusion}
+
+% \section{Participants Selection Mechanism}
+
+% \subsection{Conclusions}
+
+% \section{Cross Verification Techniques}
+
+% \subsection{Conclusions}
+
+% \section{Data Distribution, Partition and Dataset}
+
+% \input{tables/data_distribution}
+
+% \subsection{Conclusions}
+
+% \section{Sychronous vs Asynchronous Rounds}
+
+% \subsection{Conclusions}
+
+% \section{Communication Cost}
+
+% \subsection{Conclusions}
+
+
+\section{Blockchain-specific Aspects}
+
+In a BFL system, there are two different systems at play: the blockchain and the machine learning environment. They are both connected, yet they are separate entities. In this section, we analyze blockchain-specific aspects regarding BFL implementations such as blockchain platforms and consensus algorithms.
+
+\subsection{Blockchain Platforms}
+
+As explained in \autoref{preliminaries:blockchain}, blockchain platforms allow developers to build applications on top of blockchain technologies. Even though all platforms are based on the concept of blockchain, they all have different characteristics and restrictions, as well as different sets of features.
+
+As can be seen in \autoref{tab:blockchain_platforms}, the majority of papers analyzed chose an already existing platform. Among those, Ethereum was the most popular. In addition, it is worth mentioning that a large amount of authors also implemented their own blockchain platform. By implementing their own platform, it is easier to overcome certain restrictions such as limits on data per block \cite{8733825, 9524833}.
 
 \input{tables/blockchain_platforms}
 
+\subsection{Consensus Algorithms}
+
+One of the most important aspects of blockchain technology is the consensus algorithm. Consensus is the process of reaching an agreement on a single value among different distributed processes. These algorithms are designed to be reliable even on networks that have unreliable nodes. In blockchain, the consensus algorithm is used to reach consensus on the next block of the chain.
+
+\input{tables/consensus_mechanisms}
+
+As can be seen on \autoref{tab:consensus_mechanisms}, there is a high variety of consensus algorithms being used among implementations of BFL systems. Below is a summary of each consensus algorithm, as well as some of their characteristics.
+
+\begin{itemize}
+    \item \textit{Proof of Work (PoW).}
+    
+    \item \textit{Proof of Stake (PoS).}
+    
+    \item \textit{Proof of Authority (PoA).}
+    
+    \item \textit{Proof of Federated Learning (PoFL).}
+
+    \item \textit{Practical Byzantine Fault Tolerance (PBFT).}
+    
+    \item \textit{Proof of Quality (PoQ).}
+
+    \item \textit{Committee Based Consensus} \todo{isn't thius kinda PoA too?}
+\end{itemize}
+
 \subsection{Conclusions}
 
-\section{Model Parameter Storage}
-
-\subsection{Conclusion}
-
-\section{Participants Selection Mechanism}
-
-\section{Cross Verification Techniques}
-
-\section{Data Distribution, Partition and Dataset}
-
-\input{tables/data_distribution}
-
-\section{Sychronous vs Asynchronous Rounds}
-
-\section{Communication Cost}
+% Most implementations that used an already existing Blockchain platform went for Ethereum. However, a large proportion also implemented their own blockchain platform for BFL.
