@@ -94,6 +94,35 @@ Even though communication costs with a central server are removed, new communica
 
 \todo{Perhaps rename this section. I need to have a name for this because it is not just verification. It also involves scoring mechanisms and the way the aggregation is made.}
 
+During the training process, each training client produces their parameter updates and communicates them to the computing devices (indirectly, through the blockchain) in order for the aggregation process to happen. However, there are different security aspects that should be taken into account here as the parameter updates creates a vector for different attacks, such as poisoning attacks and plagiarism attacks.
+
+\begin{itemize}
+    \item \textit{Poisoning attacks}. Poisoning happen when training clients willingly send parameter updates that decrease the quality of the model. They may have been generated using an honestly unreliable data set, or done on purpose. To avoid other participants to provide unreliable data in order to degrate the model performance, there are dynamic verification technniques that allow to ignore low quality data \cite{10.48550/arxiv.2110.02182, 10.48550/arxiv.2104.10501}.
+    
+    \item \textit{Plagiarism}. Plagiarism attacks are not a \textit{problem per sea}, but they can cause unfairness when training the model. This is especially important if there is some sort of rewarding mechanism in action. Plagiarism attacks happen when lazy nodes plagiarize other node's models updates without real training \cite{9403374}. This issue can be addressed via pseudo-noise techniques \cite{10.48550/arxiv.2009.09338}.
+\end{itemize}
+
+Most of the current literature focus on poisoning attacks, as they can affect the most the final model performance. In addition, plagiarism attacks within the same round can be avoided by secure communication methods, such as differential privacy; and plagiarism attacks where a node reuses parameters from a previous round can be avoided by simply hashing the parameter values and doing a simple comparison. Therefore, we will also focus on poisoning attacks methods as they are the most common in the literature. Besides, it is important to notice that different verification techniques directly affect the security model of the system \cite{10.48550/arxiv.2110.02182}.
+
+There are different solutions found in the literature regarding verification:
+
+\begin{itemize}
+    \item \textit{Integrated Consensus Mechanisms}. Some authors implement their own blockchain systems, which allows them to design their own consensus mechanism dedicated to Federated Learning. This consensus mechanisms can use properties from the training process directly in order to detect which updates to accept or reject \cite{9293091, 10.1007/978-981-15-9213-3_12}.
+    
+    \item \textit{Random Committee}. In some works, a random set of participants is selected as committee and they must vote whether or not the model updates should be accepted. The decision to accept is based on the amount of votes that each submission received \cite{9159643}. There are different algorithms to decide on how voting works, such as voting in favor or against depending if it increases the performance relatively to the previous model or not.
+    
+    \item \textit{Points-based System}. Points-based system, also known as reputation-based system, are also related to the participants selection mechanism (\todo{add ref}). Different implementations work different, but most decide to use points where members with consistently high quality data and updates are accepted or have a larger influence on the aggregation. This solves both problems of the participants selection and verification at once \cite{10.48550/arxiv.2011.07516, 9170559, Peyvandi2022, 9292450}.
+    
+    \item \cite{8945913} implements a novel verification mechanism based on the trend of the validation error accuracy. To implement this, the updates by each training device are validated using a public validation data set known to all devices. The result of this validation will also influence the rewatrd distribution (\todo{i have to talk about rewards before too to introduce the topic}).
+    
+    \item \cite{10.48550/arxiv.2009.09338} only verifies the aggregated results instead of each other participants. This makes the process faster and less computationally expensive.
+    
+\end{itemize}
+
+The costs of model update verifications have not been considered in the most literature and it is important to understand the trade-off between system costs and different update verification mechanisms \cite{9403374}
+
+Researched recognise the importance of verifying the model updates before aggregating them. However, there is a lack of studies about the design of effective validation mechanisms \cite{10.48550/arxiv.2110.02182}
+
 \subsection{Data Distribution, Partition and Dataset}
 
 \input{tables/data_distribution}
@@ -102,3 +131,8 @@ Even though communication costs with a central server are removed, new communica
 
 \section{Conclusions}
 
+1. \textbf{Provide a detailed analysis of the trade-offs of different BFL properties and the accuracy, convergence rate and system costs (communication and resources)}. As per the literature review, there is a clear lack on research on how different properties, such as consensus algorithms, data partition, cross-verification systems and participant selection mechanisms affect the accuracy and overall system costs. Therefore, this work intends to fill such gap by providing a detailed analysis on how those aspects influence the accuracy and system costs, such as communication and resource consumption.
+
+2. \textbf{Design and implement a public framework for Blockchain-based Federated Learning that can be easily adapted.} Even though there are many works on designing Blockchain-based Federated Learning frameworks, none of them is currently released to the public or ready to be used for future research. On this work, I will design and implement a modular BFL platform that will be available publicly such that it can empower future research.
+
+3. In the end, give a guideline for future research
