@@ -1,6 +1,6 @@
 In this chapter, the different concepts and definitions regarding Machine Learning, Federated Learning and Blockchain are introduced. These can be regarded as necessary prior knowledge for understanding the remaining chapters of this report.
 
-\section{Machine Learning}
+\section{Machine Learning} \label{preliminaries:machine_learning}
 
 Machine Learning (ML) is a sub-field of Artificial Intelligence that uses algorithms and statistical models in order to detect relevant patterns based on prior experience \cite{geron_2019}. By giving models data, they can learn and adapt without explicit instructions. The data is usually structured as vectors in a multi-dimensional space, such that each vector is an \textit{instance} and each dimension is a \textit{feature}. The remaining of this section will shortly introduce the main categories of Machine Learning.
 
@@ -55,28 +55,27 @@ As with any technology, Federated Learning has its own characteristics, restrict
 
 \end{itemize}
 
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{graphics/hfl-architecture.pdf}
+    \caption{Horizontal Federated Learning Architecture}
+    \label{fig:hfl_arch}
+\end{figure}
+
 \subsection{Categories of Federated Learning}
 
 Federated Learning can be broadly divided into three main categories \cite{10.1145/3298981, 10.1145/3412357} that regard, for the most part, to the different data partition among the clients: Horizontal Federated Learning, Vertical Federated Learning and Federated Transfer Learning.
 
 \subsubsection{Horizontal Federated Learning}
 
-\begin{figure}
-    \centering
-    % \includegraphics{}
-    \todo{Make HFL diagram} 
-    \caption{Horizontal Federated Learning Architecture}
-    \label{fig:hfl_arch}
-\end{figure}
-
 In Horizontal Federated Learning (HFL), clients with the same data structure collaboratively build a single model. In other words, the different data sets in each client share the same feature space, but have a different samples space. For example, two different banks may have very different target user groups (sample space), but their businesses are very similar (feature space). In HFL settings there are usually tens to hundreds of parties and the data is more likely to be equally distributed across the involved parties. A classic system architecture of HFL can be seen in \autoref{fig:hfl_arch}.
 
 \subsubsection{Vertical Federated Learning}
 
-\begin{figure}
+\begin{figure}[!ht]
     \centering
-    % \includegraphics{}
-    \todo{Make VFL diagram} 
+    \centering
+    \includegraphics[width=0.8\textwidth]{graphics/vfl-architecture.pdf}
     \caption{Vertical Federated Learning Architecture}
     \label{fig:vfl_arch}
 \end{figure}
@@ -90,19 +89,28 @@ In Federated Transfer Learning (FTL), clients do not share a sample space, nor a
 \section{Blockchain}
 \label{preliminaries:blockchain}
 
-% - **Consensus Mechanism**: ****the mechanisms used by the network to reach a consensus on the current state.
-% - **Permission Types**
-%     - **Public**: permissionless, no central authority
-%     - **Private**: permissioned, controlled by one authority
-%     - **Consortium:** permissioned, controlled by a group
-% - **Platforms**
-%     - Ethereum
-%     - Hyperledger Fabric
-%     - EOS
-%     - Others
+A blockchain is an immutable distributed ledger of transactions maintained by several computers, also known as nodes, linked through a peer-to-peer network. The concept of blockchain was first introduced by Stuart Haber and W. Scott Stornetta in 1991\cite{10.48550/ARXIV.1810.06130}, being popularized by Satoshi Nakamoto in 2008 when the cryptocurrency Bitcoin was introduced \cite{nakamoto2009bitcoin}.
 
-% "Blockchain platforms allow the development of blockchain-based applications. They can either be permissioned or permissionless."
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{graphics/blockchain.pdf}
+    \caption{Blockchain Representation}
+    \label{fig:blockchain_blocks}
+\end{figure}
 
-\cite{nakamoto2009bitcoin}
+In a blockchain, the data is structured as blocks. Each block contains a certain amount of transactions and links to the previous block, forming a chain. Therefore, the name blockchain. One of the main aspects that has made this technology popular is the fact that is guarantees fidelity and trust without requiring a trusted third party. In addition, since the record is immutable and decentralized, all transactions can be transparently viewed by others.
+
+As mentioned beforehand, a blockchain is maintained by several nodes in a peer-to-peer network. As transactions come in, nodes compete in order to generate the next block. Since it is a decentralized process, multiple nodes will try to create the next block of the chain in parallel. In order to reach an agreement between the nodes, a consensus algorithm is used. The consensus algorithm allows to reach an agreement between multiple decentralized nodes without requiring a singular node to be in charge.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{graphics/blockchain-types.pdf}
+    \caption{Blockchain Types}
+    \label{fig:blockchain_types}
+\end{figure}
+
+There are broadly four different types of blockchain: public, private, consortium and hybrid. On one side of the spectrum, there are public blockchains, which are permissionless. Permissionless blockchains have no central authority and anyone can join the network. On the opposite side of the spectrum, there are private blockchains, which are controlled by a single authority and whose access is restricted. There are also consortium blockchains, which, similarly to private blockchains, are permissioned. However, instead of being controlled by a single authority, are controlled by a group of different authorities. In addition, there are also hybrid blockchains. Similarly to private blockchains, hybrid blockchians are usually controlled by a single organization. However, it also incorporates some permissionless features from public blockchains.
+
+Some blockchain platforms, such as Ethereum \cite{wood2014ethereum}, provide functionality for smart contracts. Smart contracts are small computer programs that live within the blockchain and they automatically run when predetermined conditions are met. As they live in the blockchain, they are trustless and are typically used to automate the execution of agreements so that every party involved is certain that once the conditions are met, the agreement will be honored.
 
 \todo{Finish section} 
