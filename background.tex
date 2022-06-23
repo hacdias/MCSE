@@ -1,0 +1,57 @@
+As mentioned in \Cref{chapter:introduction} and \Cref{chapter:related_work}, this work focuses on comparing different aspects of Blockchain-based Federated Learning, such as specific properties of the Blockchain platform the system runs on, and aspects of the Federated Learning process. This chapter gives an overview of the techniques selected for some of the properties that will be compared.
+
+\section{Blockchain Platform}
+
+In this work, we focus on already existing blockchain platforms that do not require internal changes to make the system work. As seen in \Cref{related_work:blockchain_platforms}, the most common blockchain platform among the reviewed works is Ethereum. Ethereum will also be our platform of choice as it is popular and compatible with all the techniques we are comparing.
+
+\section{Consensus Algorithm}
+
+The consensus algorithm is one of the most important properties of a Blockchain platform, as it makes it possible for the decentralized blockchain nodes to reach an agreement on what block comes next. In this work, we compare Proof of Work, Proof of Authority and a Byzantine Fault Tolerance-based consensus algorithm.
+
+\begin{itemize}
+    \item \textit{Proof of Work (PoW).} The PoW consensus algorithm was first introduced in the context of blockchain paltforms by Satoshi Nakamoto in Bitcoin \cite{nakamoto2009bitcoin}. PoW works by means of computation effort proofs, where a set of virtual miners race in solving a complex, yet feasible, mathematical problem. The winner of the race generates a cryptographic proof based on the solution of the problem that can be easily verified by others. Then, the winner adds a new block containing the newly verified transactions to the blockchain. In addition, the winner is rewarded according to some pre-determined rules.
+    
+    \item \textit{Proof of Authority (PoA).} The PoA consensus algorithm is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. In this system, there is a set of validator nodes that are responsible for validating the new transactions that stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network owner.
+
+    \item \textit{Istanbul Byzantine Fault Tolerance (IBFT).} The IBFT \cite{10.48550/arxiv.2002.03613} consensus algorithm is similar to the Practical Byzantine Fault Tolerance algorithm, which is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus. The different between IBFT and PBFT is that in the first the set of validators is dynamic, while on PBFT it is static. The network reaches a consensus once $2f+1$ nodes agree.
+\end{itemize}
+
+\section{Participants Selection Mechanism}
+
+For the participants selection mechanism, only random selection and first come, first served-basis selection will be compared. In the former, both the amount of participants and the participants themselves are selected randomly before the start of each round. In the latter, each participant takes initiative to register for the the next round. Once the limit is reached, no more participants are allowed.
+
+\section{Scoring and Aggregation Mechanism}
+
+Scoring mechanisms attribute a score to each submission and may, or not, influence how the aggregation is made. By default, the aggregation algorithm used is the Federated Averaging algorithm, which can be found in \autoref{eq:fedavg}. In this section, we explain briefly how each of the scoring mechanisms that will be compared works and if they influence the aggregation algorithm.
+
+\subsection{BlockFlow Score}
+
+The BlockFlow scoring algorithm work by giving each submission a score and, based on that score, do the aggregation \cite{10.48550/arxiv.2007.03856}. In this algorithm, each client $a$ gives each other client $k$ a score $s_{a,k} \in [0.0, 1.0]$, which can be based on $a$'s validation set accuracy using $k$'s submission. Based on this scores, a median score and a evaluation quality scores are calculated. The overall scores will then be the minimum between the scaled median score and the scaled least accurate evaluation score.
+
+With the final scores, the aggregation is calculated using the scores as weights in the Federated Averaging algorithm, instead of the number of samples. More details regarding the algorithm specifics can be found in the original paper.
+
+\subsection{Marginal Gain Score}
+
+The marginal gain score, also known as contributivity score, is calculated by summing the marginal performance gains of all the client's submissions so far \cite{10.48550/arxiv.2011.07516}. Similarly to BlockFlow scoring, each client has to give each other clients' submission a score. The formula of the client $c$'s submission score $S(c)$ is calculated as follows:
+
+\begin{equation}
+    \label{eq:marginal-gain}
+    S(c)= \sum_r(v(M_r)-v(M^c_{r+1}))
+\end{equation}
+
+Where $v$ is a performance metric, such as accuracy, and $m$ is the model and $r$ the round. These scores are used as weights in the Federated Averaging Algorithm. If the submission's score is equal or below $0$, the submission is ignored.
+
+\subsection{Multi-KRUM Score}
+
+The Multi-KRUM algorithm works by giving each submission a score and eliminating dubious submissions based on their score \cite{9170559, Peyvandi2022, 9292450}. This scores are calculated by the servers and are based on the Euclidean distances between the different client $c$'s submissions. The score of each client is denoted as $S(c)$ and calculated as follows:
+
+\begin{equation}
+    \label{eq:multi-krum}
+    S(c)=\sum_{c \rightarrow k} || \Delta w_c - \Delta w_k|| ^2
+\end{equation}
+
+Where $\Delta w$ is a submission and $c \rightarrow k$ are the clients $k$ whose submission $\Delta w_k$ are the $R-f-2$ closest to $\Delta w_c$. In this formula, $R$ is the total number of submissions, while $f$ represents the amount of Byzantine clients. After giving each submission a score, the $R-f$ clients with the lowest scores are chosen and the remaining are rejected. Please note that Byzantine fault tolerant systems behave correctly when no more than $f$ out of $3f+1$ replicas fail.
+
+\subsection{Data Validity Score}
+
+In \cite{10.48550/arxiv.2009.09338, 8945913}, a data validity score is implemented and calculated by the servers based on a publicly available validation dataset. Similarly to the marginal gain score, the data validity score is based on the performance improvements that each submission makes to the global model. However, it uses the regular Federated Averaging algorithm with the samples as weights instead of the scores.

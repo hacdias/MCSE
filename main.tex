@@ -5,11 +5,13 @@
 \usepackage[nottoc]{tocbibind}
 \usepackage{amssymb}
 \usepackage{hyperref}
+\usepackage[nameinlink]{cleveref}
 \usepackage{graphicx}
 \usepackage{fancyhdr}
 \usepackage{multirow}
 \usepackage{caption}
 \usepackage{xcolor}
+\usepackage{lscape}
 
 \pagestyle{fancy}
 
@@ -80,11 +82,14 @@ External Assessor\par
 \pagenumbering{arabic}
 \input{introduction}
 
-\chapter{Preliminaries}\label{chapter:preliminaries}
-\input{preliminaries}
+\chapter{Fundamental Concepts}\label{chapter:fundamental}
+\input{fundamentals}
 
-\chapter{Related Work}\label{chapter:relatedWork}
-\input{related_work.tex}
+\chapter{Related Work}\label{chapter:related_work}
+\input{related_work}
+
+\chapter{Background}\label{chapter:background}
+\input{background}
 
 \chapter{Methodology}\label{chapter:methodology}
 \input{methodology}
@@ -101,9 +106,9 @@ External Assessor\par
 \bibliographystyle{acm}
 \bibliography{literature}
 
-\appendix 
-\addcontentsline{toc}{chapter}{Appendix}
+% \appendix 
+% \addcontentsline{toc}{chapter}{Appendix}
 
-\chapter{One Appendix}\label{chapter:oneappendix}
+% \chapter{One Appendix}\label{chapter:oneappendix}
 
 \end{document}

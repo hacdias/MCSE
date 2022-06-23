@@ -1,24 +1,20 @@
+\todo{Expalantions should go to background}
+
 \section{Federated Learning}
 
 \subsection{Optimization Algorithms}
 
 \subsection{Challenges}
 
-Federated Averaging (\textit{FedAvg}):
-
-\begin{equation}
-w_{t+1} = \sum_{k \in K} \frac{n_k}{n} w_{t+1}^k
-\end{equation}
-
-where $n_k$ is the number of samples at participant $k$
+\todo{Move this to fundamentals}
 
 \section{Blockchain-based Federated Learning}
 
 In a BFL system, there are two different systems at play: the blockchain and the machine learning environment. They are both connected, yet they are separate entities. In this section, we analyze blockchain-specific aspects regarding BFL implementations such as blockchain platforms and consensus algorithms.
 
-\subsection{Blockchain Platforms}
+\subsection{Blockchain Platforms}\label{related_work:blockchain_platforms}
 
-As explained in \autoref{preliminaries:blockchain}, blockchain platforms allow developers to build applications on top of blockchain technologies. Even though all platforms are based on the concept of blockchain, they all have different characteristics and restrictions, as well as different sets of features.
+As explained in \autoref{fundamentals:blockchain}, blockchain platforms allow developers to build applications on top of blockchain technologies. Even though all platforms are based on the concept of blockchain, they all have different characteristics and restrictions, as well as different sets of features.
 
 As can be seen in \autoref{tab:blockchain_platforms}, the majority of papers analyzed chose an already existing platform. Among those, Ethereum was the most popular. In addition, it is worth mentioning that a large amount of authors also implemented their own blockchain platform. By implementing their own platform, it is easier to overcome certain restrictions such as limits on data per block \cite{8733825, 9524833}.
 
@@ -35,19 +31,27 @@ One of the most important aspects of blockchain technology is the consensus algo
 As can be seen on \autoref{tab:consensus_mechanisms}, there is a high variety of consensus algorithms being used among implementations of BFL systems. Below is a summary of each consensus algorithm, as well as some of their characteristics
 
 \begin{itemize}
-    \item \textit{Proof of Work (PoW).} The Proof of Work consensus was first introduced in the context of blockchain platforms by Satoshi Nakamoto in Bitcoin \cite{nakamoto2009bitcoin}. PoW works by means of computation effort proofs, where a set of virtual miners race in solving a complex, yet feasible, mathematical problem. The winner of the race generates a cryptographic proof based on the solution of the problem that can be easily verified by others. Then, the winner adds a new block containing the newly verified transactions to the blockchain. In addition, the winner is rewarded according to some pre-determined rules.
+    \item \textit{Proof of Work (PoW).} PoW has been used for many years and some of its advantages and disadvantages are now clear. On the one hand, it is a very simple algorithm where proofs are easily verifiable. Not only it is robust and proven to work, but the cost of attacking a PoW blockchain is also very high. For an attacker to be successful, they would need to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021}. According to estimations by the University of Cambridge, Bitcoin alone consumes more energy per year than mid-sized countries, such as The Netherlands and Argentina \cite{ccaf}.
     
-    PoW has been used for many years and some of its advantages and disadvantages are now clear. On the one hand, it is a very simple algorithm where proofs are easily verifiable. Not only it is robust and proven to work, but the cost of attacking a PoW blockchain is also very high. For an attacker to be successful, they would need to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021}. According to estimations by the University of Cambridge, Bitcoin alone consumes more energy per year than mid-sized countries, such as The Netherlands and Argentina \cite{ccaf}.
+    \item \textit{Proof of Stake (PoS).}
     
-    \item \textit{Proof of Stake (PoS).} The Proof of Stake consensus is one of the main alternatives to PoW. In a PoS blockchain, there are a set of validators, which are nodes that stake their own cryptocurrency in exchange for the ability to validate new transactions and therefore update the blockchain. During the validation process, the network selects a winner validator from the network according to specific rules. Usually, validators with that hold more cryptocurrency for the longest time have a higher change of being selected. After the winner generates a new block, the remaining validators have to verify if the new block is correct. Depending on the outcome, the winner either receives a reward or is penalized.
+    % The Proof of Stake consensus is one of the main alternatives to PoW. In a PoS blockchain, there are a set of validators, which are nodes that stake their own cryptocurrency in exchange for the ability to validate new transactions and therefore update the blockchain. During the validation process, the network selects a winner validator from the network according to specific rules. Usually, validators with that hold more cryptocurrency for the longest time have a higher change of being selected. After the winner generates a new block, the remaining validators have to verify if the new block is correct. Depending on the outcome, the winner either receives a reward or is penalized.
     
     Similarly to PoW, PoS also has some advantages and disadvantages. On the one hand, it does not require high computational resources from the validator nodes and therefore the energy consumption can be kept low. In addition, it allows for fast throughput and nodes are incentivized to behave correctly through the rewarding system \cite{li_blockchain_2021}. On the other hand, validators with large equities can have an excessive influence over the transaction verification process as they are more likely to be chosen more frequently \cite{li_blockchain_2021}. In either case, the details vary from implementation to implementation.
     
-    \item \textit{Proof of Authority (PoA).} The Proof of Authority consensus is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. Similarly to the PoS algorithm, there is a set of validator nodes that are responsible for validating the new transactions. However, instead of staking cryptocurrency, the validator nodes stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network deployer. Both this points make the system highly scalable with high throughput \cite{binance_academy_2020}. However, one of the main criticisms of the PoA is that it goes against decentralization since the validators are manually chosen. Therefore, there is hesitation on using PoA in public networks.
+    \item \textit{Proof of Authority (PoA).} 
+    
+    % The Proof of Authority consensus is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. Similarly to the PoS algorithm, there is a set of validator nodes that are responsible for validating the new transactions. However, instead of staking cryptocurrency, the validator nodes stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network deployer.
+    
+    Both this points make the system highly scalable with high throughput \cite{binance_academy_2020}. However, one of the main criticisms of the PoA is that it goes against decentralization since the validators are manually chosen. Therefore, there is hesitation on using PoA in public networks.
 
     \item \textit{Proof of Federated Learning (PoFL) and Proof of Quality (PoQ)} Proof of Federated Learning \cite{9347812, 10.48550/arxiv.2007.15145} and Proof of Quality \cite{8843900} are both novel consensus algorithms that integrate the training process in order to reduce the resources and energy consumption. These are custom algorithms and they are not readily available on public blockchain projects. To use it, developers would either need to implement their custom blockchains, or modify an existing blockchain.
 
-    \item \textit{Practical Byzantine Fault Tolerance (PBFT).} The Practical Byzantine Fault Tolerance algorithm is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus \cite{Castro99practicalbyzantine}. The network reaches a consensus once $2f+1$ nodes agree. On one hand, the PBFT consensus allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. On the other hand, a system that it will stop working if only 33\% or less nodes are running and the three-phase system can lead to high communication costs.
+    \item \textit{Practical Byzantine Fault Tolerance (PBFT).}
+    
+    % The Practical Byzantine Fault Tolerance algorithm is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus \cite{Castro99practicalbyzantine}. The network reaches a consensus once $2f+1$ nodes agree.
+    
+    On one hand, the PBFT consensus allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. On the other hand, a system that it will stop working if only 33\% or less nodes are running and the three-phase system can lead to high communication costs.
 
     \item \textit{Committee-based Consensus.} Committee-based consensus are a group of consensus algorithms where a selected number of members from a committee are selected in order to achieve consensus in a fast way \cite{qu_blockchain-enabled_2022}. This is usually used on custom blockchain implementations with specific goals in mind, such as minimizing communication costs \cite{9293091}.
 \end{itemize}
@@ -94,7 +98,7 @@ Even though communication costs with a central server are removed, new communica
     \item Possible solutions: reward-based training (\cite{9079513}, “Blockchained on-device federated learning,”) adjustment of block arrival rate (“Low-latency federated learning and blockchain for edge association in digital twin empowered 6G networks”) and bandwidth resource constrains.
 \end{itemize}
 
-\subsection{Cross Verification Techniques}
+\subsection{Scoring and Aggregation Mechanisms}
 
 \todo{Perhaps rename this section. I need to have a name for this because it is not just verification. It also involves scoring mechanisms and the way the aggregation is made.}
 
@@ -126,6 +130,8 @@ There are different solutions found in the literature regarding verification:
 The costs of model update verifications have not been considered in the most literature and it is important to understand the trade-off between system costs and different update verification mechanisms \cite{9403374}
 
 Researched recognise the importance of verifying the model updates before aggregating them. However, there is a lack of studies about the design of effective validation mechanisms \cite{10.48550/arxiv.2110.02182}
+
+\subsection{Privacy Mechanisms}
 
 \subsection{Data Distribution, Partition and Dataset}
 
