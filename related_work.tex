@@ -1,148 +1,90 @@
-\todo{Expalantions should go to background}
+In Blockchain-based Federated Learning systems, there are different properties that are need to be taken into consideration when building the system. In this chapter, we go over different properties and what variations are used in the literature.
 
-\section{Federated Learning}
-
-\subsection{Optimization Algorithms}
-
-\subsection{Challenges}
-
-\todo{Move this to fundamentals}
-
-\section{Blockchain-based Federated Learning}
-
-In a BFL system, there are two different systems at play: the blockchain and the machine learning environment. They are both connected, yet they are separate entities. In this section, we analyze blockchain-specific aspects regarding BFL implementations such as blockchain platforms and consensus algorithms.
-
-\subsection{Blockchain Platforms}\label{related_work:blockchain_platforms}
-
+\section{Blockchain Platforms}\label{related_work:blockchain_platforms}
+ 
 As explained in \autoref{fundamentals:blockchain}, blockchain platforms allow developers to build applications on top of blockchain technologies. Even though all platforms are based on the concept of blockchain, they all have different characteristics and restrictions, as well as different sets of features.
 
-As can be seen in \autoref{tab:blockchain_platforms}, the majority of papers analyzed chose an already existing platform. Among those, Ethereum was the most popular. In addition, it is worth mentioning that a large amount of authors also implemented their own blockchain platform. By implementing their own platform, it is easier to overcome certain restrictions such as limits on data per block \cite{8733825, 9524833}.
+As can be seen in \autoref{tab:blockchain_platforms}, around half of the implementations used an already existing platform, where the remaining preferred to implement their own blockchain platform Among already existing platforms, Ethereum was the most popular. When implementing a custom platform, it is easier to overcome certain restrictions such as limits on data per block \cite{8733825, 9524833}.
 
 \input{tables/blockchain_platforms}
 
-\todo{Rewrite} Most implementations that used an already existing Blockchain platform went for Ethereum. However, a large proportion also implemented their own blockchain platform for BFL.
-
-\subsection{Consensus Algorithms}
+\section{Consensus Algorithms}
 
 One of the most important aspects of blockchain technology is the consensus algorithm. Consensus is the process of reaching an agreement on a single value among different distributed processes. These algorithms are designed to be reliable even on networks that have unreliable nodes. In blockchain, the consensus algorithm is used to reach consensus on the next block of the chain.
 
 \input{tables/consensus_mechanisms}
 
-As can be seen on \autoref{tab:consensus_mechanisms}, there is a high variety of consensus algorithms being used among implementations of BFL systems. Below is a summary of each consensus algorithm, as well as some of their characteristics
+As can be seen on \autoref{tab:consensus_mechanisms}, there is a high variety of consensus algorithms being used among implementations of BFL systems. Below is a summary of each consensus algorithm, as well as some of their characteristics.
 
 \begin{itemize}
-    \item \textit{Proof of Work (PoW).} PoW has been used for many years and some of its advantages and disadvantages are now clear. On the one hand, it is a very simple algorithm where proofs are easily verifiable. Not only it is robust and proven to work, but the cost of attacking a PoW blockchain is also very high. For an attacker to be successful, they would need to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021}. According to estimations by the University of Cambridge, Bitcoin alone consumes more energy per year than mid-sized countries, such as The Netherlands and Argentina \cite{ccaf}.
-    
-    \item \textit{Proof of Stake (PoS).}
-    
-    % The Proof of Stake consensus is one of the main alternatives to PoW. In a PoS blockchain, there are a set of validators, which are nodes that stake their own cryptocurrency in exchange for the ability to validate new transactions and therefore update the blockchain. During the validation process, the network selects a winner validator from the network according to specific rules. Usually, validators with that hold more cryptocurrency for the longest time have a higher change of being selected. After the winner generates a new block, the remaining validators have to verify if the new block is correct. Depending on the outcome, the winner either receives a reward or is penalized.
-    
-    Similarly to PoW, PoS also has some advantages and disadvantages. On the one hand, it does not require high computational resources from the validator nodes and therefore the energy consumption can be kept low. In addition, it allows for fast throughput and nodes are incentivized to behave correctly through the rewarding system \cite{li_blockchain_2021}. On the other hand, validators with large equities can have an excessive influence over the transaction verification process as they are more likely to be chosen more frequently \cite{li_blockchain_2021}. In either case, the details vary from implementation to implementation.
-    
-    \item \textit{Proof of Authority (PoA).} 
-    
-    % The Proof of Authority consensus is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. Similarly to the PoS algorithm, there is a set of validator nodes that are responsible for validating the new transactions. However, instead of staking cryptocurrency, the validator nodes stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network deployer.
-    
-    Both this points make the system highly scalable with high throughput \cite{binance_academy_2020}. However, one of the main criticisms of the PoA is that it goes against decentralization since the validators are manually chosen. Therefore, there is hesitation on using PoA in public networks.
+    \item \textit{Proof of Work (PoW)} has been used for many years and some of its advantages and disadvantages are now clear. On one hand, it is a simple algorithm where proofs are hard to create, but easy to verify. Not only is it robust and proven to work, but the cost of attacking a PoW blockchain is also extremely high. For an attacker to be successful, they would need to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021, ccaf}. In addition, \cite{10.48550/arxiv.2112.07938} mentions the importance of analyzing the constraints and trade-offs of using PoW with BFL.
 
-    \item \textit{Proof of Federated Learning (PoFL) and Proof of Quality (PoQ)} Proof of Federated Learning \cite{9347812, 10.48550/arxiv.2007.15145} and Proof of Quality \cite{8843900} are both novel consensus algorithms that integrate the training process in order to reduce the resources and energy consumption. These are custom algorithms and they are not readily available on public blockchain projects. To use it, developers would either need to implement their custom blockchains, or modify an existing blockchain.
-
-    \item \textit{Practical Byzantine Fault Tolerance (PBFT).}
+    \item \textit{Proof of Stake (PoS)}, in contrast to PoW, does not require high computational resources from the blockchain nodes and therefore the energy consumption can be kept lower. In addition, it allows for fast throughput and nodes are incentivized to behave correctly through the rewarding system \cite{li_blockchain_2021}. On the other hand, some nodes may have excessive influence over the transaction verification process \cite{li_blockchain_2021}. In either case, the details vary from implementation to implementation.
     
-    % The Practical Byzantine Fault Tolerance algorithm is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus \cite{Castro99practicalbyzantine}. The network reaches a consensus once $2f+1$ nodes agree.
-    
-    On one hand, the PBFT consensus allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. On the other hand, a system that it will stop working if only 33\% or less nodes are running and the three-phase system can lead to high communication costs.
+    \item \textit{Proof of Authority (PoA)} is a highly sxwcalable consensus algorithm with high throughput \cite{binance_academy_2020}. However, one of the main criticisms of the PoA is that it goes against decentralization since the validators are manually chosen. Therefore, there is hesitation on using PoA in public networks.
 
-    \item \textit{Committee-based Consensus.} Committee-based consensus are a group of consensus algorithms where a selected number of members from a committee are selected in order to achieve consensus in a fast way \cite{qu_blockchain-enabled_2022}. This is usually used on custom blockchain implementations with specific goals in mind, such as minimizing communication costs \cite{9293091}.
+    \item \textit{Proof of Federated Learning (PoFL) \cite{9347812, 10.48550/arxiv.2007.15145} and Proof of Quality (PoQ)} \cite{8843900} are both novel consensus algorithms that integrate the training process in order to reduce the resources and energy consumption. These are custom algorithms and they are not readily available on public blockchain platforms. To use it, developers would either need to implement their custom blockchains, or modify an existing blockchain.
+
+    \item \textit{Practical Byzantine Fault Tolerance (PBFT)} allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. However, it will stop working if only 33\% or less nodes are running and it can also have high communication costs due to its three-phase protocol nature.
+
+    \item \textit{Committee-based Consensus} are a group of consensus algorithms where a selected number of members from a committee are selected in order to achieve consensus in a fast way \cite{qu_blockchain-enabled_2022}. This is usually used on custom blockchain implementations with specific goals in mind, such as minimizing communication costs \cite{9293091}.
 \end{itemize}
 
-\todo{Rewrite} The most commonly used consensus was PoA, which works well on private chains. \cite{10.48550/arxiv.2112.07938} also mentions the importance of analyzing the constraints and trade-offs of using PoW with BFL.  
-
-\subsection{Model Parameter Storage}
+\section{Model Parameter Storage}
 
 Another important aspect of BFL systems is where the model parameters are stored during the training process in order to share them between devices. According to the literature, either the parameters are stored on-chain, i.e., in the blockchain itself, or off-chain, i.e., in a separate storage provider.
 
 \begin{itemize}
-    \item With \textit{on-chain storage}, the smart contract stores the model parameters itself \cite{9274451, baffle, demo, 8733825, 9524833, 8894364, 9184854, 8893114}, which means that the parameters themselves will be stored in the blockchain. However, most blockchain platforms have a limit on how large a block can be. Therefore, the amount of data that can be stored per contract is also limited. In this cases, smart contracts are chunked, i.e., a single contract is split into many different contracts that hold smaller chunks of the parameters \cite{9274451, baffle}. In this cases, the new model parameters can be directly calculated through the smart contract as the values are accessible.
+    \item With \textit{on-chain storage}, the smart contract stores the model parameters itself \cite{9274451, baffle, demo, 8733825, 9524833, 8894364, 9184854, 8893114}, which means that the parameters themselves will be stored in the blockchain. However, most blockchain platforms have a limit on how large a block can be. Therefore, the amount of data that can be stored per contract is also limited. In these cases, smart contracts are chunked, i.e., a single contract is split into many different contracts that hold smaller chunks of the parameters \cite{9274451, baffle}. In addition, this allows for the new model parameters to be directly calculated through the smart contract as the values are directly accessible.
     
-    \item With \textit{off-chain storage}, the smart contract holds a reference to the model parameters in some external storage \cite{10.48550/arxiv.2202.02817, 10.48550/arxiv.1910.12603, 10.48550/arxiv.2007.03856, 8945913, Peyvandi2022, 9170559, 10.1145/3319535.3363256, 10.48550/arxiv.2011.07516}, such a decentralized storage system. In this case, the new model parameters cannot be calculated directly on the smart contract as smart contracts have limited functionality and are not able to download external information during execution. The most common approach is to have a set of miners/validators to run the aggregation in parallel and then submit their final version. Through the smart contract, the majority of the validators must agree on what is the next global version. \todo{Maybe add some of the information from the paragraph below here and then only give quick comparison as conclusion, also explain IPFS (preliminaries?).}
+    \item With \textit{off-chain storage}, the smart contract holds a reference to the model parameters in some external storage \cite{10.48550/arxiv.2202.02817, 10.48550/arxiv.1910.12603, 10.48550/arxiv.2007.03856, 8945913, Peyvandi2022, 9170559, 10.1145/3319535.3363256, 10.48550/arxiv.2011.07516}, such a decentralized storage system. In this case, the new model parameters cannot be calculated directly on the smart contract as smart contracts have limited functionality and are not able to download external information during execution. The most common approach is to have a set of devices performing the aggregation in parallel and submitting their final version. Through the smart contract, the majority of the devices must agree on what is the next global version.
 \end{itemize}
 
-As can be seen per the list above, most implementations prefer on-chain storage. However, these implementations also use custom blockchain implementations \cite{8733825, 9524833, 8894364, 9184854, 8893114}, which means that they can implement a platform that has different restrictions on how much data a smart contract can handle. When it comes to using already existing blockchain platforms, such as Ethereum, most implementations prefer off-chain storage using a system such as IPFS \cite{10.48550/arxiv.2007.03856, 8945913, Peyvandi2022, 9170559, 10.1145/3319535.3363256, 10.48550/arxiv.2011.07516}.
+As can be seen per the list above, most implementations prefer on-chain storage. However, these implementations also use custom blockchain implementations \cite{8733825, 9524833, 8894364, 9184854, 8893114}, which means that they can implement a platform that has different restrictions on how much data a smart contract can handle. When it comes to using already existing blockchain platforms, such as Ethereum, most implementations prefer off-chain storage using a system such as the InterPlanetary File System (IPFS) \cite{10.48550/arxiv.2007.03856, 8945913, Peyvandi2022, 9170559, 10.1145/3319535.3363256, 10.48550/arxiv.2011.07516}.
 
-\subsection{Participants Selection Techniques}
+\section{Participants Selection Techniques}
 
-\todo{Rewrite all sub-section}
+Usually, only some clients participate in each round. The process of choosing the clients that participate in each round can vary and have different costs. In most cases, the clients were chosen \textit{randomly} \cite{Peyvandi2022}, both the number of clients participating and which clients to participate. In some other systems, clients are allowed to take initiative, operating in a \textit{first come, first served} basis \cite{9184854}. In these systems, a pre-defined number of required clients is set and once enough clients have submitted their updates, the aggregation takes place.
 
-Usually only some participants participate in each round. The process of choosing the participants that will participate in each round can vary and have different associated costs. Also, the number of participants participating in each round (safely larger than N/2, where N is the total number of members) can vary.
+\section{Scoring and Aggregation Mechanisms}
+
+During the training process, each training client produces their parameter updates and communicates them to the computing devices through the blockchain in order to be aggregated. However, there are different security aspects that should be taken into account here as the parameter updates creates a vector for different attacks, such as poisoning attacks and plagiarism attacks.
 
 \begin{itemize}
-    \item \textit{Randomly.} participants are chosen randomly. Random number generation is impossible in smart contracts due to their deterministic nature. Therefore, the selection of the random participants has to be down out of bounds \cite{9293091}.
+    \item \textit{Poisoning attacks} happen when training clients willingly send parameter updates that decrease the quality of the model. They may have been generated using an honestly unreliable data set, or done on purpose. To avoid other participants to provide unreliable data in order to degrate the model performance, there are dynamic verification technniques that allow to ignore low quality data \cite{10.48550/arxiv.2110.02182, 10.48550/arxiv.2104.10501}.
     
-    \item \textit{First Come, First Served.} each participant takes initiative to register for the next round. As soon as the limit is reached, no more participants are allowed. \cite{9184854}  Variation: all register, but the first ones to submit are the ones that are used. \cite{needed}
-    
-    \item \textit{Points-based System} : these are usually based on some reward mechanism that classifies each of the participants depending on how good and reliable their contributions are \cite{9293091, baffle, demo, 8905038, 8893114, Peyvandi2022}
+    \item \textit{Plagiarism attacks} happen when lazy clients plagiarize other client's models updates without real training \cite{9403374}, which can be addressed via pseudo-noise techniques \cite{10.48550/arxiv.2009.09338}.
 \end{itemize}
 
-There are various participant selection mechanisms. For custom blockchains, they are embedded in the blockchain itself. Otherwise, they're usually in the smart contract.
-
-\subsection{Communication Costs}
-
-\todo{This probably needs to be moved somewhere else or split the information next to other sub sections where it would fit better}
-
-Even though communication costs with a central server are removed, new communications with and between the blockchain nodes are introduced. Other aspects such as consensus algorithms may influence the communication.
-
-\begin{itemize}
-    \item Most solutions nowadays rely on PoW, which is time consuming and often requires large bandwidth. Communication cost can be an issue when IoT devices are in play. \textbf{There is little research on how different aspects of Blockchain-based Federated Learning influence the communication costs} \cite{9403374}
-    
-    \item Possible solutions: reward-based training (\cite{9079513}, “Blockchained on-device federated learning,”) adjustment of block arrival rate (“Low-latency federated learning and blockchain for edge association in digital twin empowered 6G networks”) and bandwidth resource constrains.
-\end{itemize}
-
-\subsection{Scoring and Aggregation Mechanisms}
-
-\todo{Perhaps rename this section. I need to have a name for this because it is not just verification. It also involves scoring mechanisms and the way the aggregation is made.}
-
-During the training process, each training client produces their parameter updates and communicates them to the computing devices (indirectly, through the blockchain) in order for the aggregation process to happen. However, there are different security aspects that should be taken into account here as the parameter updates creates a vector for different attacks, such as poisoning attacks and plagiarism attacks.
-
-\begin{itemize}
-    \item \textit{Poisoning attacks}. Poisoning happen when training clients willingly send parameter updates that decrease the quality of the model. They may have been generated using an honestly unreliable data set, or done on purpose. To avoid other participants to provide unreliable data in order to degrate the model performance, there are dynamic verification technniques that allow to ignore low quality data \cite{10.48550/arxiv.2110.02182, 10.48550/arxiv.2104.10501}.
-    
-    \item \textit{Plagiarism}. Plagiarism attacks are not a \textit{problem per sea}, but they can cause unfairness when training the model. This is especially important if there is some sort of rewarding mechanism in action. Plagiarism attacks happen when lazy nodes plagiarize other node's models updates without real training \cite{9403374}. This issue can be addressed via pseudo-noise techniques \cite{10.48550/arxiv.2009.09338}.
-\end{itemize}
-
-Most of the current literature focus on poisoning attacks, as they can affect the most the final model performance. In addition, plagiarism attacks within the same round can be avoided by secure communication methods, such as differential privacy; and plagiarism attacks where a node reuses parameters from a previous round can be avoided by simply hashing the parameter values and doing a simple comparison. Therefore, we will also focus on poisoning attacks methods as they are the most common in the literature. Besides, it is important to notice that different verification techniques directly affect the security model of the system \cite{10.48550/arxiv.2110.02182}.
-
-There are different solutions found in the literature regarding verification:
+Most of the current literature focus on poisoning attacks, as they can affect the most the final model performance. In addition, plagiarism attacks within the same round can be avoided by secure communication methods, such as differential privacy; and plagiarism attacks where a node reuses parameters from a previous round can be avoided by simply hashing the parameter values and performing a comparison. It is important to notice that different verification techniques directly affect the security model of the system \cite{10.48550/arxiv.2110.02182}. There are different solutions found in the literature regarding verification:
 
 \begin{itemize}
     \item \textit{Integrated Consensus Mechanisms}. Some authors implement their own blockchain systems, which allows them to design their own consensus mechanism dedicated to Federated Learning. This consensus mechanisms can use properties from the training process directly in order to detect which updates to accept or reject \cite{9293091, 10.1007/978-981-15-9213-3_12}.
     
     \item \textit{Random Committee}. In some works, a random set of participants is selected as committee and they must vote whether or not the model updates should be accepted. The decision to accept is based on the amount of votes that each submission received \cite{9159643}. There are different algorithms to decide on how voting works, such as voting in favor or against depending if it increases the performance relatively to the previous model or not.
     
-    \item \textit{Points-based System}. Points-based system, also known as reputation-based system, are also related to the participants selection mechanism (\todo{add ref}). Different implementations work different, but most decide to use points where members with consistently high quality data and updates are accepted or have a larger influence on the aggregation. This solves both problems of the participants selection and verification at once \cite{10.48550/arxiv.2011.07516, 9170559, Peyvandi2022, 9292450}.
+    \item \textit{Points-based System}. Points-based system, also known as reputation-based system, usually work by giving clients with consistently high quality data and updates higher amounts of points. Then, the updates with less points are either rejected, or they have a smaller influence on the aggregation  \cite{10.48550/arxiv.2011.07516, 9170559, Peyvandi2022, 9292450}.
     
-    \item \cite{8945913} implements a novel verification mechanism based on the trend of the validation error accuracy. To implement this, the updates by each training device are validated using a public validation data set known to all devices. The result of this validation will also influence the rewatrd distribution (\todo{i have to talk about rewards before too to introduce the topic}).
-    
-    \item \cite{10.48550/arxiv.2009.09338} only verifies the aggregated results instead of each other participants. This makes the process faster and less computationally expensive.
-    
+    \item \cite{8945913} implements a novel verification mechanism based on the trend of the validation error accuracy. To implement this, the updates by each training device are validated using a public validation data set known to all devices. The result of this validation will also influence the reward distribution.
+
 \end{itemize}
 
-The costs of model update verifications have not been considered in the most literature and it is important to understand the trade-off between system costs and different update verification mechanisms \cite{9403374}
+The costs of model update scoring have not been considered in most of the literature and it is important to understand the trade-off between system costs and the different scoring mechanisms \cite{9403374, 10.48550/arxiv.2110.02182}.
 
-Researched recognise the importance of verifying the model updates before aggregating them. However, there is a lack of studies about the design of effective validation mechanisms \cite{10.48550/arxiv.2110.02182}
+\section{Privacy Mechanisms}
 
-\subsection{Privacy Mechanisms}
+\todo{Mention the existing ones (DP, HOM ENC, etc) and that DP is the most commmon.}
 
-\subsection{Data Distribution, Partition and Dataset}
+\section{Data Partition and Distribution}
+
+Regarding data partition, as can be seen in \autoref{tab:data_distribution}, the vast majority of the literature related to BFL systems has focused on Horizontal Federated Learning systems, with only one focusing on Vertical Federated Learning and none addressing Transfer Federated Learning.
+
+When it comes to data distribution, most of the reviewed work assumed it to be \textit{iid}, while only a minority assuming the data is \textit{non-iid}. Other papers were reviewed, however this information was not specified.
 
 \input{tables/data_distribution}
 
-\todo{Rewrite} Only one of the reviewed papers can be applied to Blockchain-based Vertical Federated Learning, which shows that there is little research on this subject.
-
 \section{Conclusions}
 
-1. \textbf{Provide a detailed analysis of the trade-offs of different BFL properties and the accuracy, convergence rate and system costs (communication and resources)}. As per the literature review, there is a clear lack on research on how different properties, such as consensus algorithms, data partition, cross-verification systems and participant selection mechanisms affect the accuracy and overall system costs. Therefore, this work intends to fill such gap by providing a detailed analysis on how those aspects influence the accuracy and system costs, such as communication and resource consumption.
+From the literature review, we can take a few conclusions. Firstly, there is a clear lack on how different BFL properties, such as consensus algorithms and scoring mechanisms, impact communication and computation costs and accuracy. The survey \cite{9403374} also noticed this. Therefore, this work intends to fill such gap by providing a detailed analysis on how some of this properties influence the accuracy, communication and computation costs.
 
-2. \textbf{Design and implement a public framework for Blockchain-based Federated Learning that can be easily adapted.} Even though there are many works on designing Blockchain-based Federated Learning frameworks, none of them is currently released to the public or ready to be used for future research. On this work, I will design and implement a modular BFL platform that will be available publicly such that it can empower future research.
-
-3. In the end, give a guideline for future research
+Secondly, even though there are many works on designing BFL frameworks, very few are released to the public, or are modular. On this work, we will work on designing and implementing a modular BFL framework that can be easily changed to support other techniques and will be available to the public to empower future research.  

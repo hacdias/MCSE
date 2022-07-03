@@ -9,11 +9,11 @@ In this work, we focus on already existing blockchain platforms that do not requ
 The consensus algorithm is one of the most important properties of a Blockchain platform, as it makes it possible for the decentralized blockchain nodes to reach an agreement on what block comes next. In this work, we compare Proof of Work, Proof of Authority and a Byzantine Fault Tolerance-based consensus algorithm.
 
 \begin{itemize}
-    \item \textit{Proof of Work (PoW).} The PoW consensus algorithm was first introduced in the context of blockchain paltforms by Satoshi Nakamoto in Bitcoin \cite{nakamoto2009bitcoin}. PoW works by means of computation effort proofs, where a set of virtual miners race in solving a complex, yet feasible, mathematical problem. The winner of the race generates a cryptographic proof based on the solution of the problem that can be easily verified by others. Then, the winner adds a new block containing the newly verified transactions to the blockchain. In addition, the winner is rewarded according to some pre-determined rules.
+    \item The PoW consensus algorithm was first introduced in the context of blockchain paltforms by Satoshi Nakamoto in Bitcoin \cite{nakamoto2009bitcoin}. PoW works by means of computation effort proofs, where a set of virtual miners race in solving a complex, yet feasible, mathematical problem. The winner of the race generates a cryptographic proof based on the solution of the problem that can be easily verified by others. Then, the winner adds a new block containing the newly verified transactions to the blockchain. In addition, the winner is rewarded according to some pre-determined rules.
     
-    \item \textit{Proof of Authority (PoA).} The PoA consensus algorithm is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. In this system, there is a set of validator nodes that are responsible for validating the new transactions that stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network owner.
+    \item The PoA consensus algorithm is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. In this system, there is a set of validator nodes that are responsible for validating the new transactions that stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network owner.
 
-    \item \textit{Istanbul Byzantine Fault Tolerance (IBFT).} The IBFT \cite{10.48550/arxiv.2002.03613} consensus algorithm is similar to the Practical Byzantine Fault Tolerance algorithm, which is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus. The different between IBFT and PBFT is that in the first the set of validators is dynamic, while on PBFT it is static. The network reaches a consensus once $2f+1$ nodes agree.
+    \item The IBFT \cite{10.48550/arxiv.2002.03613} consensus algorithm is similar to the Practical Byzantine Fault Tolerance algorithm, which is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus. The different between IBFT and PBFT is that in the first the set of validators is dynamic, while on PBFT it is static. The network reaches a consensus once $2f+1$ nodes agree.
 \end{itemize}
 
 \section{Participants Selection Mechanism}
@@ -52,6 +52,10 @@ The Multi-KRUM algorithm works by giving each submission a score and eliminating
 
 Where $\Delta w$ is a submission and $c \rightarrow k$ are the clients $k$ whose submission $\Delta w_k$ are the $R-f-2$ closest to $\Delta w_c$. In this formula, $R$ is the total number of submissions, while $f$ represents the amount of Byzantine clients. After giving each submission a score, the $R-f$ clients with the lowest scores are chosen and the remaining are rejected. Please note that Byzantine fault tolerant systems behave correctly when no more than $f$ out of $3f+1$ replicas fail.
 
-\subsection{Data Validity Score}
+\section{Privacy Mechanisms}
 
-In \cite{10.48550/arxiv.2009.09338, 8945913}, a data validity score is implemented and calculated by the servers based on a publicly available validation dataset. Similarly to the marginal gain score, the data validity score is based on the performance improvements that each submission makes to the global model. However, it uses the regular Federated Averaging algorithm with the samples as weights instead of the scores.
+\todo{LDP}
+
+% \subsection{Data Validity Score}
+
+% In \cite{10.48550/arxiv.2009.09338, 8945913}, a data validity score is implemented and calculated by the servers based on a publicly available validation dataset. Similarly to the marginal gain score, the data validity score is based on the performance improvements that each submission makes to the global model. However, it uses the regular Federated Averaging algorithm with the samples as weights instead of the scores.

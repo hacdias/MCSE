@@ -4,6 +4,16 @@ Machine Learning (ML) models can be powerful tools to predict things that would 
 
 Collaboratively training ML models has been done in the past by simply sending the original data to a central server that trains the model. However, this brings issues, both in terms of resource consumption, such as network traffic, and privacy, when the data is sensitive. In 2016, Google researchers introduced a new paradigm called Federated Learning (FL) \cite{10.48550/arxiv.1602.05629}, which allows different clients to collaboratively train a model while keeping the original data private. In FL, clients train the model locally with their own data and share a representation of the model, such as the model weights, with a central server. 
 
+% The concept of Federated Learning was introduced by Google researchers in 2016 \cite{10.48550/arxiv.1602.05629}, as an attempt build communication-efficient deep networks in decentralized data settings. Among others, there are different motivations behind building FL systems:
+
+% \begin{itemize}
+%     \item \textit{The central server does not require large computing resources.} The data is produced locally at each client and it is never shared with a central server. In addition, the amount of data at each client is much smaller than the aggregation of all client's data. Since the model is trained at the client's device with their own data, the client's device does not require as many computing resources as a central server would if it trained a model over the aggregation of all client's data.
+    
+%     \item \textit{Models can be trained on sensitive data.} Since the data is produced locally and never shared, a model can be trained over different sensitive data sets without the risk of exposing the sensitive information the data may contain.
+    
+%     \item \textit{There is less data being transported over the network.} During training, only model parameters are required to be shared between devices in order to produce a final model. In addition, model parameters are usually much smaller than the data itself. Therefore, since model parameters are exchanged, there is less data being transported over the network. This can be useful in settings where there is costly or limited network bandwidth.
+% \end{itemize}
+
 \section{Problem Statement}
 
 \todo{Needs more citations. Maybe first paragraph should not be into problem statement.}
@@ -23,15 +33,11 @@ With this being said, this work will focus on answering the following question:
 Which can be divided into many sub-questions:
 
 \begin{enumerate}
-    \item \textit{How to design a modular pipeline to compare different aspects of Blockchain-based Federated Learning?}
+    \item \textit{How to design a modular framework to compare different aspects of Blockchain-based Federated Learning?}
     
-    \item \textit{How do consensus algorithms influence accuracy, time and communication and computation costs?}
+    \item \textit{How do consensus algorithms, participant selection, scoring mechanisms and number of training devices influence accuracy, time and communication and computation costs?}
     
-    \item \textit{How do participant selection mechanisms influence accuracy, time and communication and computation costs?}
-    
-    \item \textit{How do scoring and aggregation mechanisms influence accuracy, time and communication and computation costs?}
-    
-    \item \textit{How does the number of training devices influence accuracy, time and communication and computation costs?}
+    \item \textit{How can we build a Blockchain-based Federated Learning framework that supports different data partition formats, such as vertical and horizontal?}
 \end{enumerate}
 
 \section{Report Organization}

@@ -1,28 +1,9 @@
-MNIST \cite{lecun2010mnist} and CIFAR10 \cite{Krizhevsky09learningmultiple}
+\todo{The things below are just notes.}
 
-
-\section{Impact of Consensus Algorithms}
-
-\section{Impact of Participants Selection Mechanisms}
-
-\section{Impact of Scoring and Aggregation Mechanisms}
-
-\section{Impact of Number of Training Clients}
-
-% \section{Impact of Local Differential Privacy}
-
-
-
-\begin{landscape}
-
-\begin{table}[]
-\begin{tabular}{lllllllllllll}
-                  & \textbf{ Servers} & \textbf{Consensus Algorithms} & \textbf{Clients} & \textbf{Participants Selection} & \textbf{Scoring and Aggregation Mechanisms} & \textbf{Data Partition}     & \textbf{Data Distribution} & \textbf{Dataset}       & \textbf{Rounds}     & \multicolumn{2}{l}{\textbf{Privacy Mechanism}} & \textbf{Accuracy} \\
-\multirow{3}{*}{} & \multirow{3}{*}{10}        & PoA                           & \multirow{3}{*}{25}       & \multirow{3}{*}{Random}         & \multirow{3}{*}{None (FedAvg)}              & \multirow{3}{*}{Horizontal} & \multirow{3}{*}{non-iid}   & \multirow{3}{*}{MNIST} & \multirow{3}{*}{50} & \multicolumn{2}{l}{\multirow{3}{*}{None}}      & 97.93             \\
-                  &                            & PoW                           &                           &                                 &                                             &                             &                            &                        &                     & \multicolumn{2}{l}{}                           & 98.35             \\
-                  &                            & IBFT                          &                           &                                 &                                             &                             &                            &                        &                     & \multicolumn{2}{l}{}                           & 98.23            
-\end{tabular}
-\end{table}
-
-
-\end{landscape}
+\begin{itemize}
+    \item \textbf{Epochs}: 50 to be able to compare with other papers.
+    
+    \item \textbf{Dataset}: MNIST \cite{lecun2010mnist} as it is the one that occuirs the most in most papers. Widely known and well tested datasets and can be used for both HFL and VFL as long as paritionly correctly.
+    
+    \item \textbf{Model}: simple/generic CNN that works reasonably fine for both datasets since they are quite simple datasets. The goal of this project is not to have a fantastic model, but to compare how different blockchain FL aspects affect the model.
+\end{itemize}
