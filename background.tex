@@ -114,13 +114,14 @@ Recently, the idea of applying blockchain to Federated Learning has emerged. Thi
 
 \todo{Explain why it exists, what it attempts to solve and architecture, mention rewards}
 
-\subsection{Participants Selection Mechanism}
+\subsection{Participants Selection Techniques}
 
-For the participants selection mechanism, only random selection and first come, first served-basis selection will be compared. In the former, both the amount of participants and the participants themselves are selected randomly before the start of each round. In the latter, each participant takes initiative to register for the the next round. Once the limit is reached, no more participants are allowed.
+For the participants selection technique, only random selection and first come, first served-basis selection will be compared. In the former, both the amount of participants and the participants themselves are selected randomly before the start of each round. In the latter, each participant takes initiative to register for the the next round. Once the limit is reached, no more participants are allowed.
 
-\subsection{Scoring and Aggregation Mechanism}
+\subsection{Scoring and Aggregation Techniques}
+\label{background:scoring}
 
-Scoring mechanisms attribute a score to each submission and may, or not, influence how the aggregation is made. By default, the aggregation algorithm used is the Federated Averaging algorithm, which can be found in \autoref{eq:fedavg}. In this section, we explain briefly how each of the scoring mechanisms that will be compared works and if they influence the aggregation algorithm.
+Scoring techniques attribute a score to each submission and may, or not, influence how the aggregation is made. By default, the aggregation algorithm used is the Federated Averaging algorithm, which can be found in \autoref{eq:fedavg}. In this section, we explain briefly how each of the scoring techniques that will be compared works and if they influence the aggregation algorithm.
 
 \subsubsection{BlockFlow Score}
 
@@ -160,6 +161,6 @@ When it comes to data distribution, most of the reviewed work assumed it to be \
 
 \input{tables/data_distribution}
 
-\subsection{Privacy Mechanisms}
+\subsection{Privacy Techniques}
 
 \todo{Explain local differential privacy}

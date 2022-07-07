@@ -1,6 +1,6 @@
-In this chapter, we analyze the first experiment, that is, the impact of using different consensus algorithms in a Blockchain-based Federated Learning system. In this set of experiments, all properties of the system are static, except for the consensus algorithm, which vary between PoA, PoW and QBFT.
+In this chapter, we analyze the first experiment, that is, the impact of using different consensus algorithms in a Blockchain-based Federated Learning system. In this set of experiments, all properties of the system are static, except for the consensus algorithm, which varies between PoA, PoW and QBFT.
 
-\section{Time and Transactions}
+\section{Execution Time, Transaction Cost and Latency}
 
 The first interesting statistics we look into are the E2E time, the mean time it takes for a round to complete, as well as the mean transaction latency and the mean transaction cost. These are represented in \autoref{tab:metrics_consensus_algorithms}.
 
@@ -16,7 +16,7 @@ Mean Transaction Latency (s)    & 1.549  & 1.821  & 1.558  \\ \hline
 Mean Transaction Cost (Gas)     & 183124 & 227052 & 182880 \\ \hline
 % Median Cost Per Transaction (Gas)   & 185198 & 229866 & 185068 \\ \hline \hline
 \end{tabular}
-\caption{Time, Transaction Latency and Transaction Costs Per Consensus Algorithm}
+\caption{Time and Transaction Metrics Per Consensus Algorithm}
 \label{tab:metrics_consensus_algorithms}
 \end{table}
 
@@ -42,7 +42,7 @@ Regarding accuracy, as can be seen in \autoref{fig:accuracy_consensus_algorithms
 
 For the communication costs, we analyze the inbound and outbound network traffic per round at the training clients, computing servers and blockchain nodes. This values can be observed in \autoref{fig:net_consensus_algorithms}.
 
-On one hand, the inbound and outbound traffic for the clients and server has negligible differences when using different consensus algorithms. As mentioned in the previous section, the consensus algorithms have no expected impact on the ML process. Since the clients and servers only concern the ML process, it was expected that the clients and servers would not be affected. The small differences we can observe, in the order of $< 2$ MB, are likely connected to fluctuations in the random participant selection mechanism. If there are more participants being selected, more data needs to be transmitted, and vice-versa.
+On one hand, the inbound and outbound traffic for the clients and server has negligible differences when using different consensus algorithms. As mentioned in the previous section, the consensus algorithms have no expected impact on the ML process. Since the clients and servers only concern the ML process, it was expected that the clients and servers would not be affected. The small differences we can observe, in the order of $< 2$ MB, are likely connected to fluctuations in the random participant selection technique. If there are more participants being selected, more data needs to be transmitted, and vice-versa.
 
 On the other hand, the traffic at the blockchain nodes varies considerably depending on the consensus algorithm. On average, PoW requires more bandwidth per round than PoA, but the difference is very minimal. However, QBFT requires $2$ times more network traffic than PoW and $4$ times more traffic than PoA. QBFT is a three-phase consensus algorithm, which requires a higher amount of network messages to be transmitted before reaching consensus. In addition, the size of the messages also differs. When combining both of this aspects, we can conclude that the expected network traffic per round using the QBFT algorithm would be higher.
 
@@ -86,4 +86,4 @@ In conclusion, we can observe that different consensus algorithms have no direct
 
 Assuming the blockchain network is only being used for Federated Learning, PoA is the most cost-effective of the consensus algorithms we analyzed. In case the network network is needed for other applications, other properties might be required to be taken into account.
 
-For future work, it would be interesting to see if the Ethereum blockchain could be adapted to easily incorporate the custom consensus mechanisms that were seen in \ref{related_work:consensus_algorithms}. These algorithms work by producing proofs directly from the Machine Learning process. That can lead to better usage of resources if the blockchain network is solely used for a Federated Learning system.
+For future work, it would be interesting to see if the Ethereum blockchain could be adapted to easily incorporate the custom consensus techniques that were seen in \ref{related_work:consensus_algorithms}. These algorithms work by producing proofs directly from the Machine Learning process. That can lead to better usage of resources if the blockchain network is solely used for a Federated Learning system.
