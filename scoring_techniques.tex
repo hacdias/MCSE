@@ -34,19 +34,11 @@ On one hand, we can observe that transaction latency is not influenced by the sc
     \label{fig:accuracy_scoring}
 \end{figure}
 
-When comparing the accuracy across the different scoring techniques, we can see on \autoref{fig:accuracy_scoring} that all techniques reached a very high accuracy of above $97\%$. However, some techniques reach higher values faster than others, that is, some converge faster than others.
+When comparing the accuracy across the different scoring techniques, we can see on \autoref{fig:accuracy_scoring} that all techniques reached a very high accuracy of above $97\%$. However, some techniques reach higher values faster than others, that is, some converge faster than others. As we can see, Marginal Gain converges the fastest, followed by no scoring, then Multi-KRUM and lastly BlockFlow.
 
-As we can see, Marginal Gain converges the fastest, followed by no scoring technique, then Multi-KRUM and lastly the BlockFlow technique. 
+On one hand, BlockFlow, is not only the slowest converging scoring technique, but also the only technique that does not drop submissions when aggregating. By not dropping submissions, but still giving them a score that is used during the weighted average, worse submissions are always considered for the global model, which can lead to lower convergence rates. 
+On the other hand, Marginal Gain and Multi-KRUM both drop the worst submissions in each round, only considering the best. While Marginal Gain uses its own score for the aggregation, Multi-KRUM uses the amount of samples of each submission, similarly to not using a scoring mechanism. For that reason, Multi-KRUM convergence resembles the one of no scoring mechanism, while Marginal Gain has a smoothest convergence curve.
 
-As we can see, Marginal Gain converges the fastest, followed by no scoring technique, then Multi-KRUM and lastly the BlockFlow technique. Both Marginal Gain and Multi-KRUM have a similar convergence to using no scoring technique. There
-
-
-
-
-% marginalgain scores in fedavg, drops bad ones
-% mkrum: fedavg samokes, drop bad ones
-% blocksflow: scores in fedavg,no drops
-  
 \section{Communication Costs}
 
 \begin{figure}[!ht]
