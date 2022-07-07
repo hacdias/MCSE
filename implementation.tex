@@ -1,28 +1,32 @@
+In this chapter, we provide the information regarding the implementation of the framework and the experimental setup.
+
+\section{Client Sampling}
+
+\todo{}
+
+\subsection{Horizontal}
+
+\todo{}
+
+\subsection{Vertical}
+
+\todo{}
+
 \todo{The things below are just notes.}
 
 \begin{itemize}
+
+    \item diffprivlib \cite{diffprivlib}
+    
+    \item Pyfhel for HE https://github.com/ibarrond/Pyfhel
+    \item https://github.com/TsingZ0/PFL-Non-IID for dataset partition (HFL).
+    
     \item \textbf{Platform}: Ethereum. Among the papers I read that did not use a custom blockchain implementation, Ethereum was one of the most used blockchains. Besides, Ethereum is one of the most popular blockchains with most support.
     
     \item \textbf{Storage}: off-chain storage will be used during the comparisons. Off-chain storage is the most popular strategy when using already existing blockchain platforms. Among the off-chain storage methods we found, IPFS was among one of the most popular methods.  IPFS is a decentralised file system that allows to store content that can be retrieved by its CID (Content Identifier).
+    
+    \item \textbf{PoS} was initially supposed to be tested. However, it was not possible: https://github.com/bnb-chain/bsc/issues/861
 \end{itemize}
 
-
-Machine hardware specifications used for the evaluation:
-
-\begin{itemize}
-    \item CPU: AMD Ryzen 5 3600 6-Core Processor 4.2 GHz
-    \item RAM: 64 GB
-    \item Disk: 500 GB NVMe
-\end{itemize}
-
-Software:
-
-\begin{itemize}
-    \item Docker version 20.10.15, build fd82621
-    \item Docker Compose version v2.5.0
-    \item Node.js version \todo{XXX}
-    \item diffprivlib \cite{diffprivlib}
-    \item https://github.com/TsingZ0/PFL-Non-IID for dataset partition (HFL).
-\end{itemize}
     
 Please note that random number generation is impossible in smart contracts due to their deterministic nature. Therefore, the selection of the random participants has to be down out of bounds \cite{9293091}. 

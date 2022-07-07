@@ -1,14 +1,9 @@
 In Blockchain-based Federated Learning systems, there are different properties that are need to be taken into consideration when building the system. In this chapter, we go over different properties and what variations are used in the literature.
 
-\section{Blockchain Platforms}\label{related_work:blockchain_platforms}
- 
-As explained in \autoref{fundamentals:blockchain}, blockchain platforms allow developers to build applications on top of blockchain technologies. Even though all platforms are based on the concept of blockchain, they all have different characteristics and restrictions, as well as different sets of features.
 
-As can be seen in \autoref{tab:blockchain_platforms}, around half of the implementations used an already existing platform, where the remaining preferred to implement their own blockchain platform Among already existing platforms, Ethereum was the most popular. When implementing a custom platform, it is easier to overcome certain restrictions such as limits on data per block \cite{8733825, 9524833}.
-
-\input{tables/blockchain_platforms}
 
 \section{Consensus Algorithms}
+\label{related_work:consensus_algorithms}
 
 One of the most important aspects of blockchain technology is the consensus algorithm. Consensus is the process of reaching an agreement on a single value among different distributed processes. These algorithms are designed to be reliable even on networks that have unreliable nodes. In blockchain, the consensus algorithm is used to reach consensus on the next block of the chain.
 
@@ -73,15 +68,7 @@ The costs of model update scoring have not been considered in most of the litera
 
 \section{Privacy Mechanisms}
 
-\todo{Mention the existing ones (DP, HOM ENC, etc) and that DP is the most commmon.}
-
-\section{Data Partition and Distribution}
-
-Regarding data partition, as can be seen in \autoref{tab:data_distribution}, the vast majority of the literature related to BFL systems has focused on Horizontal Federated Learning systems, with only one focusing on Vertical Federated Learning and none addressing Transfer Federated Learning.
-
-When it comes to data distribution, most of the reviewed work assumed it to be \textit{iid}, while only a minority assuming the data is \textit{non-iid}. Other papers were reviewed, however this information was not specified.
-
-\input{tables/data_distribution}
+\todo{Mention the existing ones (diff privacy, homomorphic encryption, etc) and cite}
 
 \section{Conclusions}
 

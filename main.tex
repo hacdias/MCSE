@@ -9,10 +9,11 @@
 \usepackage{graphicx}
 \usepackage{fancyhdr}
 \usepackage{multirow}
-\usepackage{caption}
+\usepackage[font=small]{caption}
 \usepackage{xcolor}
 \usepackage{lscape}
 \usepackage{subcaption}
+\usepackage{floatrow}
 
 \pagestyle{fancy}
 
@@ -83,9 +84,6 @@ External Assessor\par
 \pagenumbering{arabic}
 \input{introduction}
 
-\chapter{Fundamental Concepts}\label{chapter:fundamental}
-\input{fundamentals}
-
 \chapter{Related Work}\label{chapter:related_work}
 \input{related_work}
 
@@ -100,6 +98,20 @@ External Assessor\par
 
 \chapter{Evaluation}\label{chapter:evaluation}
 \input{evaluation}
+
+\chapter{Analysis on the Impact of Consensus Algorithms}\label{analysis:consensus_algorithms}
+\input{consensus_algorithms}
+
+\chapter{Analysis on the Impact of Participants Selection Mechanisms}\label{analysis:participants}
+\input{participants_selection}
+
+\chapter{Analysis on the Impact of Training Clients}\label{analysis:clients}
+
+\chapter{Analysis on the Impact of Scoring Mechanisms}\label{analysis:scoring}
+
+\chapter{Analysis on the Impact of Privacy Mechanisms}\label{analysis:privacy}
+
+\chapter{Vertical Federated Learning Proof of Concept}
 
 \chapter{Conclusion}\label{chapter:conclusion}
 \input{conclusion}
