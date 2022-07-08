@@ -14,9 +14,13 @@
 \usepackage{lscape}
 \usepackage{subcaption}
 \usepackage{floatrow}
+\usepackage{sectsty}
+\usepackage[skip=10pt, indent=0pt]{parskip}
+
+\allsectionsfont{\sffamily}
+\chapterfont{\sffamily\color[HTML]{c72125}}
 
 \pagestyle{fancy}
-
 \fancyhf{}
 \fancyfoot[L]{\thepage}
 \fancyfoot[R]{\leftmark}
@@ -32,12 +36,8 @@
     \renewcommand{\footrulewidth}{0.5pt}
 }
 
-\usepackage[skip=10pt, indent=0pt]{parskip}
-
 \newskip\bigskipamount \bigskipamount =20pt plus 4pt minus 4pt
-
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
-
 \setcounter{tocdepth}{1}
 
 \begin{document}

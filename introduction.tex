@@ -2,6 +2,9 @@
 
 Machine Learning (ML) models can be powerful tools to predict things that would otherwise require high amounts of effort, either human or computational. As an example, we can think about image recognition in healthcare that can help medical professionals diagnose disorders. Another example would be smart watch sensor data that could help train models to detect abnormal heart rates or walking patters. Even though models such as these can be very helpful, they have to be trained with elevated amounts of good quality data in order to perform accurately. To address this issue, there are techniques that allow multiple parties to collaboratively train ML models.
 
+% Machine Learning has revolutionized the way we think and work with data, opening way to new techniques and explorations. Recently, Federated Learning was proposed as a way to allow multiple clients, in different locations, to cooperate on the same Machine Learning model without sharing their own data with each order. By not sharing the raw data they own, models can preserve the data privacy, allowing new models to be trained on sensitive data. Currently, Federated Learning networks include a central server that coordinates the entire process and aggregates the model parameters from each client into a single model. This central coordinator is also a single point of failure in the network, since it is always required to be online and behave correctly. To address this, Blockchain-based Federated Learning techniques have been proposed. In these systems, the central server is replaced by a distributed ledger that works with multiple computing servers, eliminating the single point of failure.
+
+
 Collaboratively training ML models has been done in the past by simply sending the original data to a central server that trains the model. However, this brings issues, both in terms of resource consumption, such as network traffic, and privacy, when the data is sensitive. In 2016, Google researchers introduced a new paradigm called Federated Learning (FL) \cite{10.48550/arxiv.1602.05629}, which allows different clients to collaboratively train a model while keeping the original data private. In FL, clients train the model locally with their own data and share a representation of the model, such as the model weights, with a central server. 
 
 % The concept of Federated Learning was introduced by Google researchers in 2016 \cite{10.48550/arxiv.1602.05629}, as an attempt build communication-efficient deep networks in decentralized data settings. Among others, there are different motivations behind building FL systems:
@@ -54,7 +57,7 @@ Which can be divided into many sub-questions:
     \item \textit{How can we build a Blockchain-based Federated Learning framework that supports different data partition formats, such as vertical and horizontal?}
 \end{enumerate}
 
-\section{Organization}
+\section{Outline}
 
 The remainder of the thesis is structured as follows. \Cref{chapter:related_work} reviews the existing work regarding aspects and techniques used in Blockchain-based Federated Learning. \Cref{chapter:background} provides information on the aspects and techniques that will be explored. \Cref{chapter:methodology} goes over the design and methodology of the experiment. \Cref{chapter:implementation} provides details about the implementation of the experiment. \Cref{chapter:evaluation} goes over the results of the experiment. Finally, \cref{chapter:conclusion} discusses the results and provides directions for future works.
 
