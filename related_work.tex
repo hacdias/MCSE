@@ -1,21 +1,18 @@
 In Blockchain-based Federated Learning systems, there are different properties that are need to be taken into consideration when building the system. In this chapter, we go over different properties and what variations are used in the literature.
 
-
 \section{Consensus Algorithms}
 \label{related_work:consensus_algorithms}
 
 One of the most important aspects of blockchain technology is the consensus algorithm. Consensus is the process of reaching an agreement on a single value among different distributed processes. These algorithms are designed to be reliable even on networks that have unreliable nodes. In blockchain, the consensus algorithm is used to reach consensus on the next block of the chain.
 
-\input{tables/consensus_algorithms}
-
-As can be seen on \autoref{tab:consensus_algorithms}, there is a high variety of consensus algorithms being used among implementations of BFL systems. Below is a summary of each consensus algorithm, as well as some of their characteristics.
+As can be seen on \autoref{tab:platf_consensus}, there is a high variety of consensus algorithms being used among implementations of BFL systems. Below is a summary of each consensus algorithm, as well as some of their characteristics.
 
 \begin{itemize}
     \item \textit{Proof of Work (PoW)} has been used for many years and some of its advantages and disadvantages are now clear. On one hand, it is a simple algorithm where proofs are hard to create, but easy to verify. Not only is it robust and proven to work, but the cost of attacking a PoW blockchain is also extremely high. For an attacker to be successful, they would need to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021, ccaf}. In addition, \cite{10.48550/arxiv.2112.07938} mentions the importance of analyzing the constraints and trade-offs of using PoW with BFL.
 
     \item \textit{Proof of Stake (PoS)}, in contrast to PoW, does not require high computational resources from the blockchain nodes and therefore the energy consumption can be kept lower. In addition, it allows for fast throughput and nodes are incentivized to behave correctly through the rewarding system \cite{li_blockchain_2021}. On the other hand, some nodes may have excessive influence over the transaction verification process \cite{li_blockchain_2021}. In either case, the details vary from implementation to implementation.
     
-    \item \textit{Proof of Authority (PoA)} is a highly sxwcalable consensus algorithm with high throughput \cite{binance_academy_2020}. However, one of the main criticisms of the PoA is that it goes against decentralization since the validators are manually chosen. Therefore, there is hesitation on using PoA in public networks.
+    \item \textit{Proof of Authority (PoA)} is a highly scalable consensus algorithm with high throughput \cite{binance_academy_2020}. However, one of the main criticisms of the PoA is that it goes against decentralization since the validators are manually chosen. Therefore, there is hesitation on using PoA in public networks.
 
     \item \textit{Proof of Federated Learning (PoFL) \cite{9347812, 10.48550/arxiv.2007.15145} and Proof of Quality (PoQ)} \cite{8843900} are both novel consensus algorithms that integrate the training process in order to reduce the resources and energy consumption. These are custom algorithms and they are not readily available on public blockchain platforms. To use it, developers would either need to implement their custom blockchains, or modify an existing blockchain.
 
@@ -28,17 +25,24 @@ As can be seen on \autoref{tab:consensus_algorithms}, there is a high variety of
 
 Another important aspect of BFL systems is where the model parameters are stored during the training process in order to share them between devices. According to the literature, either the parameters are stored on-chain, i.e., in the blockchain itself, or off-chain, i.e., in a separate storage provider.
 
-\begin{itemize}
-    \item With \textit{on-chain storage}, the smart contract stores the model parameters itself \cite{9274451, baffle, demo, 8733825, 9524833, 8894364, 9184854, 8893114}, which means that the parameters themselves will be stored in the blockchain. However, most blockchain platforms have a limit on how large a block can be. Therefore, the amount of data that can be stored per contract is also limited. In these cases, smart contracts are chunked, i.e., a single contract is split into many different contracts that hold smaller chunks of the parameters \cite{9274451, baffle}. In addition, this allows for the new model parameters to be directly calculated through the smart contract as the values are directly accessible.
+With \textit{on-chain storage}, the smart contract stores the model parameters itself, which means that the parameters themselves will be stored in the blockchain. However, most blockchain platforms have a limit on how large a block can be. Therefore, the amount of data that can be stored per contract is also limited. In these cases, smart contracts are chunked, i.e., a single contract is split into many different contracts that hold smaller chunks of the parameters \cite{9274451, baffle}. In addition, this allows for the new model parameters to be directly calculated through the smart contract as the values are directly accessible.
     
-    \item With \textit{off-chain storage}, the smart contract holds a reference to the model parameters in some external storage \cite{10.48550/arxiv.2202.02817, 10.48550/arxiv.1910.12603, 10.48550/arxiv.2007.03856, 8945913, Peyvandi2022, 9170559, 10.1145/3319535.3363256, 10.48550/arxiv.2011.07516}, such a decentralized storage system. In this case, the new model parameters cannot be calculated directly on the smart contract as smart contracts have limited functionality and are not able to download external information during execution. The most common approach is to have a set of devices performing the aggregation in parallel and submitting their final version. Through the smart contract, the majority of the devices must agree on what is the next global version.
-\end{itemize}
+With \textit{off-chain storage}, the smart contract holds a reference to the model parameters in some external storage, such a decentralized storage system. In this case, the new model parameters cannot be calculated directly on the smart contract as smart contracts have limited functionality and are not able to download external information during execution. The most common approach is to have a set of devices performing the aggregation in parallel and submitting their final version. Through the smart contract, the majority of the devices must agree on what is the next global version.
 
-As can be seen per the list above, most implementations prefer on-chain storage. However, these implementations also use custom blockchain implementations \cite{8733825, 9524833, 8894364, 9184854, 8893114}, which means that they can implement a platform that has different restrictions on how much data a smart contract can handle. When it comes to using already existing blockchain platforms, such as Ethereum, most implementations prefer off-chain storage using a system such as the InterPlanetary File System (IPFS) \cite{10.48550/arxiv.2007.03856, 8945913, Peyvandi2022, 9170559, 10.1145/3319535.3363256, 10.48550/arxiv.2011.07516}.
+\begin{table}[!b]
+\begin{tabular}{c|c} \hline \hline
+                  & Paper \\ \hline \hline
+On-chain Storage  & \cite{9274451, baffle, demo, 8733825, 9524833, 8894364, 9184854, 8893114}\\ \hline
+Off-chain Storage & \cite{10.1145/3319535.3363256, 10.48550/arxiv.2011.07516, 8945913, 10.48550/arxiv.2202.02817, 10.48550/arxiv.2007.03856, 10.48550/arxiv.1910.12603, Peyvandi2022, 9170559} \\      \hline
+\end{tabular}
+\caption{Model Parameter Storage}\label{tab:storage}
+\end{table}
 
-\section{Participants Selection Techniques}
+As can be seen per \Cref{tab:storage}, most implementations prefer on-chain storage. However, these implementations also use custom blockchain implementations \cite{8733825, 9524833, 8894364, 9184854, 8893114}, which means that they can implement a platform that has different restrictions on how much data a smart contract can handle. When it comes to using already existing blockchain platforms, such as Ethereum, most implementations prefer off-chain storage using a system such as the InterPlanetary File System (IPFS) \cite{10.48550/arxiv.2007.03856, 8945913, Peyvandi2022, 9170559, 10.1145/3319535.3363256, 10.48550/arxiv.2011.07516}.
 
-Usually, only some clients participate in each round. The process of choosing the clients that participate in each round can vary and have different costs. In most cases, the clients were chosen \textit{randomly} \cite{Peyvandi2022}, both the number of clients participating and which clients to participate. In some other systems, clients are allowed to take initiative, operating in a \textit{first come, first served} basis \cite{9184854}. In these systems, a pre-defined number of required clients is set and once enough clients have submitted their updates, the aggregation takes place.
+\section{Participants Selection Techniques} 
+
+Usually, only some clients participate in each round. The process of choosing the clients that participate in each round can vary and have different costs. In most cases, the clients were chosen \textit{randomly} \cite{Peyvandi2022, demo, 9293091}, both the number of clients participating and which clients to participate. In some other systems, clients are allowed to take initiative, operating in a \textit{first come, first served} basis \cite{9184854, FANG20221}. In these systems, a pre-defined number of required clients is set and once enough clients have submitted their updates, the aggregation takes place.
 
 \section{Scoring and Aggregation Techniques}
 
@@ -67,10 +71,16 @@ The costs of model update scoring have not been considered in most of the litera
 
 \section{Privacy Mechanisms}
 
-\todo{Mention the existing ones (diff privacy, homomorphic encryption, etc) and cite}
+Even though Federated Learning is already more secure than centralized Machine Learning in the sense that the raw data is never shared, the model parameters are still a vector for inference attacks \cite{10.1145/3298981}. To combat this, authors use different privacy mechanisms, such as Differential Privacy \cite{10.48550/arxiv.2007.03856, Peyvandi2022, 9170559} and Homomorphic Encryption \cite{8945913, 8894364}.
 
 \section{Conclusions}
 
-From the literature review, we can take a few conclusions. Firstly, there is a clear lack on how different BFL properties, such as consensus algorithms and scoring techniques, impact communication and computation costs and accuracy. The survey \cite{9403374} also noticed this. Therefore, this work intends to fill such gap by providing a detailed analysis on how some of this properties influence the accuracy, communication and computation costs.
+In this literature review, we can take three conclusions. Firstly, there is a clear lack on how different properties of a BFL system, such as consensus algorithms, scoring techniques, number of devices, impact the convergence, accuracy, communication and computation costs of the system. This was also pointed out on a recent survey \cite{9403374} and it seems it was not addressed yet. Therefore, this work intends to fill such gap by providing a detailed analysis on how some of this properties and algorithms influence convergence, accuracy, communication and computation costs of the system.
 
-Secondly, even though there are many works on designing BFL frameworks, very few are released to the public, or are modular. On this work, we will work on designing and implementing a modular BFL framework that can be easily changed to support other techniques and will be available to the public to empower future research.  
+Secondly, even though there are many works on designing BFL frameworks, very few are released to the public, or modular. In this thesis, we will work on designing and implementing a modular BFL framework that can be easily changed to support new techniques and will be available to the public to empower future research.
+
+Lastly, to the best of our knowledge, there is only one work that argues that it is possible to implement Vertical Federated Learning in a BFS setting. This can be seen on \autoref{tab:data_distribution}, which shows the majority of the BFL works pertain only Horizontal Federated Learning. With this being said, we also would like to understand if such thing is feasible, and if so, implement it on our modular framework.
+
+\input{tables/platforms_consensus}
+
+\input{tables/data_distribution}
