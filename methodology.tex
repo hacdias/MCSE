@@ -1,25 +1,78 @@
-In this chapter, we provide information regarding the design and methodology of the experiments and the framework in which the experiments will run on. To be more precise, the chapter focuses on client sampling, framework design, experiments and metrics.
-
-\section{Client Sampling}
-
-\todo{}
-
-\subsection{Horizontal}
-
-\todo{}
-
-\subsection{Vertical}
-
-\todo{see how PyVertical paper does it}
+In this chapter, we provide information regarding the design and research methods used to design the framework, as well as the experiments. To be more precise, this chapter focuses on the framework design, the client sampling, the experiments and the metrics.
 
 \section{Framework Design}
 
+The modular framework is designed in such a way that new modules can be added, as well as removed or changed, easily. As can be seen in \todo{ADD DIAGRAM}, the framework is divided into three main parts: the smart contracts, the library and the testbed. In the following subsections, each of the parts will be addressed.
+
 \todo{Modules Diagram}
 
+\subsection{Smart Contracts}
+
+\subsection{Library}
+
+\subsection{Testbed}
+
+\section{Client Sampling}
+
+The client sampling, that is, the process of choosing which samples are attributed to which client, varies depending on whether we want to partition the data horizontally, or vertically. The following subsections explain how the data is sampled for each of the data partitions.
+
+\subsection{Horizontal}
+
+As previously explained in \Cref{background:archfl}, in horizontally partition data, different clients have different samples that share the same feature space. In addition, for a distributed system such as this one, it is expected that the clients are both heterogeneous in characteristics, and in data. Therefore, it is safe to assume that the data distribution in a distributed setting is \textit{non-iid}.
+
+To simulate a \textit{non-iid} distribution, both in number of samples, as in number of classes at each client, the Dirichlet distribution can be used \cite{tim, 10.48550/arxiv.2006.07242}. The Dirichlet distribution, $Dir(\alpha)$ is a probability distribution characterized by its parameter $\alpha$, which controls the degree of \textit{non-iid}-ness of the distribution. The higher the $\alpha$, the more identically distributed the data will be. The lower the $\alpha$, the more likely it is for each client to only hold samples of a single class.
+
+For our experiments, $\alpha = 0.1$ is used in the Dirichlet distribution as it yields a realistic \textit{non-iid} distribution \cite{10.48550/arxiv.2006.07242}, where some clients only hold many samples of a few classes, while other clients have few samples of many classes. In addition, each client has, on average $2500$ samples, such that some clients have lower amounts, and others have higher amounts, simulating a \textit{non-iid} distribution in regards to the number of samples at each device.
+
+\subsection{Vertical}
+
+Vertically partitioned data is significantly different from horizontally partition data, in the sense that the clients share intersecting sample spaces, but different feature spaces. Therefore, it is not possible to simply attribute some samples to some clients, and other sample to other clients. We have to give each client samples of the same sample space, but different features.
+
+The vertical data partition used in this experiment is based on the work done in \cite{10.48550/arxiv.2104.00489}. Firstly, we choose how many sample to assign each client. To have a comparable experiment, we chose the same amount as for the horizontal partitioning, $2500$ samples. This samples are chosen at random, keeping the original data distribution from the original data set. Then, each sample is attributed a unique identifier (ID) that will be used as label when giving the data set to each client. Only the model owner, or server, has access to the true labels. After choosing the IDs, the feature space $F$ is divided into $C$ parts $F_c$, where $C$ is the number of clients. Finally, the features $F_c$, with $c \in C$ are attributed to each one of the clients.
+
+Since the vertical partitioning is more dependent on the data set and ML model in use than the horizontal partitioning, more details are provided in \Cref{chapter:evaluation}.
+
 \section{Experiments}
+
+The conducted experiments can be divided into six groups, of which five compare how using different algorithms and properties impact the system. These five groups can be divided as: consensus algorithms, participant selection techniques, scoring techniques, number of clients and privacy degrees. The sixth group of experiments is dedicated to show a proof of concept of how vertical federated learning can be applied to a Blockchain-based Federated Learning system.
+
+Even though all experiment groups compare different things, there are certain aspects that are common to all of the experiments. Firstly, all experiments are run for 50 rounds. 50 rounds was chosen such that we can compare the accuracy results to other papers in order to ensure that our experiments are within the expected values. Secondly, all experiments are run with 10 computing servers, as well as 10 blockchain nodes. In practical settings, these would likely be the same machines. However, in order to be able to compare the individual effects in the services we run on the computing servers and in the blockchain nodes, these will be treated as separate entities.
+
+\subsection{Consensus Algorithms}
+
+\todo{}
+
+\subsection{Participant Selection Techniques}
+
+\todo{}
+
+\subsection{Scoring Techniques}
+
+\todo{}
+
+\subsection{Number of Clients}
+
+\todo{}
+
+\subsection{Privacy Degrees}
+
+\todo{}
+
+\subsection{Vertical Federated Learning}
 
 \todo{}
 
 \section{Metrics}
 
-\todo{}
+To compare the different experiments within the experiment groups, we define a set of metrics relevant for our experiments.
+
+One of the goals of the experiments is to identify how different aspects influence the time it takes to execute an experiment. To compare the execution time, we define two metrics: the \textit{End-to-end (E2E) execution time} and the \textit{Mean Round Execution Time}. The former is defined by the time it takes for an experiment to execute from start to end. The latter is defined by the mean time it takes to complete a round for the whole system, which can be calculated by dividing the E2E Execution Time by the number of rounds of the experiment.
+
+\todo{Transaction Latency, Transaction Cost} 
+
+\todo{Accuracy}
+
+\todo{Communication: Network Traffic Per Round} Also mention how the traffic per round cna cause slow downs if the bandwidth is limited.
+
+\todo{Computation: RAM and CPU}
+

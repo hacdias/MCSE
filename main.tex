@@ -16,9 +16,11 @@
 \usepackage{floatrow}
 \usepackage{sectsty}
 \usepackage[skip=10pt, indent=0pt]{parskip}
+\usepackage{titlesec}
 
+\definecolor{scarlat}{HTML}{c72125}
 \allsectionsfont{\sffamily}
-\chapterfont{\sffamily\color[HTML]{c72125}}
+\chapterfont{\sffamily\color{scarlat}}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -27,6 +29,7 @@
 \fancyfoot[C]{}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0.5pt}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
 
 \fancypagestyle{plain}{%
     \fancyhf{}
@@ -49,25 +52,33 @@
 Department of Mathematics and Computer Science
 
 \vspace{3cm}
-{\LARGE\textbf{A Comparative Study of Blockchain-based Federated Learning Properties}}\par\vspace{0.5cm}
-{\large\textit{Master Thesis}}\par\vspace{1cm}
-{\large Henrique Afonso Coelho Dias}\par
+
+{\sffamily\LARGE\textbf{
+A Comparative Study of Blockchain-based Federated Learning Properties
+}}
+
+\par\vspace{2cm}
+{\large\textit{Master Thesis}}\\
+\vspace{0.2cm}
+{\large Henrique Afonso Coelho Dias}
+
+\vspace{2cm}
+
+\textbf{Supervisor} \\
+\vspace{0.1cm}
+prof. dr. ir. N. Meratnia
+
+\par
+
+\textbf{Assessment Committee} \\
+\vspace{0.1cm}
+prof. dr. ir. N. Meratnia \\
+Internal Assessor \\
+External Assessor \\
 
 \vfill
 
-\emph{Supervisor}\par
-prof. dr. ir. N. Meratnia\par
-
-\vspace{2cm}
-
-\emph{Assessment Committee}\par
-prof. dr. ir. N. Meratnia\par
-Internal Assessor\par
-External Assessor\par
-
-\vspace{2cm}
-
-{Day-Month-2022}
+{Eindhoven, September 2022}
 
 \end{titlepage}
 
@@ -99,21 +110,21 @@ External Assessor\par
 \chapter{Evaluation}\label{chapter:evaluation}
 \input{evaluation}
 
-\chapter{Analysis on the Impact of Consensus Algorithms}\label{analysis:consensus_algorithms}
+\chapter{Analysis on the Impact of Consensus Algorithms}\label{chapter:analysis:consensus_algorithms}
 \input{consensus_algorithms}
 
-\chapter{Analysis on the Impact of Participants Selection Techniques}\label{analysis:participants}
+\chapter{Analysis on the Impact of Participants Selection Techniques}\label{chapter:analysis:participants}
 \input{selection_techniques}
 
-\chapter{Analysis on the Impact of Scoring Techniques}\label{analysis:scoring}
+\chapter{Analysis on the Impact of Scoring Techniques}\label{chapter:analysis:scoring}
 \input{scoring_techniques}
 
-\chapter{Analysis on the Impact of Training Clients}\label{analysis:clients}
+\chapter{Analysis on the Impact of Training Clients}\label{chapter:analysis:clients}
 
-\chapter{Analysis on the Impact of Privacy Techniques}\label{analysis:privacy}
-\input{privacy_techniques}
+\chapter{Analysis on the Impact of Privacy Degrees}\label{chapter:analysis:privacy}
+\input{privacy_degrees}
 
-\chapter{Vertical Federated Learning Proof of Concept}
+\chapter{Vertical Federated Learning Proof of Concept}\label{chapter:vertical}
 
 \chapter{Conclusion}\label{chapter:conclusion}
 \input{conclusion}

@@ -24,7 +24,7 @@ w_{t+1} = \sum_{k \in K} \frac{n_k}{n} w_{t+1}^k
 
 Where $n_k$ is the number of samples that the client $k$ used to train and $w_{t+1}^k$ the weights of client $k$ at round $t+1$.
 
-\subsection{Architectures of Federated Learning}
+\subsection{Architectures of Federated Learning}\label{background:archfl}
 
 Federated Learning can be broadly divided into three main architectures \cite{10.1145/3298981, 10.1145/3412357} that regard, for the most part, to the different data partition among the clients: Horizontal Federated Learning, Vertical Federated Learning and Federated Transfer Learning. This study focuses on Horizontal and Vertical Federated Learning.
 
@@ -112,7 +112,7 @@ The consensus algorithm is one of the most important properties of a Blockchain 
 
 Recently, the idea of applying blockchain to Federated Learning has emerged. This is motivated by the fact that FL architectures are highly dependent on a single central server, leading to a central point of failure, that can be either overloaded or compromised.
 
-\todo{Explain why it exists, what it attempts to solve and architecture, mention rewards}
+\todo{Explain: say there are 3 types of architecture (\cite{10.48550/arxiv.2110.02182}) and that we picked flexibly coupled because it provides the most flexibility?}
 
 \subsection{Participants Selection Techniques}
 
@@ -120,6 +120,8 @@ For the participants selection technique, only random selection and first come, 
 
 \subsection{Scoring and Aggregation Techniques}
 \label{background:scoring}
+
+\todo{Mention rewards and why scoring mechanisms can also be used for those}
 
 Scoring techniques attribute a score to each submission and may, or not, influence how the aggregation is made. By default, the aggregation algorithm used is the Federated Averaging algorithm, which can be found in \autoref{eq:fedavg}. In this section, we explain briefly how each of the scoring techniques that will be compared works and if they influence the aggregation algorithm.
 
@@ -161,6 +163,6 @@ When it comes to data distribution, most of the reviewed work assumed it to be \
 
 \input{tables/data_distribution}
 
-\subsection{Privacy Techniques}
+\subsection{Differential Privacy}
 
-\todo{Explain local differential privacy}
+\todo{Explain local differential privacy, say there are other privacy mechansism, such as homomorphic encryption, smc, etc}
