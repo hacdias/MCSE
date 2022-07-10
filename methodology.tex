@@ -2,33 +2,48 @@ In this chapter, we provide information regarding the design and research method
 
 \section{Framework Design}
 
-The modular framework, to which we called BlockLearning, is designed in such a way that new modules can be added, as well as removed or changed, easily. As can be seen in \autoref{fig:blocklearning_modules}, the framework is divided into three main parts: the smart contracts, the library and the testbed. In the following subsections, each of the parts will be addressed.
+The modular framework, to which we called BlockLearning, is designed in such a way that new modules can be added, as well as removed or changed, easily. In this framework, the devices, identified by the address of their account in the blockchain, can be classified into three categories: \textit{trainers}, \textit{aggregators} and \textit{scorers}. Additionally, the entity that deploys the contract and is responsible for starting and terminating the rounds is called \textit{owner}.
+
+A device can be categorized as one or more categories. By doing so, the framework provides flexibility to support different architectures and algorithms. For example, BlockFlow's scoring procedure is done at the clients, which are then categorized as trainers and scorers, while the servers are categorized as aggregators. In contrast, Multi-KRUM is executed at the servers, which are then categorized as aggregators and scorers, while the clients are categorized as trainers.
+
+The following subsections present the execution flow of the framework, as well as the structure and modules of BlockLearning.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1\textwidth]{graphics/sequence.pdf}
+    \caption{BlockLearning Flow}
+    \label{fig:blocklearning_steps}
+\end{figure}
+
+\subsection{Execution Flow}
+
+The framework supports a modular sequential flow represented on \autoref{fig:blocklearning_steps}. Firstly, the owner initializes the round. Secondly, the trainers submit their updates. Thirdly, if there is a scoring mechanism enabled, the scorers submit their update scores. Then, the aggregators execute the aggregation algorithm and submit the aggregation. Now, in case we are using a vertically partitioned data set, the trainers confirm the back-propagation. Note that this step is tightly connected to the model we will use for Vertical Federated Learning, which will be introduced later. Finally, the round is marked as terminated by the owner. The third and fifth rounds can be seen as proofs of how the framework is modular enough to add different steps in the flow.
+
+\subsection{Structure and Modules}
+
+The framework is divided into three main parts: the smart contracts, the library and the testbed. These are depicted on \autoref{fig:blocklearning_modules} and will be individually explored on the following subsections.
 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=1\textwidth]{graphics/modules.pdf}
-    \caption{BlockLearning Modules}
+    \caption{BlockLearning Structure and Modules}
     \label{fig:blocklearning_modules}
 \end{figure}
-
-To provide flexibility to use this framework in different architecture settings, this framework classifies devices into three categories: \textit{trainers}, \textit{aggregators} and \textit{scorers}. A device can be categorized as one or more categories. For example, for some algorithms, the devices that perform the scoring procedure are also the ones performing the training (training clients). In contrast, in some other algorithms, the scoring is performed by who performs the aggregation (computing servers).
 
 \subsection{Smart Contracts}
 
 The first component of the framework is the smart contracts. The smart contracts live on the blockchain and are the main means of communication between clients and servers. In addition, the smart contracts hold information regarding the current status of the round, as well as the updates, scores, aggregations, among others. The smart contracts provide the following functionality:
 
 \begin{itemize}
-    \item \textit{Round Information}: the smart contract must provide information on whether the round is ongoing and which phase it is in: scoring, aggregation or termination. It must allow for enough flexibility such that new phases can be added in the future. For example, Vertical Federated Learning may require an additional backpropagation phase depending on which model is used.
+    \item \textit{Round Information and Control}: the smart contract must provide information on whether the round is ongoing and which phase it is in: scoring, aggregation or termination. It must allow for enough flexibility such that new phases can be added in the future. In addition, it must allow for rounds to be started and marked as terminated. Round phase advancements are defined through pre-defined conditions that, once met, automatically move the round to the next phase. For example, after all updates are received, the smart contract moves to the next phase.
     
-    \item \textit{Registrations}: the smart contract must allow devices to register as training clients, aggregators, or scorers in the system. In addition, it should provide information about which devices participate in each round.
+    \item \textit{Registration Management}: the smart contract must allow devices to register themselves as training clients, aggregators, or scorers in the system. Regarding the owner, it is automatically assigned to whom deployed the contract. Finally, it should provide information about which devices participate in each round.
     
-    \item \textit{Updates}: the smart contract must allow trainers to submit their updates, which must include a pointer to the model weights and the amount of data points that were used to train the model. In addition, it can include the training accuracy and testing accuracy for each individual trainer.
+    \item \textit{Update Submission and Retrieval}: the smart contract must allow trainers to submit their updates, which must include a pointer to the model weights and the amount of data points that were used to train the model. In addition, it can include the training accuracy and testing accuracy for each individual trainer. The submissions must be accessible.
     
-    \item \textit{Scores}: the smart contract must allow scorers to submit their scores. It must be possible to know which scorer scored which update.
+    \item \textit{Scores Submission and Retrieval}: the smart contract must allow scorers to submit their scores. It must be possible to know which scorer scored which update and they must be accessible.
     
-    \item \textit{Aggregations}: the smart contract must allow aggregators to submit the aggregations, which contain a pointer to the weights.
-    
-    \item \textit{Initiate and Complete Rounds}: the smart contract must allow for rounds to be started and completed. Round phase advancements are defined through pre-defined conditions that, once met, automatically move the round to the next phase. For example, after all updates are received, the smart contract moves to the next phase.
+    \item \textit{Aggregation Submission and Retrieval}: the smart contract must allow aggregators to submit the aggregations, which contain a pointer to the weights. The aggregations must be accessible.
 \end{itemize}
 
 \subsection{Library}
@@ -36,18 +51,28 @@ The first component of the framework is the smart contracts. The smart contracts
 The second part of the framework is the library. The library encodes the algorithms, utilities and building blocks necessary to write the process that runs on the clients and the servers. It must include:
 
 \begin{itemize}
-    \item \textit{Aggregation, Scoring} and \textit{Privacy Algorithms}: provide implementation for aggregation, scoring and differential privacy algorithms. Each of these categories of algorithm must implement a common interface, such that adding new algorithms is easy and simple and they are interchangeable in the code.
+    \item \textit{Aggregation, Scoring} and \textit{Privacy Algorithms}: provide implementation for aggregation, scoring and privacy algorithms. Each of these categories of algorithm must implement a common interface, such that adding new algorithms is easy and simple and they are interchangeable in the code.
     
-    \item \textit{Weights Storage}: utilities to load and store weights on the decentralized storage provider. These must also provide an interface in order to make it easy to change the storage provider by providing a different implementation only.
+    \item \textit{Weights Storage and Retrieval}: utilities to load and store weights on the decentralized storage provider. These must also provide an interface in order to make it easy to change the storage provider by providing a different implementation.
     
-    \item \textit{Contract Bridge}: a contract class that provides an interface to the smart contract that lives in the blockchain. With this class, it is possible to contact the smart contract as if they were local functions.
+    \item \textit{Smart Contract Bridge}: a contract class that provides an interface to the smart contract that lives on the blockchain. With this class, it is possible to call the smart contract functions as if they were local functions.
     
-    \item \textit{Trainer, Scorer} and \textit{Aggregator}: a class per each device category that registers the device as such category upon initialization. It must also provide methods to execute the training, scoring and aggregation tasks, respectively.
+    \item \textit{Trainer, Scorer} and \textit{Aggregator Processes}: a class per each device category. This class must register the devices as their category upon initialization. It must also provide methods to execute the training, scoring and aggregation tasks, respectively.
 \end{itemize}
 
 \subsection{Testbed}
 
-The third part of the framework is the testbed. The testbed provides the platform to conduct the experiments in a reproducible way. In the testbed, there must be tools to deploy the blockchain nodes, the training clients and computing servers, as well as the smart contracts to the blockchain network. Furthermore, the testbed also includes scripts for the training client and computing server processes using the library. Finally, it must also include tools to collect the required statistics and logs that can be later processed to retrieve the previously discussed metrics.
+The third part of the framework is the testbed. The testbed provides the platform to conduct the experiments in a reproducible way. It must include:
+
+\begin{itemize}
+    \item \textit{Client} and \textit{Server Processes}: scripts that will be run on the client and server devices, respectively. These scripts will use the library in order to perform the right tasks according to which algorithm is being used.
+    
+    \item \textit{Federated Learning Setup and Deployment}: scripts and tools to easily deploy the client and server machines in a test environment, such as containers.
+    
+    \item \textit{Blockchain Setup and Deployment}: scripts and tools to easily deploy the blockchain network in a test environment, as well as deploy the contract to such network.
+\end{itemize}
+
+In addition, the testbed must also include tools to collect the required statistics and logs that can be later processed to retrieve the previously discussed metrics.
 
 \section{Client Sampling}
 
