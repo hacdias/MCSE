@@ -49,7 +49,7 @@ Usually, only some clients participate in each round. The process of choosing th
 During the training process, each training client produces their parameter updates and communicates them to the computing devices through the blockchain in order to be aggregated. However, there are different security aspects that should be taken into account here as the parameter updates creates a vector for different attacks, such as poisoning attacks and plagiarism attacks.
 
 \begin{itemize}
-    \item \textit{Poisoning attacks} happen when training clients willingly send parameter updates that decrease the quality of the model. They may have been generated using an honestly unreliable data set, or done on purpose. To avoid other participants to provide unreliable data in order to degrate the model performance, there are dynamic verification technniques that allow to ignore low quality data \cite{10.48550/arxiv.2110.02182, 10.48550/arxiv.2104.10501}.
+    \item \textit{Poisoning attacks} happen when training clients willingly send parameter updates that decrease the quality of the model. They may have been generated using an honestly unreliable data set, or done on purpose. To avoid other participants to provide unreliable data in order to degrade the model performance, there are dynamic verification techniques that allow to ignore low quality data \cite{10.48550/arxiv.2110.02182, 10.48550/arxiv.2104.10501}.
     
     \item \textit{Plagiarism attacks} happen when lazy clients plagiarize other client's models updates without real training \cite{9403374}, which can be addressed via pseudo-noise techniques \cite{10.48550/arxiv.2009.09338}.
 \end{itemize}

@@ -28,7 +28,11 @@ Where $n_k$ is the number of samples that the client $k$ used to train and $w_{t
 
 Federated Learning can be broadly divided into three main architectures \cite{10.1145/3298981, 10.1145/3412357} that regard, for the most part, to the different data partition among the clients: Horizontal Federated Learning, Vertical Federated Learning and Federated Transfer Learning. This study focuses on Horizontal and Vertical Federated Learning.
 
-\begin{figure}[!ht]
+In \textit{Horizontal Federated Learning} (HFL), clients with the same data structure collaborate to build a single model. In other words, the different data sets in the different clients share the same feature space, but not the sample space. For example, two banks have similar businesses (feature space), but target different clients (sample space). The architecture of HFL, depicted in \autoref{fig:hfl_arch}, consists of multiple clients training a model, while the central server performs the aggregation of all local updates.
+
+In \textit{Vertical Federated Learning} (VFL), clients share an intersecting sample space, but different feature spaces. For example, two companies operating in the same city have a similar client base (sample space), but different areas of operation (feature space). The architecture of VFL, depicted in \autoref{fig:vfl_arch}, is similar to the one of HFL. However, it includes an additional step to calculate the Private Set Intersection (PSI) since the clients do not share the exact same sample space.
+
+\begin{figure}[!htp]
     \centering
     \centering
     \includegraphics[width=0.6\textwidth]{graphics/hfl-architecture.pdf}
@@ -36,11 +40,7 @@ Federated Learning can be broadly divided into three main architectures \cite{10
     \label{fig:hfl_arch}
 \end{figure}
 
-In \textit{Horizontal Federated Learning} (HFL), clients with the same data structure collaborate to build a single model. In other words, the different data sets in the different clients share the same feature space, but not the sample space. For example, two banks have similar businesses (feature space), but target different clients (sample space). The architecture of HFL, depicted in \autoref{fig:hfl_arch}, consists of multiple clients training a model, while the central server performs the aggregation of all local updates.
-
-In \textit{Vertical Federated Learning} (VFL), clients share an intersecting sample space, but different feature spaces. For example, two companies operating in the same city have a similar client base (sample space), but different areas of operation (feature space). The architecture of VFL, depicted in \autoref{fig:vfl_arch}, is similar to the one of HFL. However, it includes an additional step to calculate the Private Set Intersection (PSI) since the clients do not share the exact same sample space.
-
-\begin{figure}[!ht] % !ht
+\begin{figure}[!hbp]
     \centering
     \centering
     \includegraphics[width=0.6\textwidth]{graphics/vfl-architecture.pdf}
@@ -90,9 +90,7 @@ Some blockchain platforms, such as Ethereum \cite{wood2014ethereum}, provide fun
  
 As explained in \autoref{background:blockchain}, blockchain platforms allow developers to build applications on top of blockchain technologies. Even though all platforms are based on the concept of blockchain, they all have different characteristics and restrictions, as well as different sets of features.
 
-As can be seen in \autoref{tab:blockchain_platforms}, around half of the implementations used an already existing platform, where the remaining preferred to implement their own blockchain platform Among already existing platforms, Ethereum was the most popular. When implementing a custom platform, it is easier to overcome certain restrictions such as limits on data per block \cite{8733825, 9524833}.
-
-In this work, we focus on already existing blockchain platforms that do not require internal changes to make the system work. As can be seen in the table, the most common blockchain platform among the reviewed works is Ethereum. Ethereum will also be our platform of choice as it is popular and compatible with all the techniques we are comparing.
+As can be seen in \autoref{tab:platf_consensus}, around half of the implementations used an already existing platform, where the remaining preferred to implement their own blockchain platform Among already existing platforms, Ethereum was the most popular. When implementing a custom platform, it is easier to overcome certain restrictions such as limits on data per block \cite{8733825, 9524833}. In this work, we focus on already existing blockchain platforms that do not require internal changes to make the system work. Per the table, the most common blockchain platform among the reviewed works is Ethereum. Ethereum will also be our platform of choice as it is popular and compatible with all the techniques we are comparing.
 
 \subsection{Consensus Algorithm}\label{background:consensus_algorithms}
 
@@ -103,14 +101,24 @@ The consensus algorithm is one of the most important properties of a Blockchain 
     
     \item The PoA consensus algorithm is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. In this system, there is a set of validator nodes that are responsible for validating the new transactions that stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network owner.
 
-    \item The IBFT \cite{10.48550/arxiv.2002.03613} consensus algorithm is similar to the Practical Byzantine Fault Tolerance algorithm, which is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus. The different between IBFT and PBFT is that in the first the set of validators is dynamic, while on PBFT it is static. The network reaches a consensus once $2f+1$ nodes agree.
+    \item The QBFT \cite{10.48550/arxiv.2002.03613} consensus algorithm is similar to the Practical Byzantine Fault Tolerance algorithm, which is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus. The different between QBFT and PBFT is that in the first the set of validators is dynamic, while on PBFT it is static. The network reaches a consensus once $2f+1$ nodes agree.
 \end{itemize}
 
 \section{Blockchain-based Federated Learning}\label{background:bfl}
 
-Recently, the idea of applying blockchain to Federated Learning has emerged. This is motivated by the fact that FL architectures are highly dependent on a single central server, leading to a central point of failure, that can be either overloaded or compromised.
+Recently, the idea of applying blockchain to Federated Learning has emerged. This is motivated by the fact that FL architectures are highly dependent on a single central server, leading to a central point of failure, that can be either overloaded or compromised. With blockchain, the central server can be replaced by multiple decentralized servers that operate the blockchain nodes.
 
-\todo{Explain: say there are 3 types of architecture (\cite{10.48550/arxiv.2110.02182}) and that we picked flexibly coupled because it provides the most flexibility?}
+Since Blockchain-based Federated Learning is a new concept, there are different architectures proposed in the literature \cite{10.48550/arxiv.2110.02182}: \textit{Fully Coupled BFL}, \textit{Flexibly Coupled BFL} and \textit{Loosely Coupled BFL}. Even though the modular framework we build in this work is capable of operating in different architectures, we focus on what is called Flexibly Coupled BFL.
+
+\begin{figure}[!ht]
+    \centering
+    \centering
+    \includegraphics[width=0.6\textwidth]{graphics/bfl-architecture.pdf}
+    \caption{Blockchain-based Federated Learning Architecture}
+    \label{fig:bfl_arch}
+\end{figure}
+
+In a Flexibly Coupled BFL architecture, the blockchain nodes are decoupled from the clients, and run by separate servers. This servers are also responsible for maintaining the blockchain nodes and use the blockchain to store information such as aggregations, scores, among others. The architecture is depicted in \autoref{fig:bfl_arch}.
 
 \subsection{Participants Selection Techniques}
 
@@ -119,9 +127,7 @@ For the participants selection technique, only random selection and first come, 
 \subsection{Scoring and Aggregation Techniques}
 \label{background:scoring}
 
-\todo{Mention rewards and why scoring mechanisms can also be used for those}
-
-Scoring techniques attribute a score to each submission and may, or not, influence how the aggregation is made. By default, the aggregation algorithm used is the Federated Averaging algorithm, which can be found in \autoref{eq:fedavg}. In this section, we explain briefly how each of the scoring techniques that will be compared works and if they influence the aggregation algorithm.
+Scoring techniques are used to give each client, or its submission, a score. Based on this score, the submission may have more or less impact on the aggregation, if any at all. In addition, scores are used for reward mechanisms in systems where public models are being trained and clients need some sort of incentive to keep participating \cite{8945913, 8832210, 8905038, 9006344}. In this section, we explain briefly how each of the scoring techniques that will be compared works and if they influence the aggregation algorithm.
 
 \subsubsection{BlockFlow Score}
 
@@ -151,10 +157,19 @@ The Multi-KRUM algorithm works by giving each submission a score and eliminating
 
 Where $\Delta w$ is a submission and $c \rightarrow k$ are the clients $k$ whose submission $\Delta w_k$ are the $R-f-2$ closest to $\Delta w_c$. In this formula, $R$ is the total number of submissions, while $f$ represents the amount of Byzantine clients. After giving each submission a score, the $R-f$ clients with the lowest scores are chosen and the remaining are rejected. Please note that Byzantine fault tolerant systems behave correctly when no more than $f$ out of $3f+1$ replicas fail.
 
-\subsection{Data Partition and Distribution}
+\section{Differential Privacy}
 
+In this thesis, we compare the impact of different degrees of privacy for each scoring mechanism. Even though there are different privacy mechanisms, we will be using Local Differential Privacy. This mechanism is the most used across the literature of the algorithms we will be using and can be applied locally without the need to exchange encryption keys with other clients.
 
+Local Differential Privacy (LDP) is a Differential Privacy technique that ensures a specific degree of privacy. Usually, this is done by using a randomized algorithm $A$ to apply noise to the original data. We say that $A$ provides $\epsilon$-local differential privacy if, and only if, for all subsets $S$ of the image of $A$, and for all pairs of private data $x$ and $x'$:
 
-\subsection{Differential Privacy}
+\begin{equation}
+    \label{eq:e-ldp}
+    \Pr[A(x) \in S] \leq e^\epsilon \times \Pr[A(x') \in S]
+\end{equation}
 
-\todo{Explain local differential privacy, say there are other privacy mechansism, such as homomorphic encryption, smc, etc}
+Where the probability is taken from the randomized algorithm. The lower the $\epsilon$, the higher the degree of privacy.
+
+\section{InterPlanetary File System}
+
+The InterPlanetary File System (IPFS) \cite{10.48550/arxiv.1407.3561} is a decentralized storage system and protocol used by many of the works reviewed in \Cref{chapter:related_work} to store the model parameters and other relevant information that would otherwise be too large to be on the blockchain. IPFS is a content addressed file system, that is, every file is addressed by its content. It works by attributing a hash, based on the file's content. Using this hash, also known as Content Identifier (CID), the file can be retrieved from the network. Instead of storing the entire file in the blockchain, the CID can be stored. Pairing IPFS with the blockchain keeps the system decentralized and distributed, while offloading the storage to a different system.
