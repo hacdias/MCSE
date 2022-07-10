@@ -4,19 +4,19 @@ In 2016, Google researchers attempted to build communication-efficient deep neur
 
 Currently, most FL networks include a central server that coordinates the entire process and aggregates the model eights from each of the clients into a single model. This central coordinator is a single point of failure in the network, since it is always required to be online and behave correctly \cite{li_blockchain_2021, 10.48550/arxiv.2110.02182}. To address this, Blockchain-based Federated Learning techniques have been proposed. In these systems, the central server is replaced by a distributed ledger that works with multiple computing servers, eliminating the single point of failure \cite{10.48550/arxiv.2009.09338, 9403374}.
 
-\section{Motivation}
+\section{Motivation}\label{intro:motivation}
 
 In Blockchain-based Federated Learning, there are certain aspects to take into account that influence the outcome of the learning process, as well as the resources consumed to reach that point. With Federated Learning being increasingly adopted in IoT networks, where low powered devices with low resources are the norm, it is important to ensure that certain aspects of the system, as well as new techniques, consume the least amount of resources.
 
 One of the most impactful aspects of blockchain networks is the consensus algorithms, which can lead to very different resource consumption \cite{ccaf}, as well as different degrees of latency \cite{Alqahtani_2021}. Two other important aspects in Blockchain-based Federated Learning systems are the participant selection techniques and the scoring techniques. While the former indicates how the participants are chosen in each round, the latter aids on scoring each client's submissions in order to identify which ones are the best and should be included in the final aggregation. All this algorithms and techniques influence the accuracy, convergence and resource consumption. At the same time, they are influenced by the number of devices participating in the network, and also by the degrees of privacy
 
-\section{Problem Statement}
+\section{Problem Statement}\label{intro:problem}
 
 Motivated by the lack of any open-source framework for Blockchain-based Federated Learning, this thesis first focuses on designing and implementing the first open-source modular framework for Blockchain-based Federated Learning using Ethereum and TensorFlow. This framework can be easily adapted to support multiple architectures, as well as different techniques, whether it be for participant selection, or for scoring, or for aggregation. In addition, this framework should also support multiple types of data partition, such as horizontal and vertical.
 
 With the framework designed and implemented, we will then compare different aspects and techniques of Blockchain-based Federated Learning in terms of execution time, convergence, accuracy, communication and computation costs. This will allow us to identify which techniques or combination of techniques and properties are more adequate in different scenarios. For example, we will be able to identify which techniques are more adequate for resource constricted networks, whether it be low bandwidth devices, or low computation power devices. Another example would be a scenario where we need to identify which scoring technique is the least affected by a high degree of privacy.
 
-\section{Research Questions}
+\section{Research Questions}\label{intro:questions}
 
 Taking into account the motivation and problem statement, this work will focus on answering the following main research question:
 
@@ -36,7 +36,7 @@ This research question can be further sub-divided into four sub-questions to aid
     \item \textit{How can we build a Blockchain-based Federated Learning framework that supports different data partition formats, such as vertical and horizontal?}
 \end{enumerate}
 
-\section{Outline}
+\section{Outline}\label{intro:outline}
 
 The remainder of the thesis is structured as follows. \Cref{chapter:related_work} reviews the existing work regarding aspects and techniques used in Blockchain-based Federated Learning systems. \Cref{chapter:background} provides definitions and fundamental concepts about the system, as well as background information on the aspects and techniques that will be explored. \Cref{chapter:methodology} goes over the design and methodology of the experiment. \Cref{chapter:implementation} provides details about the implementation of the experiment. \Cref{chapter:evaluation} provides information regarding the experimental setup of the experiments. Chapters \ref{chapter:analysis:consensus_algorithms}, \ref{chapter:analysis:participants}, \ref{chapter:analysis:scoring}, \ref{chapter:analysis:clients}, \ref{chapter:analysis:privacy} provide the analysis on the impacts of consensus algorithms, participant selection techniques, scoring techniques, training clients and privacy degrees, respectively. \Cref{chapter:vertical} provides analysis of the proof of concept of Vertical Federated Learning applied in a Blockchain-based Federated Learning system. Finally, \cref{chapter:conclusion} discusses the results, contributions and provides directions for future works.
 

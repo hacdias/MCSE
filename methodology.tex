@@ -1,6 +1,6 @@
 In this chapter, we provide information regarding the design and research methods used to design the framework, as well as the experiments. To be more precise, this chapter focuses on the framework design, the client sampling, the experiments and the metrics.
 
-\section{Framework Design}
+\section{Framework Design}\label{meth:framework_design}
 
 The modular framework, to which we called BlockLearning, is designed in such a way that new modules can be added, as well as removed or changed, easily. In this framework, the devices, identified by the address of their account in the blockchain, can be classified into three categories: \textit{trainers}, \textit{aggregators} and \textit{scorers}. Additionally, the entity that deploys the contract and is responsible for starting and terminating the rounds is called \textit{owner}.
 
@@ -15,11 +15,11 @@ The following subsections present the execution flow of the framework, as well a
     \label{fig:blocklearning_steps}
 \end{figure}
 
-\subsection{Execution Flow}
+\subsection{Execution Flow}\label{meth:exec_flow}
 
 The framework supports a modular sequential flow represented on \autoref{fig:blocklearning_steps}. Firstly, the owner initializes the round. Secondly, the trainers submit their updates. Thirdly, if there is a scoring mechanism enabled, the scorers submit their update scores. Then, the aggregators execute the aggregation algorithm and submit the aggregation. Now, in case we are using a vertically partitioned data set, the trainers confirm the back-propagation. Note that this step is tightly connected to the model we will use for Vertical Federated Learning, which will be introduced later. Finally, the round is marked as terminated by the owner. The third and fifth rounds can be seen as proofs of how the framework is modular enough to add different steps in the flow.
 
-\subsection{Structure and Modules}
+\subsection{Structure and Modules}\label{meth:struct_modules}
 
 The framework is divided into three main parts: the smart contracts, the library and the testbed. These are depicted on \autoref{fig:blocklearning_modules} and will be individually explored on the following subsections.
 
@@ -30,7 +30,7 @@ The framework is divided into three main parts: the smart contracts, the library
     \label{fig:blocklearning_modules}
 \end{figure}
 
-\subsection{Smart Contracts}
+\subsection{Smart Contracts}\label{meth:smart_contracts}
 
 The first component of the framework is the smart contracts. The smart contracts live on the blockchain and are the main means of communication between clients and servers. In addition, the smart contracts hold information regarding the current status of the round, as well as the updates, scores, aggregations, among others. The smart contracts provide the following functionality:
 
@@ -46,7 +46,7 @@ The first component of the framework is the smart contracts. The smart contracts
     \item \textit{Aggregation Submission and Retrieval}: the smart contract must allow aggregators to submit the aggregations, which contain a pointer to the weights. The aggregations must be accessible.
 \end{itemize}
 
-\subsection{Library}
+\subsection{Library}\label{meth:library}
 
 The second part of the framework is the library. The library encodes the algorithms, utilities and building blocks necessary to write the process that runs on the clients and the servers. It must include:
 
@@ -60,7 +60,7 @@ The second part of the framework is the library. The library encodes the algorit
     \item \textit{Trainer, Scorer} and \textit{Aggregator Processes}: a class per each device category. This class must register the devices as their category upon initialization. It must also provide methods to execute the training, scoring and aggregation tasks, respectively.
 \end{itemize}
 
-\subsection{Testbed}
+\subsection{Testbed}\label{meth:testbed}
 
 The third part of the framework is the testbed. The testbed provides the platform to conduct the experiments in a reproducible way. It must include:
 
@@ -74,7 +74,7 @@ The third part of the framework is the testbed. The testbed provides the platfor
 
 In addition, the testbed must also include tools to collect the required statistics and logs that can be later processed to retrieve the previously discussed metrics.
 
-\section{Client Sampling}
+\section{Client Sampling}\label{meth:client_sampling}
 
 The client sampling, that is, the process of choosing which samples are attributed to which client, varies depending on whether we want to partition the data horizontally, or vertically. The following subsections explain how the data is sampled for each of the data partitions.
 
@@ -94,7 +94,7 @@ The vertical data partition used in this experiment is based on the work done in
 
 Since the vertical partitioning is more dependent on the data set and ML model in use than the horizontal partitioning, more details are provided in \Cref{chapter:evaluation}.
 
-\section{Experiments}
+\section{Experiments}\label{meth:experiments}
 
 The conducted experiments can be divided into six groups, of which five compare how using different algorithms and properties impact the system. These five groups can be divided as: consensus algorithms, participant selection techniques, scoring techniques, number of clients and privacy degrees. The sixth group of experiments is dedicated to show a proof of concept of how vertical federated learning can be applied to a Blockchain-based Federated Learning system.
 
@@ -126,7 +126,7 @@ In the sixth and last experiment group, we investigate whether or not it is poss
 
 As mentioned in \Cref{background:archfl}, Vertical Federated Learning systems have an additional step where the Private Set Intersection (PSI) of the client's data sets is calculated. In this work, we assume that the PSI is calculated beforehand and that it is already known to all devices. In future works, it would be interesting to integrate a PSI mechanism into the framework.
 
-\section{Metrics}
+\section{Metrics}\label{meth:metrics}
 
 To compare the different experiments, we define a set of metrics regarding to the different categories of aspects we are comparing: execution time, accuracy, communication and computation costs.
 

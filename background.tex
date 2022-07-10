@@ -82,7 +82,7 @@ There are four different types of blockchain: public, private, consortium and hy
     \item \textit{Hybrid Blockchains}. The hybrid blockchains have features of both permissioned and permissionless blockchain systems. On one hand, they are usually controlled by a single authority. On the other hand, they have a mixed usage of permissioned and permissionless protocols running in parallel for different use cases.
 \end{itemize}
 
-\subsection{Smart Contracts}
+\subsection{Smart Contracts}\label{background:smart_contracts}
 
 Some blockchain platforms, such as Ethereum \cite{wood2014ethereum}, provide functionality for smart contracts. Smart contracts are small computer programs that live within the blockchain and automatically run when predetermined conditions are met. As they live in the blockchain, they are trustless and are typically used to automate the execution of agreements. This way, every party involved in the agreement is certain that it will be honored once the conditions of the agreement are met.
 
@@ -157,7 +157,7 @@ The Multi-KRUM algorithm works by giving each submission a score and eliminating
 
 Where $\Delta w$ is a submission and $c \rightarrow k$ are the clients $k$ whose submission $\Delta w_k$ are the $R-f-2$ closest to $\Delta w_c$. In this formula, $R$ is the total number of submissions, while $f$ represents the amount of Byzantine clients. After giving each submission a score, the $R-f$ clients with the lowest scores are chosen and the remaining are rejected. Please note that Byzantine fault tolerant systems behave correctly when no more than $f$ out of $3f+1$ replicas fail.
 
-\section{Differential Privacy}
+\section{Differential Privacy}\label{background:diff_priv}
 
 In this thesis, we compare the impact of different degrees of privacy for each scoring mechanism. Even though there are different privacy mechanisms, we will be using Local Differential Privacy. This mechanism is the most used across the literature of the algorithms we will be using and can be applied locally without the need to exchange encryption keys with other clients.
 
@@ -170,6 +170,6 @@ Local Differential Privacy (LDP) is a Differential Privacy technique that ensure
 
 Where the probability is taken from the randomized algorithm. The lower the $\epsilon$, the higher the degree of privacy.
 
-\section{InterPlanetary File System}
+\section{InterPlanetary File System}\label{background:ipfs}
 
 The InterPlanetary File System (IPFS) \cite{10.48550/arxiv.1407.3561} is a decentralized storage system and protocol used by many of the works reviewed in \Cref{chapter:related_work} to store the model parameters and other relevant information that would otherwise be too large to be on the blockchain. IPFS is a content addressed file system, that is, every file is addressed by its content. It works by attributing a hash, based on the file's content. Using this hash, also known as Content Identifier (CID), the file can be retrieved from the network. Instead of storing the entire file in the blockchain, the CID can be stored. Pairing IPFS with the blockchain keeps the system decentralized and distributed, while offloading the storage to a different system.

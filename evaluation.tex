@@ -1,25 +1,49 @@
-\todo{The things below are just notes.}
+\section{Data Partitioning}
 
-Machine hardware specifications used for the evaluation:
+% MNIST \cite{lecun2010mnist} as it is the one that occuirs the most in most papers. Widely known and well tested datasets and can be used for both HFL and VFL as long as paritionly correctly.
 
-\begin{itemize}
-    \item CPU: AMD Ryzen 5 3600 6-Core Processor 4.2 GHz
-    \item RAM: 64 GB
-    \item Disk: 500 GB NVMe
-\end{itemize}
+\subsection{Horizontal}
 
-Software:
+\subsection{Vertical}
 
-\begin{itemize}
-    \item Docker version 20.10.15, build fd82621
-    \item Docker Compose version v2.5.0
-    \item Node.js version \todo{XXX}
-\end{itemize}
+\section{Model}
 
-\begin{itemize}
-    \item \textbf{Epochs}: 50 to be able to compare with other papers.
-    
-    \item \textbf{Dataset}: MNIST \cite{lecun2010mnist} as it is the one that occuirs the most in most papers. Widely known and well tested datasets and can be used for both HFL and VFL as long as paritionly correctly.
-    
-    \item \textbf{Model}: simple/generic CNN that works reasonably fine for both datasets since they are quite simple datasets. The goal of this project is not to have a fantastic model, but to compare how different blockchain FL aspects affect the model. Show both vertical and horizontal.
-\end{itemize}
+\subsection{Horizontal: CNN}
+
+% simple/generic CNN that works reasonably fine for both datasets since they are quite simple datasets. The goal of this project is not to have a fantastic model, but to compare how different blockchain FL aspects affect the model. Show both vertical and horizontal.
+
+\subsection{Vertical: SplitNN}
+
+\section{Hardware and Software Specifications}
+
+\begin{table}[!h]
+    \begin{subtable}[h]{0.59\textwidth}
+        \centering
+        \begin{tabular}{l|l} \hline \hline
+            Hardware & Model                                    \\ \hline \hline
+            CPU      & AMD Ryzen 5 3600 6-Core 4.2 GHz          \\ \hline
+            RAM      & 64 GB                                    \\ \hline
+            Disk     & 500 GB NVMe                              \\ \hline
+        \end{tabular}
+        \caption{Hardware}
+        \label{evaluation:hardware}
+    \end{subtable}
+    \hfill
+    \begin{subtable}[h]{0.39\textwidth}
+        \centering
+        \begin{tabular}{l|l} \hline \hline
+            Software            & Version               \\ \hline \hline
+            Docker              & 20.10.15              \\ \hline
+            Docker Compose      & 2.5.0                 \\ \hline
+            Python              & 3.8.13               \\ \hline
+            Node.js             & 16.15.0               \\ \hline
+            Truffle             & 5.5.13               \\ \hline
+            Ganache             & 7.1.0               \\ \hline
+            Solidity            & 0.5.16               \\ \hline
+        \end{tabular}
+        \caption{Software}
+        \label{evaluation:software}
+     \end{subtable}
+     \caption{Hardware and Software Specifications}
+     \label{tab:temps}
+\end{table}
