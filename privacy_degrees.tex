@@ -1,31 +1,34 @@
-% \todo{Do it.}
 
-% \section{Client Participation}
+\section{Execution Time, Transaction Cost and Latency}
 
-% \begin{figure}[!ht]
-%     \centering
-%     \centering
-%     \includegraphics[width=0.7\textwidth]{graphics/02_selection_clients.pdf}
-%     \caption{Participation of Each Client Per Selection Technique}
-%     \label{fig:participations_client}
-% \end{figure}
-
-% \section{Execution Time, Transaction Cost and Latency}
-
-% \begin{table}[!ht]
-% \begin{tabular}{c|c|c} \hline \hline
-%                               & First Come First Served & Random \\ \hline \hline
-% E2E Time (m)                   & 19.70                   & 18.93  \\ \hline
-% Mean Round Time (s)            & 23.62                   & 22.70  \\ \hline
-% % Median Round Time (s)          & 22.06                   & 21.90  \\ \hline
-% Mean Transaction Latency (s)   & 1.560                   & 1.549  \\ \hline
-% % Median Transaction Latency (s) & 1.561                   & 1.549  \\ \hline
-% Mean Transaction Cost (Gas)    & 189179                  & 183124 \\ \hline
-% % Median Transaction Cost (Gas)  & 223471                  & 185198 \\ \hline
-% \end{tabular}
-% \caption{Time and Transaction Metrics Per Participant Selection Technique}
-% \label{tab:metrics_selection}
-% \end{table}
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_e2e.pdf}
+        \caption{E2E Time}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_round.pdf}
+        \caption{Mean Round Time}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_tx_latency.pdf}
+        \caption{Transaction Latency}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_tx_cost.pdf}
+        \caption{Multi-KRUM}
+    \end{subfigure}
+    \caption{Transaction Cost}
+    \label{fig:priv_metrics}
+\end{figure}
 
 \section{Accuracy and Convergence}
 
@@ -58,7 +61,95 @@
     \label{fig:accuracy_priv}
 \end{figure}
 
-% \section{Communication Costs}
+\section{Communication Costs}
+
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_none_client.pdf}
+        \caption{None}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_blockflow_client.pdf}
+        \caption{BlockFlow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_marginalgain_client.pdf}
+        \caption{Marginal Gain}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_multikrum_client.pdf}
+        \caption{Multi-KRUM}
+    \end{subfigure}
+    \caption{Network Traffic on Training Clients for Different Privacy Degrees}
+    \label{fig:net_priv_degree_clients}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_none_server.pdf}
+        \caption{None}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_blockflow_server.pdf}
+        \caption{BlockFlow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_marginalgain_server.pdf}
+        \caption{Marginal Gain}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_multikrum_server.pdf}
+        \caption{Multi-KRUM}
+    \end{subfigure}
+    \caption{Network Traffic on Computing Servers for Different Privacy Degrees}
+    \label{fig:net_priv_degree_server}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_none_miner.pdf}
+        \caption{None}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_blockflow_miner.pdf}
+        \caption{BlockFlow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_marginalgain_miner.pdf}
+        \caption{Marginal Gain}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_net_multikrum_miner.pdf}
+        \caption{Multi-KRUM}
+    \end{subfigure}
+    \caption{Network Traffic on Blockchain Nodes for Different Privacy Degrees}
+    \label{fig:net_priv_degree_miner}
+\end{figure}
 
 % \begin{figure}[!ht]
 %     \centering
@@ -68,22 +159,185 @@
 %     \label{fig:net_selection}
 % \end{figure}
 
-% \section{Computation Costs}
+\section{Computation Costs}
 
-% \begin{figure}[!hpt]
-%     \centering
-%     \centering
-%     \includegraphics[width=0.8\textwidth]{graphics/02_selection_ram.pdf}
-%     \caption{RAM Usage Per Participant Selection technique}
-%     \label{fig:ram_selection}
-% \end{figure}
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_none_client.pdf}
+        \caption{None}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_blockflow_client.pdf}
+        \caption{BlockFlow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_marginalgain_client.pdf}
+        \caption{Marginal Gain}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_multikrum_client.pdf}
+        \caption{Multi-KRUM}
+    \end{subfigure}
+    \caption{RAM Usage on Training Clients for Different Privacy Degrees}
+    \label{fig:ram_priv_degree_clients}
+\end{figure}
 
-% \begin{figure}[!hpb]
-%     \centering
-%     \centering
-%     \includegraphics[width=0.8\textwidth]{graphics/02_selection_cpu.pdf}
-%     \caption{CPU Usage Per Participant Selection technique}
-%     \label{fig:cpu_selection}
-% \end{figure}
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_none_server.pdf}
+        \caption{None}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_blockflow_server.pdf}
+        \caption{BlockFlow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_marginalgain_server.pdf}
+        \caption{Marginal Gain}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_multikrum_server.pdf}
+        \caption{Multi-KRUM}
+    \end{subfigure}
+    \caption{RAM Usage on Computing Servers for Different Privacy Degrees}
+    \label{fig:ram_priv_degree_server}
+\end{figure}
 
-% \section{Conclusions} % and improvements? and limitations?
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_none_miner.pdf}
+        \caption{None}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_blockflow_miner.pdf}
+        \caption{BlockFlow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_marginalgain_miner.pdf}
+        \caption{Marginal Gain}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_ram_multikrum_miner.pdf}
+        \caption{Multi-KRUM}
+    \end{subfigure}
+    \caption{RAM Usage on Blockchain Nodes for Different Privacy Degrees}
+    \label{fig:ram_priv_degree_miner}
+\end{figure}
+
+
+
+
+
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_none_client.pdf}
+        \caption{None}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_blockflow_client.pdf}
+        \caption{BlockFlow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_marginalgain_client.pdf}
+        \caption{Marginal Gain}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_multikrum_client.pdf}
+        \caption{Multi-KRUM}
+    \end{subfigure}
+    \caption{CPU Usage on Training Clients for Different Privacy Degrees}
+    \label{fig:cpu_priv_degree_clients}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_none_server.pdf}
+        \caption{None}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_blockflow_server.pdf}
+        \caption{BlockFlow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_marginalgain_server.pdf}
+        \caption{Marginal Gain}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_multikrum_server.pdf}
+        \caption{Multi-KRUM}
+    \end{subfigure}
+    \caption{CPU Usage on Computing Servers for Different Privacy Degrees}
+    \label{fig:cpu_priv_degree_server}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_none_miner.pdf}
+        \caption{None}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_blockflow_miner.pdf}
+        \caption{BlockFlow}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_marginalgain_miner.pdf}
+        \caption{Marginal Gain}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/05_priv_cpu_multikrum_miner.pdf}
+        \caption{Multi-KRUM}
+    \end{subfigure}
+    \caption{CPU Usage on Blockchain Nodes for Different Privacy Degrees}
+    \label{fig:cpu_priv_degree_miner}
+\end{figure}
+
+\section{Conclusions} % and improvements? and limitations?
