@@ -33,7 +33,7 @@ Regarding accuracy, as can be seen in \autoref{fig:accuracy_consensus_algorithms
 \begin{figure}[!ht]
     \centering
     \centering
-    \includegraphics[width=0.7\textwidth]{graphics/01_consensus_accuracy.pdf}
+    \includegraphics[width=0.7\textwidth]{graphics/consensus/accuracy.pdf}
     \caption{Accuracy Per Consensus Algorithm}
     \label{fig:accuracy_consensus_algorithms}
 \end{figure}
@@ -42,14 +42,14 @@ Regarding accuracy, as can be seen in \autoref{fig:accuracy_consensus_algorithms
 
 For the communication costs, we analyze the inbound and outbound network traffic per round at the training clients, computing servers and blockchain nodes. This values can be observed in \autoref{fig:net_consensus_algorithms}.
 
-On one hand, the inbound and outbound traffic for the clients and server has negligible differences when using different consensus algorithms. As mentioned in the previous section, the consensus algorithms have no expected impact on the ML process. Since the clients and servers only concern the ML process, it was expected that the clients and servers would not be affected. The small differences we can observe, in the order of $< 0.2$ MB, are likely connected to fluctuations in the random participant selection technique. If there are more participants being selected, more data needs to be transmitted, and vice-versa.
+On one hand, the inbound and outbound traffic for the clients and server has negligible differences when using different consensus algorithms. As mentioned in the previous section, the consensus algorithms have no expected impact on the ML process. Since the clients and servers only concern the ML process, it was expected that the clients and servers would not be affected. The small differences we can observe, in the order of $< 2$ MB, are likely connected to fluctuations in the random participant selection technique. If there are more participants being selected, more data needs to be transmitted, and vice-versa.
 
 On the other hand, the traffic at the blockchain nodes varies considerably depending on the consensus algorithm. On average, PoW requires more bandwidth per round than PoA, but the difference is very minimal. However, QBFT requires $2$ times more network traffic than PoW and $4$ times more traffic than PoA. QBFT is a three-phase consensus algorithm, which requires a higher amount of network messages to be transmitted before reaching consensus. In addition, the size of the messages also differs. When combining both of this aspects, we can conclude that the expected network traffic per round using the QBFT algorithm would be higher.
 
 \begin{figure}[!ht]
     \centering
     \centering
-    \includegraphics[width=0.8\textwidth]{graphics/01_consensus_net.pdf}
+    \includegraphics[width=0.8\textwidth]{graphics/consensus/net.pdf}
     \caption{Network Traffic Per Round Per Consensus Algorithm}
     \label{fig:net_consensus_algorithms}
 \end{figure}
@@ -61,7 +61,7 @@ Regarding computation costs, we will look at both RAM and CPU usage on the train
 \begin{figure}[!hpt]
     \centering
     \centering
-    \includegraphics[width=0.8\textwidth]{graphics/01_consensus_ram.pdf}
+    \includegraphics[width=0.8\textwidth]{graphics/consensus/ram.pdf}
     \caption{RAM Usage Per Consensus Algorithm}
     \label{fig:ram_consensus_algorithms}
 \end{figure}
@@ -69,7 +69,7 @@ Regarding computation costs, we will look at both RAM and CPU usage on the train
 \begin{figure}[!hpb]
     \centering
     \centering
-    \includegraphics[width=0.8\textwidth]{graphics/01_consensus_cpu.pdf}
+    \includegraphics[width=0.8\textwidth]{graphics/consensus/cpu.pdf}
     \caption{CPU Usage Per Consensus Algorithm}
     \label{fig:cpu_consensus_algorithms}
 \end{figure}
