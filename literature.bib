@@ -788,3 +788,21 @@
   
   copyright = {Creative Commons Attribution 3.0 Unported}
 }
+
+@inproceedings{10.1145/3297858.3304038,
+author = {Jin, Tian and Hong, Seokin},
+title = {Split-CNN: Splitting Window-Based Operations in Convolutional Neural Networks for Memory System Optimization},
+year = {2019},
+isbn = {9781450362405},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3297858.3304038},
+doi = {10.1145/3297858.3304038},
+abstract = {We present an interdisciplinary study to tackle the memory bottleneck of training deep convolutional neural networks (CNN). Firstly, we introduce Split Convolutional Neural Network (Split-CNN) that is derived from the automatic transformation of the state-of-the-art CNN models. The main distinction between Split-CNN and regular CNN is that Split-CNN splits the input images into small patches and operates on these patches independently before entering later stages of the CNN model. Secondly, we propose a novel heterogeneous memory management system (HMMS) to utilize the memory-friendly properties of Split-CNN. Through experiments, we demonstrate that Split-CNN achieves significantly higher training scalability by dramatically reducing the memory requirements of training algorithms on GPU accelerators. Furthermore, we provide empirical evidence that splitting at randomly chosen boundaries can even result in accuracy gains over baseline CNN due to its regularization effect.},
+booktitle = {Proceedings of the Twenty-Fourth International Conference on Architectural Support for Programming Languages and Operating Systems},
+pages = {835–847},
+numpages = {13},
+keywords = {memory management, GPU, deep learning, convolutional neural network, heterogeneous architecture},
+location = {Providence, RI, USA},
+series = {ASPLOS '19}
+}

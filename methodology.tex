@@ -86,7 +86,7 @@ To simulate a \textit{non-iid} distribution, both in number of samples, as in nu
 
 For our experiments, $\alpha = 0.1$ is used in the Dirichlet distribution as it yields a realistic \textit{non-iid} distribution \cite{10.48550/arxiv.2006.07242}, where some clients only hold many samples of a few classes, while other clients have few samples of many classes. In addition, each client has, on average $2500$ samples, such that some clients have lower amounts, and others have higher amounts, simulating a \textit{non-iid} distribution in regards to the number of samples at each device.
 
-\subsection{Vertical}
+\subsection{Vertical}\label{subsection:verticalpartitioning}
 
 Vertically partitioned data is significantly different from horizontally partition data, in the sense that the clients share intersecting sample spaces, but different feature spaces. Therefore, it is not possible to simply attribute some samples to some clients, and other sample to other clients. We have to give each client samples of the same sample space, but different features.
 
