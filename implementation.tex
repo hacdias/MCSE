@@ -1,123 +1,32 @@
+In this chapter, we go over the implementation details of the BlockLearning framework, following the guidelines defined in \Cref{chapter:methodology}. The complete implementation is publicly available on GitHub\footnote{\url{https://github.com/hacdias/blocklearning}}.
+
+\section{Smart Contracts}
+
+The first part of the framework is the smart contracts. As mentioned previously, this work uses the Ethereum\footnote{\url{https://ethereum.org/en/}} blockchain platform. Therefore, the smart contracts must be implemented in a programming language that supports Ethereum. We chose the Solidity\footnote{\url{https://soliditylang.org/}} programming language as it is the most well-known with the widest support.
+
 \todo{}
 
-In this chapter, we go over the implementation details of the framework and the client sampling procedure.
+% Since our framework supports different techniques with different requirements, we implemented four different smart contracts. These smart contracts inherit from a smart contract that provides the common data structures and functionality, named \texttt{Base}. In \texttt{Base}, we start by defining the different round phases:
 
-\section{Framework}
+% Below, you can see a skeleton of the functionality and data structures provided by the \texttt{Base} smart contract:
 
-This section provides details on the implementation of the BlockLearning framework, following the guidelines defined in \Cref{chapter:methodology}. The complete implementing is publicly available on GitHub\footnote{\url{https://github.com/hacdias/blocklearning}}. In the remainder of this section, we will address the implementation of the three parts of the framework: smart contracts, library and testbed.
+\section{Library}
 
-\subsection{Smart Contracts}
+% % The library is implemented in the Python\footnote{\url{https://www.python.org/}} programming language. The main motivation for using Python is that many well-known Machine Learning libraries, such as TensorFlow\footnote{\url{https://www.tensorflow.org/}} and PyTorch\footnote{\url{https://pytorch.org/}} are implemented in Python, as well as many data processing tools.
 
-The first part of the framework is the smart contracts. As mentioned previously, this work uses the Ethereum\footnote{\url{https://ethereum.org/en/}} blockchain. Therefore, the smart contracts must be implemented in a programming language that supports the Ethereum blockchain. To do so, we use Solidity\footnote{\url{https://soliditylang.org/}}, which is the most well-known programming language for Ethereum smart contracts.
+% % \subsubsection{Aggregation Algorithms}
 
-Since our framework supports different techniques with different requirements, we implemented four different smart contracts. These smart contracts inherit from a smart contract that provides the common data structures and functionality, named \texttt{Base}. In \texttt{Base}, we start by defining the different round phases:
+% % The main aggregation algorithm used in this work is FedAvg, which is a weighted sum that uses the number of samples as the weights. The remaining algorithms are variations, where the weights in the weighted sum are replaced by scores. More details regarding the scoring mechanisms can be found in \Cref{background:scoring}. The aggregation algorithms implement the following common interface:
 
-% \begin{minted}{solidity}
-% enum RoundPhase {
-%   Stopped,
-%   WaitingForUpdates,
-%   WaitingForScorings,        // Only used with scoring mechanisms.
-%   WaitingForAggregations,
-%   WaitingForTermination,
-%   WaitingForBackpropagation  // Only used for vertical federated learning.
-% }
-% \end{minted}
+% % - Storage: off-chain, IPFS.
 
+\todo{}
 
+\section{Testbed}
 
-Below, you can see a skeleton of the functionality and data structures provided by the \texttt{Base} smart contract:
+\todo{}
 
-% \begin{minted}{solidity}
-% abstract contract Base {
-%   struct Update {
-%     uint trainingAccuracy;
-%     uint testingAccuracy;
-%     uint trainingDataPoints;§
-%     string weights;
-%   }
-    
-%   // Registers devices as aggregators and trainers. A device
-%   // is identified by the address of their account in the blockchain.
-%   function registerAggregator()
-%   function registerTrainer()
-  
-%   // Retrieves the current round number and round start weights.
-%   // This function can only be called by the trainers while
-%   // while the contract is in the waiting for updates phase.
-%   function getRoundForTraining()
-%     returns (uint round, string weights)
-  
-%   // Submits an update. This function can only be called by trainers
-%   // while the contract is in the waiting for updates phase.
-%   function submitUpdate(Update update)
-  
-%   // Retrieves the current round, trainers and updates for aggregation.
-%   // It can only be called by the aggregators while the contract is in
-%   // the waiting for aggregations phase.
-%   function getUpdatesForAggregation()
-%     returns (uint round, address[] trainers, Update[] updates)
-  
-%   // Submit 
-%   function submitAggregation(string memory weights)
-%   function terminateRound()
-% }
-% \end{minted}
-
-% that inherit most of the functionality from the \texttt{Base}
-
-
-% % \begin{minted}{solidity}
-% % struct Submission {
-% %     uint trainingAccuracy;
-% %     uint testingAccuracy;
-% %     uint trainingDataPoints;
-% %     string weights;
-% % }
-% % \end{minted}
-
-
-
-% \subsection{Library}
-
-% The library is implemented in the Python\footnote{\url{https://www.python.org/}} programming language. The main motivation for using Python is that many well-known Machine Learning libraries, such as TensorFlow\footnote{\url{https://www.tensorflow.org/}} and PyTorch\footnote{\url{https://pytorch.org/}} are implemented in Python, as well as many data processing tools.
-
-% \subsubsection{Aggregation Algorithms}
-
-% The main aggregation algorithm used in this work is FedAvg, which is a weighted sum that uses the number of samples as the weights. The remaining algorithms are variations, where the weights in the weighted sum are replaced by scores. More details regarding the scoring mechanisms can be found in \Cref{background:scoring}. The aggregation algorithms implement the following common interface:
-
-% \begin{minted}{python}
-% def aggregate(trainers, submissions, scorers = None, scores = None):
-%     # ...
-%     return new_weights
-% \end{minted}
-    
-% \begin{minted}{python}
-% def score(round, trainers, submissions):
-%     # ...
-%     return trainers, scores
-% \end{minted}
-
-% \begin{minted}{python}
-% def privatize(x, accuracy = 0):
-%     # ...
-%     return o
-% \end{minted}
-
-% \subsection{Testbed}
-
-% \section{Client Sampling}
-
-
-% % \begin{itemize}
-
-
-    
-% %     \item \textbf{Platform}: Ethereum. Among the papers I read that did not use a custom blockchain implementation, Ethereum was one of the most used blockchains. Besides, Ethereum is one of the most popular blockchains with most support.
-    
-% %     \item \textbf{Storage}: off-chain storage will be used during the comparisons. Off-chain storage is the most popular strategy when using already existing blockchain platforms. Among the off-chain storage methods we found, IPFS was among one of the most popular methods.  IPFS is a decentralised file system that allows to store content that can be retrieved by its CID (Content Identifier).
-    
-% %     \item \textbf{PoS} was initially supposed to be tested. However, it was not possible: https://github.com/bnb-chain/bsc/issues/861
-% % \end{itemize}
-
-    
-% % Please note that random number generation is impossible in smart contracts due to their deterministic nature. Therefore, the selection of the random participants has to be down out of bounds \cite{9293091}. 
+% % - PoW and PoA: https://github.com/ethereum/go-ethereum
+% % - QBFT: https://github.com/ConsenSys/quorum (fork of go-ethereum)
+% % - PoS: not possible in private setting https://github.com/bnb-chain/bsc/issues/861
+% % - docker stats for metrics https://docs.docker.com/engine/reference/commandline/stats/
