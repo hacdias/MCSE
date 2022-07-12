@@ -4,15 +4,39 @@ In this chapter, we go over the implementation details of the BlockLearning fram
 
 The first part of the framework is the smart contracts. As mentioned previously, this work uses the Ethereum\footnote{\url{https://ethereum.org/en/}} blockchain platform. Therefore, the smart contracts must be implemented in a programming language that supports Ethereum. We chose the Solidity\footnote{\url{https://soliditylang.org/}} programming language as it is the most well-known with the widest support.
 
-\todo{}
+Since our framework supports different techniques with different requirements, we implemented four different smart contracts. These smart contracts inherit most of their functionality from an abstract smart contract that provides the common data structures and functionality, named \texttt{Base}. The smart contracts that inherit from \texttt{Base} are: \texttt{Scoring}, \texttt{NoScoring}, \texttt{FirstComeFirstServer} and \texttt{Vertical}. 
 
-% Since our framework supports different techniques with different requirements, we implemented four different smart contracts. These smart contracts inherit from a smart contract that provides the common data structures and functionality, named \texttt{Base}. In \texttt{Base}, we start by defining the different round phases:
-
-% Below, you can see a skeleton of the functionality and data structures provided by the \texttt{Base} smart contract:
+\todo{Add class diagram?}
 
 \section{Library}
 
-% % The library is implemented in the Python\footnote{\url{https://www.python.org/}} programming language. The main motivation for using Python is that many well-known Machine Learning libraries, such as TensorFlow\footnote{\url{https://www.tensorflow.org/}} and PyTorch\footnote{\url{https://pytorch.org/}} are implemented in Python, as well as many data processing tools.
+The library is implemented in the Python\footnote{\url{https://www.python.org/}} programming language. The main motivation for using Python is that many well-known Machine Learning libraries, such as TensorFlow\footnote{\url{https://www.tensorflow.org/}} and PyTorch\footnote{\url{https://pytorch.org/}} are implemented in Python, as well as many data processing tools.
+
+The first part of the library are the aggregation, scoring and privacy algorithms. Each of these categories of algorithms has a specific interface to which each algorithm must conform to. This allow for them to be easily modified or changed. The interfaces are described below:
+
+\begin{enumerate}
+    \item \texttt{aggregate(trainers, updates, scorers, scores) $\rightarrow$ weights}\\
+    The aggregators must provide a function \texttt{aggregate} that receives an array with the trainer addresses, an array with the updates sorted by the same order as the trainers, an array with the scorers and an array with the scores sorted by the same order as the scorers. It is important to note that the scorers and the scores are optional arguments since a scoring algorithm is not always required. The function returns an array with the aggregated weights.
+    
+    \item \texttt{score(round, trainers, updates) $\rightarrow$ trainers, scores}\\
+    The scorers must provide a function \texttt{score} that receives an integer with the round number, an array with the trainer addresses, as well as an array of updates that are sorted by the same order as the trainer addresses. The function returns an array with the trainers and their submission scores.
+    
+    \item \texttt{privatize(x) $\rightarrow$ y}\\
+    The privacy mechanisms must provide a function \texttt{score} that receives an array of the weights \texttt{x} and returns the privatized weights \texttt{y}.
+\end{enumerate}
+
+Aggr: BlockFlow, FedAvg, Multi-KRUM
+
+Scorers: Multi-KRUM, MarginalGain, Accuracy (blockflow)
+
+Priv: Gaussian
+
+
+Weights Storage and Retrieval
+
+Smart Contract Bridge
+
+Trainer, Scorer and Aggregator
 
 % % \subsubsection{Aggregation Algorithms}
 
@@ -23,6 +47,24 @@ The first part of the framework is the smart contracts. As mentioned previously,
 \todo{}
 
 \section{Testbed}
+
+The testbed, that is, the platform to conduct the experiments. It was mostly implemented using the aforementioned library and Docker\footnote{\url{https://www.docker.com/}}. Docker is a platform that allows to easily deploy applications in an isolated setting through what is called a container, allowing us to simulate multiple devices in the same network.
+
+In the testbed, we have two major components: the client, server and owner scripts, the federated learning environment deployment and the blockchain deployment. These are discussed on the following subsections.
+
+\subsection{Client, Server and Owner Scripts}
+
+The client, server and owner scripts are the processes that will run at the client, server and owner, respectively. These are implemented using the BlockLearning library. In each of these processes, we first load the required data, such as the data set in the clients, and initialize the required mechanisms, namely the scoring, aggregation and privacy mechanisms.
+
+
+
+\subsection{Federated Learning Setup and Deployment}
+
+\subsection{Blockchain Setup and Deployment}
+
+% - client and server processes
+% federated lrarning setup and deployment
+% blockchains etup and eployment
 
 \todo{}
 

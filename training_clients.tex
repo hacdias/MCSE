@@ -1,8 +1,33 @@
-In this chapter, we analyze the data from the fourth experiment group, where we compare how different amounts of clients, namely 5, 10, 25 and 50 clients, affect each scoring technique.
+In this chapter, we analyze the fourth experiment group, that is, the impact of having different amounts of clients, per scoring technique, in a Blockchain-based Federated Learning system. In this set of experiments, all properties of the system are static, except for the amount of clients, which varies between 5, 10, 25 and 50, per each scoring mechanism.
+
+\todo{}
 
 \section{Execution Time, Transaction Cost and Latency}
 
-\begin{figure}[!ht]
+The results regarding execution time and transaction cost and latency can be visualized in \autoref{fig:clients_time}. As can be seen in the picture, all scoring algorithms present different growths regarding execution time with the increase of training clients.
+
+One one hand, no scoring mechanism and Multi-KRUM present a quasi-linear execution time and mean round time growth. In Multi-KRUM, as previously discussed, the scores are calculated by the servers. Since the number of servers is independent of the number of clients, and is static, the growth is expected to be linear. On the other hand, BlockFlow and Marginal Gain present super-linear growths. Since the clients are the scorers and the clients increase, and each client has to score each other client, it is expected that the growth would be higher than with the remaining techniques.
+
+% Tx latency is around the same, no matter how many devices we have. Ethereum has a relatively fixed capacity of transactions.
+
+\begin{figure}[!hb]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/clients/e2e.pdf}
+        \caption{E2E Time}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{graphics/clients/round.pdf}
+        \caption{Mean Round Time}
+    \end{subfigure}
+    \caption{Time Metrics Per Training Clients}
+    \label{fig:clients_time}
+\end{figure}
+
+\begin{figure}[!hb]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -62,9 +87,18 @@ In this chapter, we analyze the data from the fourth experiment group, where we 
     \label{fig:clients_accuracy}
 \end{figure}
 
+
 \section{Communication Costs}
 
-\begin{figure}[!ht]
+
+\section{Computation Costs}
+
+
+\section{Conclusions} % and improvements? and limitations?
+
+\clearpage
+
+\begin{figure}[!hp]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -93,7 +127,7 @@ In this chapter, we analyze the data from the fourth experiment group, where we 
     \label{fig:net_clients_degree_clients}
 \end{figure}
 
-\begin{figure}[!ht]
+\begin{figure}[!hp]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -122,7 +156,7 @@ In this chapter, we analyze the data from the fourth experiment group, where we 
     \label{fig:net_clients_degree_server}
 \end{figure}
 
-\begin{figure}[!ht]
+\begin{figure}[!hp]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -151,9 +185,9 @@ In this chapter, we analyze the data from the fourth experiment group, where we 
     \label{fig:net_clients_degree_miner}
 \end{figure}
 
-\section{Computation Costs}
+\clearpage
 
-\begin{figure}[!ht]
+\begin{figure}[!h]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -182,7 +216,7 @@ In this chapter, we analyze the data from the fourth experiment group, where we 
     \label{fig:ram_clients_degree_clients}
 \end{figure}
 
-\begin{figure}[!ht]
+\begin{figure}[!h]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -211,7 +245,7 @@ In this chapter, we analyze the data from the fourth experiment group, where we 
     \label{fig:ram_clients_degree_server}
 \end{figure}
 
-\begin{figure}[!ht]
+\begin{figure}[!h]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -240,12 +274,9 @@ In this chapter, we analyze the data from the fourth experiment group, where we 
     \label{fig:ram_clients_degree_miner}
 \end{figure}
 
+\newpage
 
-
-
-
-
-\begin{figure}[!ht]
+\begin{figure}[!h]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -274,7 +305,7 @@ In this chapter, we analyze the data from the fourth experiment group, where we 
     \label{fig:cpu_clients_degree_clients}
 \end{figure}
 
-\begin{figure}[!ht]
+\begin{figure}[!h]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -303,7 +334,7 @@ In this chapter, we analyze the data from the fourth experiment group, where we 
     \label{fig:cpu_clients_degree_server}
 \end{figure}
 
-\begin{figure}[!ht]
+\begin{figure}[!h]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -331,5 +362,3 @@ In this chapter, we analyze the data from the fourth experiment group, where we 
     \caption{CPU Usage on Blockchain Nodes Per Training Clients}
     \label{fig:cpu_clients_degree_miner}
 \end{figure}
-
-\section{Conclusions} % and improvements? and limitations?

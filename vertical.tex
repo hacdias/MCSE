@@ -1,4 +1,12 @@
+In this chapter, we analyze the sixth and last experiment group, that is, the proof of concept of Vertical Blockchain-based Federated Learning. The goal of this experiment is to prove that, even though there is a lack of Blockchain-based Federated Learning systems applied to vertically partitioned data, it is possible.
+
+This experiment was run with two different amounts of clients: 2 and 4, with a dual-headed, and four-headed, Split-CNN model, respectively. By having two experiments in this group, we can still draw some comparisons. In addition, most Vertical Federated Learning models from the literature were applied to 2 clients. Therefore, it is interesting to see that it is possible to easily apply the model to more devices.
+
 \section{Execution Time, Transaction Cost and Latency}
+
+The execution time and transaction metrics can be seen in \autoref{tab:metrics_vertical}. It is observable that the more clients we have, the longest it takes for a round to be completed and, therefore, the entire learning process. This is a conclusion that was taken in a previous chapter too.
+
+Regarding the transaction latency and cost, we can see that both are similar to what has been seen in previous chapters. Since the number of devices is low and they are close to each other, we did not expect to have significant differences in either of them.
 
 \begin{table}[!ht]
 \begin{tabular}{c|c|c} \hline \hline
@@ -14,6 +22,8 @@ Mean Transaction Cost (Gas)     & 141335        & 142638        \\ \hline
 
 \section{Accuracy and Convergence}
 
+Regarding accuracy, we can observe smooth convergences, as well as similar high accuracy. Both clients reached an accuracy above $85\%$, only differing in $3\%$. In addition, it is interesting to see that the convergence of the Vertical Federated Learning is much smoother than what we have observed with Horizontal Federated Learning. This is likely explained by the fact that in this setting, all devices participate in each round due to the way the data is structured. In addition, the model is different from a regular CNN, which may lead to different results. However, since both types of data partition solve different types of problems, it is not a fair comparison.
+
 \begin{figure}[!ht]
     \centering
     \centering
@@ -23,6 +33,14 @@ Mean Transaction Cost (Gas)     & 141335        & 142638        \\ \hline
 \end{figure}
 
 \section{Communication Costs}
+
+The communication costs represented in \autoref{fig:net_vertical} are also within the expected values.
+
+On the clients, we can observe that there is no major difference of traffic when the number of clients increases. This can be explained by the fact that, by using a Split-CNN, each client is only required to upload their own intermediate results and download the gradient updates, which have fixed sizes.
+
+On the servers, the costs are higher with more devices. Since the Split-CNN model has more heads with more clients, the servers are required to download more intermediate results, as well as upload more gradient updates. Therefore, it would be expected that the traffic would double with the double of clients.
+
+On the blockchain nodes, the difference of amount of devices is not significant to make a significant difference on traffic.
 
 \begin{figure}[!ht]
     \centering
@@ -34,7 +52,9 @@ Mean Transaction Cost (Gas)     & 141335        & 142638        \\ \hline
 
 \section{Computation Costs}
 
-\begin{figure}[!hpt]
+Computation costs, namely RAM usage and CPU usage, are depicted in \autoref{fig:ram_vertical} and \autoref{fig:cpu_vertical}, respectively. As expected, with higher devices there is a slightly higher RAM consumption on both servers and blockchain nodes, caused by more data being stored in-memory, as well as more messages being carried over the blockchain. However, we see the opposite happening with the training clients. This is explained by the fact that the dual-headed CNN contains an additional convolutional layer compared to the four-headed CNN, which leads to more RAM usage during training process. Regarding CPU usage, we see similar results as to the RAM usage, which are explained by the same aspects.
+
+\begin{figure}[!ht]
     \centering
     \centering
     \includegraphics[width=0.8\textwidth]{graphics/vertical/ram.pdf}
@@ -42,7 +62,7 @@ Mean Transaction Cost (Gas)     & 141335        & 142638        \\ \hline
     \label{fig:ram_vertical}
 \end{figure}
 
-\begin{figure}[!hpb]
+\begin{figure}[!ht]
     \centering
     \centering
     \includegraphics[width=0.8\textwidth]{graphics/vertical/cpu.pdf}
@@ -50,4 +70,6 @@ Mean Transaction Cost (Gas)     & 141335        & 142638        \\ \hline
     \label{fig:cpu_vertical}
 \end{figure}
 
-\section{Conclusions} % and improvements? and limitations?
+\section{Conclusions and Improvements}
+
+From this experiment, we can conclude that it is possible to apply a Blockchain-based Federated Learning system to vertically partitioned data. In future work, it would be interesting to investigate how to apply other models. In addition, it would be interesting to see how other, larger data sets, could be applied with larger amounts of clients. Using MNIST, this experiment is limited because of the extremely small resolution of the images. Therefore, it is not feasible to separate many features. Finally, it would also be worth investigating how privacy mechanisms could be applied to the intermediate model outputs in order to prevent inference attacks.
