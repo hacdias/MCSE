@@ -35,304 +35,79 @@ In this chapter, we analyze the fifth experiment group, that is, the impact of h
 
 \section{Accuracy and Convergence}
 
-\begin{figure}[!ht]
+\begin{figure}[!h]
     \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/accuracy_none.pdf}
-        \caption{None}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/accuracy_blockflow.pdf}
-        \caption{BlockFlow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/accuracy_marginalgain.pdf}
-        \caption{Marginal Gain}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/accuracy_multikrum.pdf}
-        \caption{Multi-KRUM}
-    \end{subfigure}
+    \includegraphics[width=\textwidth]{graphics/privacy/accuracy.pdf}
     \caption{Accuracy Per Privacy Degree}
-    \label{fig:accuracy_priv}
+    \label{fig:accuracy_privacy}
 \end{figure}
 
 \section{Communication Costs}
 
-
-\begin{figure}[!ht]
+\begin{figure}[!h]
     \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_none_client.pdf}
-        \caption{None}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_blockflow_client.pdf}
-        \caption{BlockFlow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_marginalgain_client.pdf}
-        \caption{Marginal Gain}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_multikrum_client.pdf}
-        \caption{Multi-KRUM}
-    \end{subfigure}
-    \caption{Network Traffic on Training Clients Per Privacy Degree}
-    \label{fig:net_priv_degree_clients}
-\end{figure}
-
-\begin{figure}[!ht]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_none_server.pdf}
-        \caption{None}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_blockflow_server.pdf}
-        \caption{BlockFlow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_marginalgain_server.pdf}
-        \caption{Marginal Gain}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_multikrum_server.pdf}
-        \caption{Multi-KRUM}
-    \end{subfigure}
-    \caption{Network Traffic on Computing Servers Per Privacy Degree}
-    \label{fig:net_priv_degree_server}
-\end{figure}
-
-\begin{figure}[!ht]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_none_miner.pdf}
-        \caption{None}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_blockflow_miner.pdf}
-        \caption{BlockFlow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_marginalgain_miner.pdf}
-        \caption{Marginal Gain}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/net_multikrum_miner.pdf}
-        \caption{Multi-KRUM}
-    \end{subfigure}
-    \caption{Network Traffic on Blockchain Nodes Per Privacy Degree}
-    \label{fig:net_priv_degree_miner}
+    \includegraphics[width=\textwidth]{graphics/privacy/traffic.pdf}
+    \caption{Network Traffic Per Privacy Degree}
+    \label{fig:net_privacy}
 \end{figure}
 
 \section{Computation Costs}
 
-\begin{figure}[!ht]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_none_client.pdf}
-        \caption{None}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_blockflow_client.pdf}
-        \caption{BlockFlow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_marginalgain_client.pdf}
-        \caption{Marginal Gain}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_multikrum_client.pdf}
-        \caption{Multi-KRUM}
-    \end{subfigure}
-    \caption{RAM Usage on Training Clients Per Privacy Degree}
-    \label{fig:ram_priv_degree_clients}
-\end{figure}
-
-\begin{figure}[!ht]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_none_server.pdf}
-        \caption{None}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_blockflow_server.pdf}
-        \caption{BlockFlow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_marginalgain_server.pdf}
-        \caption{Marginal Gain}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_multikrum_server.pdf}
-        \caption{Multi-KRUM}
-    \end{subfigure}
-    \caption{RAM Usage on Computing Servers Per Privacy Degree}
-    \label{fig:ram_priv_degree_server}
-\end{figure}
-
-\begin{figure}[!ht]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_none_miner.pdf}
-        \caption{None}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_blockflow_miner.pdf}
-        \caption{BlockFlow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_marginalgain_miner.pdf}
-        \caption{Marginal Gain}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/ram_multikrum_miner.pdf}
-        \caption{Multi-KRUM}
-    \end{subfigure}
-    \caption{RAM Usage on Blockchain Nodes Per Privacy Degree}
-    \label{fig:ram_priv_degree_miner}
-\end{figure}
-
-
-
-
-
-
-\begin{figure}[!ht]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_none_client.pdf}
-        \caption{None}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_blockflow_client.pdf}
-        \caption{BlockFlow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_marginalgain_client.pdf}
-        \caption{Marginal Gain}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_multikrum_client.pdf}
-        \caption{Multi-KRUM}
-    \end{subfigure}
-    \caption{CPU Usage on Training Clients Per Privacy Degree}
-    \label{fig:cpu_priv_degree_clients}
-\end{figure}
-
-\begin{figure}[!ht]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_none_server.pdf}
-        \caption{None}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_blockflow_server.pdf}
-        \caption{BlockFlow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_marginalgain_server.pdf}
-        \caption{Marginal Gain}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_multikrum_server.pdf}
-        \caption{Multi-KRUM}
-    \end{subfigure}
-    \caption{CPU Usage on Computing Servers Per Privacy Degree}
-    \label{fig:cpu_priv_degree_server}
-\end{figure}
-
-\begin{figure}[!ht]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_none_miner.pdf}
-        \caption{None}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_blockflow_miner.pdf}
-        \caption{BlockFlow}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_marginalgain_miner.pdf}
-        \caption{Marginal Gain}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{graphics/privacy/cpu_multikrum_miner.pdf}
-        \caption{Multi-KRUM}
-    \end{subfigure}
-    \caption{CPU Usage on Blockchain Nodes Per Privacy Degree}
-    \label{fig:cpu_priv_degree_miner}
-\end{figure}
-
 \section{Conclusions} % and improvements? and limitations?
+
+
+
+\clearpage
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/ram_client.pdf}
+    \caption{RAM Usage on Training Clients Per Privacy Degree}
+    \label{fig:ram_privacy_clients}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/ram_server.pdf}
+    \caption{RAM Usage on Computing Servers Per Privacy Degree}
+    \label{fig:ram_privacy_servers}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/ram_miner.pdf}
+    \caption{CPU Usage on Training Clients Per Privacy Degree}
+    \label{fig:ram_privacy_miners}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/cpu_client.pdf}
+    \caption{RAM Usage on Training Clients Per Privacy Degree}
+    \label{fig:cpu_privacy_clients}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/cpu_server.pdf}
+    \caption{CPU Usage on Computing Servers Per Privacy Degree}
+    \label{fig:cpu_privacy_servers}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/cpu_miner.pdf}
+    \caption{CPU Usage on Blockchain Nodes Per Privacy Degree}
+    \label{fig:cpu_privacy_miners}
+\end{figure}
+
