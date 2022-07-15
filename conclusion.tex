@@ -2,10 +2,12 @@
     
 \section{General Conclusions}\label{conclusions:general}
 
+% Latency: there is always a ~1.5 second latency when waiting for transactions. Considering that each training round has at least $C+S+2$ transactions, that is quite a lot of time. Trade-off between what blockchain offers (traceability, auditability, decentralization, persistency and authentication) vs. time.
+
 % Consensus Algorithms
 %     Computation Costs: PoW >> QBFT = PoA
 %     Communication Costs: QBFT >> PoW = PoA
-%     PoA can be considered less decentralized, which can be an issue in public networks.
+%     PoA can be considered less decentralized, which can be an issue in public networks. Trade-off with degree of decentralization.
     
 % Participant Selection Methods
 %     Computation and Communication Costs: PoW = QBFT = PoA
@@ -22,6 +24,11 @@
 %         Yes: 1. Multi-KRUM
 %         No: 1. Marginal Gain, 2. BlockFlow
 
+% + Clients + Low Powered = Multi-KRUM
+% + Clients + High Powered = Marginal Gain
+% - Clients + Low Powered = Multi- KRUM
+% - Clients + High Powered = Marginal gain
+
 \section{Contributions}\label{conclusions:contributions}
 
 \begin{enumerate}
@@ -35,3 +42,7 @@
 \end{enumerate}
 
 \section{Future Work}\label{conclusions:future_work}
+
+% Build a tool that uses the smart contract to visualize the training process.
+
+% Investigate how consensus algorithms tailored for FL could be applied to ethereum such that it is still possible to re-use some part of an already existing and testedblockchain platfor??

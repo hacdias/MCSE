@@ -8,6 +8,8 @@ A device can be categorized as one or more categories. By doing so, the framewor
 
 The following subsections present the execution flow of the framework, as well as the structure and modules of BlockLearning.
 
+\subsection{Execution Flow}\label{meth:exec_flow}
+
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=1\textwidth]{graphics/sequence.pdf}
@@ -15,9 +17,29 @@ The following subsections present the execution flow of the framework, as well a
     \label{fig:blocklearning_steps}
 \end{figure}
 
-\subsection{Execution Flow}\label{meth:exec_flow}
+The framework supports a modular sequential flow represented on \autoref{fig:blocklearning_steps}. The steps are explained below:
 
-The framework supports a modular sequential flow represented on \autoref{fig:blocklearning_steps}. Firstly, the owner initializes the round. Secondly, the trainers submit their updates. Thirdly, if there is a scoring mechanism enabled, the scorers submit their update scores. Then, the aggregators execute the aggregation algorithm and submit the aggregation. Now, in case we are using a vertically partitioned data set, the trainers confirm the back-propagation. Note that this step is tightly connected to the model we will use for Vertical Federated Learning, which will be introduced later. Finally, the round is marked as terminated by the owner. The third and fifth rounds can be seen as proofs of how the framework is modular enough to add different steps in the flow.
+\begin{enumerate}
+    \item In first place, the owner initializes the round. During the round initialization, depending on the participant selection technique, the clients that will participate may be already defined, or not.
+    
+    \item In second place, the trainers retrieve the information about the round, such as the global weights from the last round, and train the model using their local data. Then, the trainers submit their updates.
+    
+    \item In third place, if there is a scoring mechanism enabled, the scorers retrieve the updates and calculate the scores. Then, they submit their scores.
+    
+    \item In fourth place, the aggregators retrieve the updates and execute the aggregation algorithm and submit the aggregation results.
+    
+    \item In fifth place, if we are using vertically partitioned data, and depending on the model in use, the trainers may have to confirm back-propagation. Note that this step is tightly connected to the model we will be using for Vertical Federated Learning, which will be introduced later. Nonetheless, it shows how modular the system can be and how steps can be easily added at different points of the flow for different purposes.
+    
+    \item Finally, the round is marked as terminated by the owner. At this point, the smart contract decides which is the final aggregation for the model based on the submissions by the aggregators.
+\end{enumerate}
+
+\subsection{Threat Model}
+
+In the last step of the execution flow, the smart contract decides the final aggregation values based on the submissions by the aggregators. For this, at least 50\% of the aggregators must agree on the same aggregation in order for it to be accepted. Therefore, the framework offers a 50\% threat model.
+
+Even though 50\% is not the ideal threat model, it is a clear improvement compared to regular Federated Learning where the central aggregator is a single point of failure that has to be always available, reliable and trusted. In this framework, an attacker would have to control over 51\% of the aggregators in order to be able to influence the outcome of the aggregation, and therefore, or the training.
+
+In addition, the framework should allow for the threat threshold to be changed. By default, it is 50\%. However, if a user prefers that all aggregators must agree on the same aggregation, they should be able to do so.
 
 \subsection{Structure and Modules}\label{meth:struct_modules}
 

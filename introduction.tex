@@ -2,7 +2,17 @@ Machine Learning (ML) has revolutionized the way we think and work with data, op
 
 In 2016, Google researchers attempted to build communication-efficient deep neural networks in decentralized data settings. The result of this work was the introduction of a new way of collaboratively training Machine Learning models, which they termed Federated Learning \cite{10.48550/arxiv.1602.05629}. Federated Learning (FL) allows multiple clients, in different locations, to cooperate on the same Machine Learning model without sharing their own data with each other. Instead of sharing the raw data, clients only share model parameters, such as weights. Both of this aspects bring some benefits. The first benefit is that, by not sharing raw data, models can preserve data privacy, allowing them to be trained on sensitive data. In addition, since model parameters are usually much smaller than the raw data, this also leads to less data being transported over the networks. Finally, since the data is distributed among different devices, a single powerful device is not required to train the model, as usually training models with smaller amounts of data is less computationally expensive.
 
-Currently, most FL networks include a central server that coordinates the entire process and aggregates the model eights from each of the clients into a single model. This central coordinator is a single point of failure in the network, since it is always required to be online and behave correctly \cite{li_blockchain_2021, 10.48550/arxiv.2110.02182}. To address this, Blockchain-based Federated Learning techniques have been proposed. In these systems, the central server is replaced by a distributed ledger that works with multiple computing servers, eliminating the single point of failure \cite{10.48550/arxiv.2009.09338, 9403374}.
+Currently, most FL networks include a central server that coordinates the entire process and aggregates the model eights from each of the clients into a single model. This central coordinator is a single point of failure in the network, since it is always required to be online and behave correctly \cite{li_blockchain_2021, 10.48550/arxiv.2110.02182}. To address this, Blockchain-based Federated Learning techniques have been proposed. The following are some aspects and properties that Blockchain can bring to Federated Learning when combined:
+
+\begin{itemize}
+    \item \textit{Traceability and Auditability}. Due to the structure of the blockchain, it is possible to trace transactions to their original source, which can be useful for auditability purposes \cite{10.48550/arxiv.1902.01046, 10.48550/arxiv.2110.02182}.
+    
+    \item \textit{Data Immutability and Persistency}. Once transactions are added to the distributed ledger, it is nearly impossible to revert them or change their information \cite{10.48550/arxiv.1902.01046, qu_blockchain-enabled_2022}. This ensures that data is not changed and it can be retrieved after the fact.
+    
+    \item \textit{Decentralization}. The involvement of a central orchestrator is eliminated and the processing of the aggregation is replaced by multiple servers \cite{10.48550/arxiv.2009.09338, 9403374, 10.48550/arxiv.2110.02182, qu_blockchain-enabled_2022}. This improves the resilience and availability of the system.
+    
+    \item \textit{Authentication}. Blockchain ensures the authentication of data and messages due to the verification mechanisms in place, such as the usage of private keys to sign transactions \cite{qu_blockchain-enabled_2022}.
+\end{itemize}
 
 \section{Motivation}\label{intro:motivation}
 

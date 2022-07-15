@@ -16,7 +16,7 @@ Since our framework supports different techniques with different requirements, w
     \item \texttt{Vertical}, which is used with vertically partitioned data, specifically with the Split-CNN. It incorporates the functionality required to provide for an additional phase, the backpropagation, as well as more information about the head and top models.
 \end{itemize}
 
-A class diagram with the public interfaces of the contracts, as well as the data types, is depicted \autoref{fig:contracts-uml}. An interesting aspect to note is that score and accuracy values are stored as integers. Currently, Solidity does not support floating point numbers. To preserve fidelity, the original values are multiplied by a large integer, $10^{18}$. Then, when the values are retrieved from the smart contract, they are divided by the same value in order to get the original value.
+A class diagram with the public interfaces of the contracts, as well as the data types, is depicted \autoref{fig:contracts-uml}.
 
 \begin{figure}[!ht]
     \centering
@@ -25,6 +25,8 @@ A class diagram with the public interfaces of the contracts, as well as the data
     \caption{Smart Contracts Class Diagram}
     \label{fig:contracts-uml}
 \end{figure}
+
+An interesting aspect to note is that score and accuracy values are stored as integers. Currently, Solidity does not support floating point numbers. To preserve fidelity, the original values are multiplied by a large integer, $10^{18}$. Then, when the values are retrieved from the smart contract, they are divided by the same value in order to get the original value.
 
 \section{Library}
 
