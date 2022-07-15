@@ -16,7 +16,7 @@ Not only is it a widely known data set, but also used by the majority of the rev
 
 \section{Data Partitioning}
 
-In this section, we show the horizontal and vertical data partitioning according to the methods described in \Cref{chapter:methodology}. To divide the data horizontally, we used a publicly available tool\footnote{\url{https://github.com/TsingZ0/PFL-Non-IID}} that supports partitioning the MNIST dataset directly using the Dirichlet distribution. We did so for 5, 10, 25 and 50 clients.
+In this section, we show the horizontal and vertical data partitioning according to the methods described in \Cref{chapter:methodology}. To divide the data horizontally, we used a publicly available tool\footnote{\url{https://github.com/TsingZ0/PFL-Non-IID}} that supports partitioning the MNIST data set directly using the Dirichlet distribution. We did so for 5, 10, 25 and 50 clients.
 
 On \autoref{fig:horizontal_dist}, you can visualize the \textit{non-iid} horizontal partitioning for 10 clients. It is possible to see how \textit{non-iid} the distribution is, both in terms of samples amount and in terms of class distribution. For example, client 7 has many samples from classes 2 and 4, while having none of the remaining classes. At the same time, client 10 has a few samples from classes 0, 1, 2 and 9 and many from class 7.
 
@@ -28,7 +28,7 @@ On \autoref{fig:horizontal_dist}, you can visualize the \textit{non-iid} horizon
     \label{fig:horizontal_dist}
 \end{figure}
 
-Regarding vertically partitioning data, it was mentioned in \Cref{subsection:verticalpartitioning} that more details would be provided in the present chapter. The vertical data partitioning highly depends on both the model and the data set. For this experiment, we will use a Split-CNN which will be introduced in the next section. To use such model, the owner is expected to have the labels, while the clients are expected to some features of each sample. In the case of the MNIST dataset, we can think of the features as vertical segments of the image. To divide a 28 by 28 image sample between 2 clients, for example, we split the image into two 14 by 28 segments, as depicted in \autoref{fig:vertical_dist}.
+Regarding vertically partitioning data, it was mentioned in \Cref{subsection:verticalpartitioning} that more details would be provided in the present chapter. The vertical data partitioning highly depends on both the model and the data set. For this experiment, we will use a Split-CNN which will be introduced in the next section. To use such model, the owner is expected to have the labels, while the clients are expected to some features of each sample. In the case of the MNIST data set, we can think of the features as vertical segments of the image. To divide a 28 by 28 image sample between 2 clients, for example, we split the image into two 14 by 28 segments, as depicted in \autoref{fig:vertical_dist}.
 
 \begin{figure}[!ht]
     \centering
@@ -97,7 +97,7 @@ For vertical training, we use a dual-headed, or four-headed, Split-CNN \cite{10.
 
 \section{Hardware and Software Specifications}
 
-The experiments were executed in a remote machine whose hardware and software specifications can be found in \autoref{tab:temps}. Due to resource limitations, it was not possible to have a machine with GPU. Furthermore, if we consider that Federated Learning systems are being run in IoT clients, it is unlikely that such low-powered devices would have a GPU available. In addition, the MNIST dataset and the models in use are relatively simple, which means that they can be easily trained using a CPU. Nonetheless, it is worth mentioning that the training process would be faster in machines with a GPU.
+The experiments were executed in a remote machine whose hardware and software specifications can be found in \autoref{tab:temps}. Due to resource limitations, it was not possible to have a machine with GPU. Furthermore, if we consider that Federated Learning systems are being run in IoT clients, it is unlikely that such low-powered devices would have a GPU available. In addition, the MNIST data set and the models in use are relatively simple, which means that they can be easily trained using a CPU. Nonetheless, it is worth mentioning that the training process would be faster in machines with a GPU.
 
 \begin{table}[!h]
     \begin{subtable}[h]{0.59\textwidth}
