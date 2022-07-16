@@ -1,6 +1,8 @@
-\todo{}
-    
+In this thesis, we explored different properties of Blockchain-based Federated Learning systems, as well as how those properties impact the system in terms of execution time, accuracy and resource consumption. In addition, we also designed and implemented a modular framework for BFL such that we could perform our experiments, as well as empower future research. Specifically, we started this thesis by setting the main research question of \textit{"What is the impact of different Blockchain-based Federated Learning properties and techniques on execution time, convergence and accuracy, as well as communication and computation costs?"}. The answer to this question will be discussed further ahead.
+
 \section{General Conclusions}\label{conclusions:general}
+
+% Blockchain properties: traceability, auditability / immutability, persistency / decentralization / authentication
 
 % Latency: there is always a ~1.5 second latency when waiting for transactions. Considering that each training round has at least $C+S+2$ transactions, that is quite a lot of time. Trade-off between what blockchain offers (traceability, auditability, decentralization, persistency and authentication) vs. time.
 
@@ -29,10 +31,14 @@
 % - Clients + Low Powered = Multi- KRUM
 % - Clients + High Powered = Marginal gain
 
+% Privacy: Multi-KRUM and Marginal Gain
+
 \section{Contributions}\label{conclusions:contributions}
 
+The contributions of this work are as follows:
+
 \begin{enumerate}
-    \item Designed and implemented the first open-source modular framework for Blockchain-based Federated Learning that can be easily adapted to support new scoring, aggregation and privacy techniques.
+    \item Designed and implemented the first open-source modular framework for Blockchain-based Federated Learning that can be easily adapted to support new scoring, aggregation and privacy techniques. This framework can be used to empower future research.
     
     \item Provided the first comparative study of how different aspects of Blockchain-based Federated Learning, namely consensus algorithms, participant selection techniques and scoring techniques, impact the accuracy, execution time and communication and computation costs.
     
