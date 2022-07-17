@@ -1,37 +1,26 @@
 In this thesis, we explored different properties of Blockchain-based Federated Learning systems, as well as how those properties impact the system in terms of execution time, accuracy and resource consumption. In addition, we also designed and implemented a modular framework for BFL such that we could perform our experiments, as well as empower future research. Specifically, we started this thesis by setting the main research question of \textit{"What is the impact of different Blockchain-based Federated Learning properties and techniques on execution time, convergence and accuracy, as well as communication and computation costs?"}. The answer to this question will be discussed further ahead.
 
-\section{General Conclusions}\label{conclusions:general}
+\section{Evaluation Summary}\label{conclusions:evaluation}
 
-% Blockchain properties: traceability, auditability / immutability, persistency / decentralization / authentication
+Blockchain-based Federated Learning was initially introduced in order to facilitate desirable properties such as traceability, auditability, immutability, persistency, authentication and decentralization. Even though applying blockchain to a Federated Learning system brings these advantages, it also brings some trade-offs. To test this, we designed and implemented the first open-source modular framework that allows many aspects of the system to be easily customized, as well as supporting multiple architectures.
 
-% Latency: there is always a ~1.5 second latency when waiting for transactions. Considering that each training round has at least $C+S+2$ transactions, that is quite a lot of time. Trade-off between what blockchain offers (traceability, auditability, decentralization, persistency and authentication) vs. time.
+In first place, we analyzed the impact of different consensus algorithm. We concluded that different consensus algorithms play a large role on the energy consumption. In terms of computation costs, PoW presented the highest consumption, while QBFT and PoA presented lower consumption. Regarding communication costs, QBFT requires up to three times more network traffic compared to its counterparts. Consequently, we can conclude that PoA is the most cost-efficient algorithm. However, it is criticized due to the degree of decentralization it provides due to the way the validator nodes are chosen. Therefore, we can conclude there is a \textit{trade-off between the degree of decentralization and the energy costs of the consensus algorithm}.
 
-% Consensus Algorithms
-%     Computation Costs: PoW >> QBFT = PoA
-%     Communication Costs: QBFT >> PoW = PoA
-%     PoA can be considered less decentralized, which can be an issue in public networks. Trade-off with degree of decentralization.
-    
-% Participant Selection Methods
-%     Computation and Communication Costs: PoW = QBFT = PoA
-%     Fairness: Random > FCFS
+In third place, we analyzed the impact of different participant selection mechanisms, which revealed to be similar in terms of energy consumption. However, randomly selecting participants revealed to be fairer and provide more stable accuracy convergence, as it gives every client an equal chance of participating in a round as long as the randomness is provided by a uniform distribution.
 
-% Scoring Technique
-%     Computation and Communication Costs:
-%         Server: Multi-KRUM > BlockFlow and Marginal Gain
-%         Clients: BlockFlow and Marginal Gain > Multi-KRUM
-%     Accuracy: Marginal Gain > Multi-KRUM > BlockFlow
+In fourth place, the scoring techniques were analyzed. The scoring mechanisms are required in order to filter worse contributions and prevent attacks, such as poisoning and plagiarism attacks. In addition, the scores are often used in order to give each client a reward for their contribution in order to incentive the client to participate. By adding a scoring technique, the execution time will increase up to twice as much, depending on whether the scoring algorithm is executed at the clients or the servers. There is a clear \textit{trade-off between the different kinds of scoring techniques and the execution time and energy consumption, at both the clients and servers}.
 
-% Decision Tree For Scoring Technique:
-%     Low-Powered
-%         Yes: 1. Multi-KRUM
-%         No: 1. Marginal Gain, 2. BlockFlow
+In fifth place, we analyzed the impact of the number of clients and the privacy degrees on each scoring mechanisms. We concluded that Marginal Gain is the most resilient to both, but also the one that consumes the most energy at the clients. Multi-KRUM revealed to be a good alternative in case the clients are low-powered devices and their communication and computations should be minimized. Finally, BlockFlow revealed to perform the worst in all aspects. We can conclude that there is a \textit{trade-off between accuracy and resiliency, and the resource consumption at the clients}.
 
-% + Clients + Low Powered = Multi-KRUM
-% + Clients + High Powered = Marginal Gain
-% - Clients + Low Powered = Multi- KRUM
-% - Clients + High Powered = Marginal gain
+In sixth, we provided a proof of concept of how Vertical Federated Learning can be applied to a Blockchain-based Federated Learning system.
 
-% Privacy: Multi-KRUM and Marginal Gain
+\section{General Conclusion}\label{conclusions:general}
+
+Overall, we answer our main research question by saying that the addition of the blockchain, namely Ethereum, has impacts both in terms of execution time and resource consumption. The average transaction latency we observed was around $1.5$ seconds. In each round, there are at least $C+S+2$ transactions, where $C$ and $S$ are the number of clients, and servers, respectively. Even though the clients and the servers execute their process in parallel, the transactions latency add up, increasing the execution time. Therefore, we conclude there is a general \textit{trade-off between the benefits of the blockchain and the execution time}.
+
+After all, when adding the blockchain, we are adding a new layer to a system that would otherwise have a single centralized server. In order to achieve decentralization, we require more than one machine to replace the central server. Moreover, this machines must reach a consensus in terms of storage and execution. The costs of getting a system that provides traceability, auditability, immutability, persistency, authentication and decentralization are translated in higher energy costs and execution times.
+
+% It is important (maybe not as we mentioned this before) to refer that, as mentioned previously in this work, there are other architectures. For example, in some architectures the clients are also the servers and the blockchain nodes. That is, the same machines execute all of the processing. However, this would not be feasible in an IoT system, or any other system where low-powered devices are the norm.
 
 \section{Contributions}\label{conclusions:contributions}
 
@@ -49,6 +38,8 @@ The contributions of this work are as follows:
 
 \section{Future Work}\label{conclusions:future_work}
 
-% Build a tool that uses the smart contract to visualize the training process.
+Firstly, it would be interesting to build a GUI for BlockLearning that, not only allows to submit new training requests, but also provides an interactive way of visualizing the steps of the process, as well as transactions and communications.
 
-% Investigate how consensus algorithms tailored for FL could be applied to ethereum such that it is still possible to re-use some part of an already existing and testedblockchain platfor??
+Secondly, it would be worth investigating more methods of scoring mechanisms that do not require evaluating the model with them. Both Marginal Gain and BlockFlow require that the model is evaluated by the clients, which consumes more resources and takes some time. On the other hand, Multi-KRUM scores updates by comparing the weight values directly. It would be interesting to see if such a method could be applied on the clients and if would bring the resource consumption down at the clients.
+
+Finally, research in Blockchain-based Vertical Federated Learning should continue. Vertical Federated Learning solves a unique problem where multiple parties have different features on the same samples. The proof of concept provided in this work uses a very specific model that would not be applicable to many use cases. Therefore, more work into different types of model and architectures is required in order to understand the full potential.

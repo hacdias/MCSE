@@ -13,7 +13,7 @@ As can be seen on \autoref{tab:platf_consensus}, there is a high variety of cons
     
     \item \textit{Proof of Authority (PoA)} is a highly scalable consensus algorithm with high throughput \cite{binance_academy_2020}. However, one of the main criticisms of the PoA is that it goes against decentralization since the validators are manually chosen. Therefore, there is hesitation on using PoA in public networks.
 
-    \item \textit{Proof of Federated Learning (PoFL) \cite{9347812, 10.48550/arxiv.2007.15145} and Proof of Quality (PoQ)} \cite{8843900} are both novel consensus algorithms that integrate the training process in order to reduce the resources and energy consumption. These are custom algorithms and they are not readily available on public blockchain platforms. To use it, developers would either need to implement their custom blockchains, or modify an existing blockchain.
+    \item \textit{Proof of Federated Learning (PoFL)} \cite{9347812, 10.48550/arxiv.2007.15145} and \textit{Proof of Quality (PoQ)} \cite{8843900} are both novel consensus algorithms that integrate the training process in order to reduce the resources and energy consumption. These are custom algorithms and they are not readily available on public blockchain platforms. To use it, developers would either need to implement their custom blockchains, or modify an existing blockchain.
 
     \item \textit{Practical Byzantine Fault Tolerance (PBFT)} allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. However, it will stop working if only 33\% or less nodes are running and it can also have high communication costs due to its three-phase protocol nature.
 
@@ -70,7 +70,7 @@ The costs of model update scoring have not been considered in most of the litera
 
 \section{Privacy Mechanisms}\label{related_work:privacy}
 
-Even though Federated Learning is already more secure than centralized Machine Learning in the sense that the raw data is never shared, the model parameters are still a vector for inference attacks \cite{10.1145/3298981}. To combat this, authors use different privacy mechanisms, such as Differential Privacy \cite{10.48550/arxiv.2007.03856, Peyvandi2022, 9170559} and Homomorphic Encryption \cite{8945913, 8894364}.
+Even though Federated Learning is already more secure than centralized Machine Learning in the sense that the raw data is never shared, the model parameters are still a vector for inference attacks \cite{10.1145/3298981}. Additionally, in Blockchain-based Federated Learning systems, the weights are visible to any other client or participant since the blockchain provides an immutable, traceable and auditable record of the whole process. Consequently, it is important to reduce the vector of attacks when it comes to the model parameters. To combat this, authors use different privacy mechanisms, such as Differential Privacy \cite{10.48550/arxiv.2007.03856, Peyvandi2022, 9170559} and Homomorphic Encryption \cite{8945913, 8894364}.
 
 \section{Conclusions}\label{related_work:conclusions}
 
