@@ -16,7 +16,7 @@ Since clients are heterogeneous and distributed, different communication costs a
 
 During the training process, the raw data never leaves the clients and only a representation of the model, such as model weights, is exchanged with the server in order to compute the global model. However, model weights can be target of inference attacks and leak secret information \cite{10.1145/3298981}.  Consequently, new innovations must be compatible with techniques that guarantee privacy, such as differential privacy, homomorphic encryption, secure multiparty computation or other cryptographic protocols.
 
-After each round of training, the central orchestrator aggregates the local updates. Usually, this is done using a formula known as Federated Averaging (\textit{FedAvg}) \cite{10.48550/arxiv.1602.05629}, which calculates the weighted average of all clients $k \in K$ weights $w^k$:
+After each round of training, the central orchestrator aggregates the local updates. Usually, this is done using a mathematical formula known as Federated Averaging (\textit{FedAvg}) \cite{10.48550/arxiv.1602.05629}, which calculates the weighted average of all clients $k \in K$ weights $w^k$:
 
 \begin{equation}
 w_{t+1} = \sum_{k \in K} \frac{n_k}{n} w_{t+1}^k
