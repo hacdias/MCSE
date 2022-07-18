@@ -20,11 +20,11 @@ The following subsections present the execution flow of the framework, as well a
 The framework supports a modular sequential flow represented on \autoref{fig:blocklearning_steps}. The steps are explained below:
 
 \begin{enumerate}
-    \item In first place, the owner initializes the round. During the round initialization, depending on the participant selection technique, the clients that will participate may be already defined, or not.
+    \item In first place, the owner initializes the round. During the round initialization, depending on the participant selection algorithm, the clients that will participate may be already defined, or not.
     
     \item In second place, the trainers retrieve the information about the round, such as the global weights from the last round, and train the model using their local data. Then, the trainers submit their updates.
     
-    \item In third place, if there is a scoring mechanism enabled, the scorers retrieve the updates and calculate the scores. Then, they submit their scores.
+    \item In third place, if there is a scoring algorithm enabled, the scorers retrieve the updates and calculate the scores. Then, they submit their scores.
     
     \item In fourth place, the aggregators retrieve the updates and execute the aggregation algorithm and submit the aggregation results.
     
@@ -118,39 +118,39 @@ Since the vertical partitioning is more dependent on the data set and ML model i
 
 \section{Experiments}\label{meth:experiments}
 
-The conducted experiments can be divided into six groups, of which five compare how using different algorithms and properties impact the system. These five groups can be divided as: consensus algorithms, participant selection techniques, scoring techniques, number of clients and privacy degrees. The sixth group of experiments is dedicated to show a proof of concept of how vertical federated learning can be applied to a Blockchain-based Federated Learning system.
+The conducted experiments can be divided into six groups, of which five compare how using different types of algorithm impact the system. These five groups can be divided as: consensus algorithms, participant selection algorithms, scoring algorithms, number of clients and privacy degrees. The sixth group of experiments is dedicated to show a proof of concept of how vertical federated learning can be applied to a BFS system.
 
 Even though all experiment groups compare different things, there are certain aspects that are common to all of the experiments. Firstly, all experiments are run for 50 rounds. 50 rounds was chosen such that we can compare the accuracy results to other papers in order to ensure that our experiments are within the expected values. Secondly, all experiments are run with 10 computing servers, as well as 10 blockchain nodes. In practical settings, these would likely be the same machines. However, in order to be able to compare the individual effects in the services we run on the computing servers and in the blockchain nodes, these will be treated as separate entities.
 
 \subsection{Consensus Algorithms}
 
-In the first experiment group, we compare different consensus algorithms in order to analyze their impact, if any, in accuracy, convergence, communication and computation costs. To do so, we execute three experiments with 25 training clients, random participants selection and no scoring technique. In each experiment, we use a different consensus algorithm: PoA, PoW and QBFT.
+In the first experiment group, we compare different consensus algorithms in order to analyze their impact, if any, in accuracy, convergence, communication and computation costs. To do so, we execute three experiments with 25 training clients, random participants selection and no scoring algorithm. In each experiment, we use a different consensus algorithm: PoA, PoW and QBFT.
 
-\subsection{Participant Selection Techniques}
+\subsection{Participant Selection Algorithms}
 
-In the second experiment group, we compare different participant selection techniques. Similarly to the previous experiment group, we set the number of clients at 25 and no scoring technique. In addition, the consensus algorithm is set to PoA and then we execute two experiments: one using random selection, and the other using a first come first served basis selection.
+In the second experiment group, we compare different participant selection algorithms. Similarly to the previous experiment group, we set the number of clients at 25 and no scoring algorithm. In addition, the consensus algorithm is set to PoA and then we execute two experiments: one using random selection, and the other using a first come first served basis selection.
 
-\subsection{Scoring Techniques}
+\subsection{Scoring Algorithms}
 
-In the third experiment group, we compare the different scoring techniques. To do so, we use the PoA consensus algorithm, 25 clients and random client selection. Then, we run an experiment for each scoring technique: BlockFlow, Marginal Gain and Multi-KRUM, as well as without a scoring technique.
+In the third experiment group, we compare the different scoring algorithms. To do so, we use the PoA consensus algorithm, 25 clients and random client selection. Then, we run an experiment for each scoring algorithm: BlockFlow, Marginal Gain and Multi-KRUM, as well as without a scoring algorithm.
 
 \subsection{Number of Clients}
 
-In the fourth experiment group, for each of the scoring mechanisms, we analyze the impact of the number of clients. The environment settings are the same as for the scoring techniques, except that we vary the number of clients: 5, 10, 25, 50. These number of clients were decided based on the current literature and on the available resources we have at our disposal to execute the experiments.
+In the fourth experiment group, for each of the scoring algorithm, we analyze the impact of the number of clients. The environment settings are the same as for the scoring algorithms, except that we vary the number of clients: 5, 10, 25, 50. These number of clients were decided based on the current literature and on the available resources we have at our disposal to execute the experiments.
 
 \subsection{Privacy Degrees}
 
-In the fifth experiment group, for each of the scoring mechanisms, we compare the impact of different privacy degrees. To do so, we have a similar environment to the previous experiment. However, the number of clients is fixed at 25. Then, we vary the privacy degree by setting the $\epsilon$ parameter for the local differential privacy. The privacy degrees tested are none, $\epsilon = 1$ and $\epsilon = 5$, which allows us to test the impact of a high level of privacy, as well as a lower one.
+In the fifth experiment group, for each of the scoring algorithms, we compare the impact of different privacy degrees. To do so, we have a similar environment to the previous experiment. However, the number of clients is fixed at 25. Then, we vary the privacy degree by setting the $\epsilon$ parameter for the local differential privacy. The privacy degrees tested are none, $\epsilon = 1$ and $\epsilon = 5$, which allows us to test the impact of a high level of privacy, as well as a lower one.
 
 \subsection{Vertical Federated Learning}
 
-In the sixth and last experiment group, we investigate whether or not it is possible to implement and run a Blockchain-base Federated Learning with vertically partitioned data. Two experiments are run for this group with 2 and 4 clients. The low number of clients is due to the nature of the data set and how we partition the data vertically. In addition, this experiment will not include a scoring mechanism of participation selection technique.
+In the sixth and last experiment group, we investigate whether or not it is possible to implement and run a Blockchain-based Federated Learning with vertically partitioned data. Two experiments are run for this group with 2 and 4 clients. The low number of clients is due to the nature of the data set and how we partition the data vertically. In addition, this experiment will not include a scoring or participation selection algorithm.
 
 As mentioned in \Cref{background:archfl}, Vertical Federated Learning systems have an additional step where the Private Set Intersection (PSI) of the client's data sets is calculated. In this work, we assume that the PSI is calculated beforehand and that it is already known to all devices. In future works, it would be interesting to integrate a PSI mechanism into the framework.
 
 \section{Metrics}\label{meth:metrics}
 
-To compare the different experiments, we define a set of metrics regarding to the different categories of aspects we are comparing: execution time, accuracy, communication and computation costs.
+To compare the different experiments, we define a set of metrics regarding to the different aspects we are comparing: execution time, accuracy, communication and computation costs.
 
 To compare execution time, we define two metrics: the \textit{End-to-end (E2E) execution time} and the \textit{Mean Round Execution Time}. The former is defined by the time it takes for an experiment to execute from start to end. The latter is defined by the mean time it takes to complete a round, which can be calculated by dividing the E2E Execution Time by the number of rounds of the experiment.
 
@@ -162,4 +162,4 @@ To compare communication costs, we define the \textit{Network Traffic Per Round}
 
 To compare the computation costs, we collect the \textit{RAM Usage} and \textit{CPU Usage}. Similarly to the communication costs, both these metrics are collected at the blockchain nodes, computing servers and training clients.
 
-It is important to note that while in practical settings the blockchain nodes would be running at the computing servers, we collect the data separately so we can compare on how different aspects influence the blockchain nodes or the processes running on the computing server individually.
+It is important to note that while in practical settings the blockchain nodes would be running at the computing servers, we collect the data separately so we can compare on how different algorithms influence the blockchain nodes or the processes running on the computing server individually.

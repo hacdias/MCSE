@@ -1,17 +1,17 @@
-In Blockchain-based Federated Learning systems, there are different properties that are need to be taken into consideration when building the system. In this chapter, we go over different properties and what variations are used in the literature.
+In Blockchain-based Federated Learning (BFL) systems, there are different algorithms that need to be taken into consideration when building the system. In this chapter, we go over these algorithms and their variations used in the literature.
 
 \section{Consensus Algorithms}\label{related_work:consensus_algorithms}
 
-One of the most important aspects of blockchain technology is the consensus algorithm. Consensus is the process of reaching an agreement on a single value among different distributed processes. These algorithms are designed to be reliable even on networks that have unreliable nodes. In blockchain, the consensus algorithm is used to reach consensus on the next block of the chain.
+One of the most important parts of blockchain technology is the consensus algorithm. Consensus is the process of reaching an agreement on a single value among different distributed processes. These algorithms are designed to be reliable even on networks that have unreliable nodes. In blockchain, the consensus algorithm is used to reach consensus on the next block of the chain.
 
-As can be seen on \autoref{tab:platf_consensus}, there is a high variety of consensus algorithms being used among implementations of BFL systems. Below is a summary of each consensus algorithm, as well as some of their characteristics.
+As it can be seen from \autoref{tab:platf_consensus}, various consensus algorithms have been used for BFL systems. Below is a summary of each of these consensus algorithms.
 
 \begin{itemize}
-    \item \textit{Proof of Work (PoW)} has been used for many years and some of its advantages and disadvantages are now clear. On one hand, it is a simple algorithm where proofs are hard to create, but easy to verify. Not only is it robust and proven to work, but the cost of attacking a PoW blockchain is also extremely high. For an attacker to be successful, they would need to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021, ccaf}. In addition, \cite{10.48550/arxiv.2112.07938} mentions the importance of analyzing the constraints and trade-offs of using PoW with BFL.
+    \item \textit{Proof of Work (PoW)} has been used for many years and some of its advantages and disadvantages are now clear. On one hand, it is a simple algorithm, for which proofs are hard to create, but easy to verify. Not only is it robust and proven to work, but the cost of attacking a PoW blockchain is extremely high. For an attack to be successful, it needs to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021, ccaf}. In addition, authors of  \cite{10.48550/arxiv.2112.07938} mentions the importance of analyzing the constraints and trade-offs of using PoW with BFL.
 
     \item \textit{Proof of Stake (PoS)}, in contrast to PoW, does not require high computational resources from the blockchain nodes and therefore the energy consumption can be kept lower. In addition, it allows for fast throughput and nodes are incentivized to behave correctly through the rewarding system \cite{li_blockchain_2021}. On the other hand, some nodes may have excessive influence over the transaction verification process \cite{li_blockchain_2021}. In either case, the details vary from implementation to implementation.
     
-    \item \textit{Proof of Authority (PoA)} is a highly scalable consensus algorithm with high throughput \cite{binance_academy_2020}. However, one of the main criticisms of the PoA is that it goes against decentralization since the validators are manually chosen. Therefore, there is hesitation on using PoA in public networks.
+    \item \textit{Proof of Authority (PoA)} is a highly scalable consensus algorithm with high throughput \cite{binance_academy_2020}. However, one of the main criticisms on the PoA is that it goes against decentralization since the validators are manually chosen. Therefore, there is hesitation on using PoA in public networks.
 
     \item \textit{Proof of Federated Learning (PoFL)} \cite{9347812, 10.48550/arxiv.2007.15145} and \textit{Proof of Quality (PoQ)} \cite{8843900} are both novel consensus algorithms that integrate the training process in order to reduce the resources and energy consumption. These are custom algorithms and they are not readily available on public blockchain platforms. To use it, developers would either need to implement their custom blockchains, or modify an existing blockchain.
 
@@ -39,34 +39,34 @@ Off-chain Storage & \cite{10.1145/3319535.3363256, 10.48550/arxiv.2011.07516, 89
 
 As can be seen per \Cref{tab:storage}, most implementations prefer on-chain storage. However, these implementations also use custom blockchain implementations \cite{8733825, 9524833, 8894364, 9184854, 8893114}, which means that they can implement a platform that has different restrictions on how much data a smart contract can handle. When it comes to using already existing blockchain platforms, such as Ethereum, most implementations prefer off-chain storage using a system such as the InterPlanetary File System (IPFS) \cite{10.48550/arxiv.2007.03856, 8945913, Peyvandi2022, 9170559, 10.1145/3319535.3363256, 10.48550/arxiv.2011.07516}.
 
-\section{Participants Selection Techniques}\label{related_work:participants_selection}
+\section{Participants Selection Algorithms}\label{related_work:participants_selection}
 
 Usually, only some clients participate in each round. The process of choosing the clients that participate in each round can vary and have different costs. In most cases, the clients were chosen \textit{randomly} \cite{Peyvandi2022, demo, 9293091}, both the number of clients participating and which clients to participate. In some other systems, clients are allowed to take initiative, operating in a \textit{first come, first served} basis \cite{9184854, FANG20221}. In these systems, a pre-defined number of required clients is set and once enough clients have submitted their updates, the aggregation takes place.
 
-\section{Scoring and Aggregation Techniques}\label{related_work:scoring_techniques}
+\section{Scoring and Aggregation Algorithms}\label{related_work:scoring_techniques}
 
 During the training process, each training client produces their parameter updates and communicates them to the computing devices through the blockchain in order to be aggregated. However, there are different security aspects that should be taken into account here as the parameter updates creates a vector for different attacks, such as poisoning attacks and plagiarism attacks.
 
 \begin{itemize}
     \item \textit{Poisoning attacks} happen when training clients willingly send parameter updates that decrease the quality of the model. They may have been generated using an honestly unreliable data set, or done on purpose. To avoid other participants to provide unreliable data in order to degrade the model performance, there are dynamic verification techniques that allow to ignore low quality data \cite{10.48550/arxiv.2110.02182, 10.48550/arxiv.2104.10501}.
     
-    \item \textit{Plagiarism attacks} happen when lazy clients plagiarize other client's models updates without real training \cite{9403374}, which can be addressed via pseudo-noise techniques \cite{10.48550/arxiv.2009.09338}.
+    \item \textit{Plagiarism attacks} happen when lazy clients plagiarize other client's models updates without real training \cite{9403374}, which can be addressed via pseudo-noise algorithms \cite{10.48550/arxiv.2009.09338}.
 \end{itemize}
 
-Most of the current literature focus on poisoning attacks, as they can affect the most the final model performance. In addition, plagiarism attacks within the same round can be avoided by secure communication methods, such as differential privacy; and plagiarism attacks where a node reuses parameters from a previous round can be avoided by simply hashing the parameter values and performing a comparison. It is important to notice that different verification techniques directly affect the security model of the system \cite{10.48550/arxiv.2110.02182}. There are different solutions found in the literature regarding verification:
+Most of the current literature focus on poisoning attacks, as they can affect the most the final model performance. In addition, plagiarism attacks within the same round can be avoided by secure communication methods, such as differential privacy; and plagiarism attacks where a node reuses parameters from a previous round can be avoided by simply hashing the parameter values and performing a comparison. It is important to notice that different verification algorithms directly affect the security model of the system \cite{10.48550/arxiv.2110.02182}. There are different solutions found in the literature regarding verification:
 
 \begin{itemize}
-    \item \textit{Integrated Consensus Techniques}. Some authors implement their own blockchain systems, which allows them to design their own consensus algorithm dedicated to Federated Learning. This consensus techniques can use properties from the training process directly in order to detect which updates to accept or reject \cite{9293091, 10.1007/978-981-15-9213-3_12}.
+    \item \textit{Integrated Consensus Algorithms}. Some authors implement their own blockchain systems, which allows them to design their own consensus algorithm dedicated to Federated Learning. This consensus algorithm can use properties from the training process directly in order to detect which updates to accept or reject \cite{9293091, 10.1007/978-981-15-9213-3_12}.
     
     \item \textit{Random Committee}. In some works, a random set of participants is selected as committee and they must vote whether or not the model updates should be accepted. The decision to accept is based on the amount of votes that each submission received \cite{9159643}. There are different algorithms to decide on how voting works, such as voting in favor or against depending if it increases the performance relatively to the previous model or not.
     
     \item \textit{Points-based System}. Points-based system, also known as reputation-based system, usually work by giving clients with consistently high quality data and updates higher amounts of points. Then, the updates with less points are either rejected, or they have a smaller influence on the aggregation  \cite{10.48550/arxiv.2011.07516, 9170559, Peyvandi2022, 9292450}.
     
-    \item \cite{8945913} implements a novel verification technique based on the trend of the validation error accuracy. To implement this, the updates by each training device are validated using a public validation data set known to all devices. The result of this validation will also influence the reward distribution.
+    \item \cite{8945913} implements a novel verification algorithm based on the trend of the validation error accuracy. To implement this, the updates by each training device are validated using a public validation data set known to all devices. The result of this validation will also influence the reward distribution.
 
 \end{itemize}
 
-The costs of model update scoring have not been considered in most of the literature and it is important to understand the trade-off between system costs and the different scoring techniques \cite{9403374, 10.48550/arxiv.2110.02182}.
+The costs of model update scoring have not been considered in most of the literature and it is important to understand the trade-off between system costs and the different scoring algorithms\cite{9403374, 10.48550/arxiv.2110.02182}.
 
 \section{Privacy Mechanisms}\label{related_work:privacy}
 
@@ -74,12 +74,13 @@ Even though Federated Learning is already more secure than centralized Machine L
 
 \section{Conclusions}\label{related_work:conclusions}
 
-In this literature review, we can take three conclusions. Firstly, there is a clear lack on how different properties of a BFL system, such as consensus algorithms, scoring techniques, number of devices, impact the accuracy, communication and computation costs of the system. This was also pointed out on a recent survey \cite{9403374} and it seems it was not addressed yet. Therefore, this work intends to fill such gap by providing a detailed analysis on how some of this properties and algorithms influence convergence, accuracy, communication and computation costs of the system.
+In this literature review, we can take three conclusions. Firstly, there is a clear lack on how different aspects of a BFL system, such as consensus algorithms, scoring algorithms, number of devices, impact the accuracy, communication and computation costs of the system. This was also pointed out on a recent survey \cite{9403374} and it seems it was not addressed yet. Therefore, this work intends to fill such gap by providing a detailed analysis on how some of this es and algorithms influence convergence, accuracy, communication and computation costs of the system.
 
-Secondly, even though there are many works on designing BFL frameworks, very few are released to the public, or modular. In this thesis, we will work on designing and implementing a modular BFL framework that can be easily changed to support new techniques and will be available to the public to empower future research.
+Secondly, even though there are many works on designing BFL frameworks, very few are released to the public, or modular. In this thesis, we will work on designing and implementing a modular BFL framework that can be easily changed to support new algorithms and will be available to the public to empower future research.
 
 Lastly, to the best of our knowledge, there is only one work that argues that it is possible to implement Vertical Federated Learning in a BFS setting. This can be seen on \autoref{tab:data_distribution}, which shows the majority of the BFL works pertain only Horizontal Federated Learning. With this being said, we also would like to understand if such thing is feasible, and if so, implement it on our modular framework.
 
+\input{tables/data_distribution}
+
 \input{tables/platforms_consensus}
 
-\input{tables/data_distribution}

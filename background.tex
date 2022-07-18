@@ -1,4 +1,4 @@
-As mentioned in \Cref{chapter:introduction} and \Cref{chapter:related_work}, this thesis focuses on comparing different aspects of Blockchain-based Federated Learning, such as the impact of specific properties of the Blockchain platform the system runs on, and aspects of the Federated Learning process. This chapter gives an overview of the fundamental concepts and the techniques selected for some of the properties that will be compared.
+As mentioned in \Cref{chapter:introduction} and \Cref{chapter:related_work}, this thesis focuses on comparing different algorithms of Blockchain-based Federated Learning (BFS). This chapter gives an overview of the fundamental concepts and the selected algorithms that will be compared.
 
 \section{Machine Learning}\label{background:machine_learning}
 
@@ -94,7 +94,7 @@ As can be seen in \autoref{tab:platf_consensus}, around half of the implementati
 
 \subsection{Consensus Algorithm}\label{background:consensus_algorithms}
 
-The consensus algorithm is one of the most important properties of a Blockchain platform, as it makes it possible for the decentralized blockchain nodes to reach an agreement on what block comes next. In this work, we compare Proof of Work, Proof of Authority and a Byzantine Fault Tolerance-based consensus algorithm.
+The consensus algorithm is one of the most important parts of a Blockchain platform, as it makes it possible for the decentralized blockchain nodes to reach an agreement on what block comes next. In this work, we compare Proof of Work, Proof of Authority and a Byzantine Fault Tolerance-based consensus algorithm.
 
 \begin{itemize}
     \item The PoW consensus algorithm was first introduced in the context of blockchain platforms by Satoshi Nakamoto in Bitcoin \cite{nakamoto2009bitcoin}. PoW works by means of computation effort proofs, where a set of virtual miners race in solving a complex, yet feasible, mathematical problem. The winner of the race generates a cryptographic proof based on the solution of the problem that can be easily verified by others. Then, the winner adds a new block containing the newly verified transactions to the blockchain. In addition, the winner is rewarded according to some pre-determined rules.
@@ -108,7 +108,7 @@ The consensus algorithm is one of the most important properties of a Blockchain 
 
 Recently, the idea of applying blockchain to Federated Learning has emerged. This is motivated by the fact that FL architectures are highly dependent on a single central server, leading to a central point of failure, that can be either overloaded or compromised. With blockchain, the central server can be replaced by multiple decentralized servers that operate the blockchain nodes. In addition, blockchain can provide authentication, traceability, auditability and data preservation.
 
-Since Blockchain-based Federated Learning is a new concept, there are different architectures proposed in the literature \cite{10.48550/arxiv.2110.02182}: \textit{Fully Coupled BFL}, \textit{Flexibly Coupled BFL} and \textit{Loosely Coupled BFL}. Even though the modular framework we build in this work is capable of operating in different architectures, we focus on what is called Flexibly Coupled BFL.
+Since BFL is a new concept, there are different architectures proposed in the literature \cite{10.48550/arxiv.2110.02182}: \textit{Fully Coupled BFL}, \textit{Flexibly Coupled BFL} and \textit{Loosely Coupled BFL}. Even though the modular framework we build in this work is capable of operating in different architectures, we focus on what is called Flexibly Coupled BFL.
 
 \begin{figure}[!ht]
     \centering
@@ -120,14 +120,14 @@ Since Blockchain-based Federated Learning is a new concept, there are different 
 
 In a Flexibly Coupled BFL architecture, the blockchain nodes are decoupled from the clients, and run by separate servers. This servers are also responsible for maintaining the blockchain nodes and use the blockchain to store information such as aggregations, scores, among others. The architecture is depicted in \autoref{fig:bfl_arch}.
 
-\subsection{Participants Selection Techniques}
+\subsection{Participants Selection Algorithms}
 
-For the participants selection technique, only random selection and first come, first served-basis selection will be compared. In the former, both the amount of participants and the participants themselves are selected randomly before the start of each round. In the latter, each participant takes initiative to register for the the next round. Once the limit is reached, no more participants are allowed.
+For the participants selection algorithms, only random selection and first come, first served-basis selection will be compared. In the former, both the amount of participants and the participants themselves are selected randomly before the start of each round. In the latter, each participant takes initiative to register for the the next round. Once the limit is reached, no more participants are allowed.
 
-\subsection{Scoring and Aggregation Techniques}
+\subsection{Scoring and Aggregation Algorithms}
 \label{background:scoring}
 
-Scoring techniques are used to give each client, or its submission, a score. Based on this score, the submission may have more or less impact on the aggregation, if any at all. In addition, scores are used for reward mechanisms in systems where public models are being trained and clients need some sort of incentive to keep participating \cite{8945913, 8832210, 8905038, 9006344}. In this section, we explain briefly how each of the scoring techniques that will be compared works and if they influence the aggregation algorithm.
+Scoring algorithms are used to give each client, or its submission, a score. Based on this score, the submission may have more or less impact on the aggregation, if any at all. In addition, scores are used for reward mechanisms in systems where public models are being trained and clients need some sort of incentive to keep participating \cite{8945913, 8832210, 8905038, 9006344}. In this section, we explain briefly how each of the scoring algorithms that will be compared works and if they influence the aggregation algorithm.
 
 \subsubsection{BlockFlow Score}
 

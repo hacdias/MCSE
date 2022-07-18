@@ -4,14 +4,14 @@ In this chapter, we go over the implementation details of the BlockLearning fram
 
 The first part of the framework is the smart contracts. As mentioned previously, this work uses the Ethereum\footnote{\url{https://ethereum.org/en/}} blockchain platform. Therefore, the smart contracts must be implemented in a programming language that supports Ethereum. We chose the Solidity\footnote{\url{https://soliditylang.org/}} programming language as it is the most well-known with the widest support.
 
-Since our framework supports different techniques with different requirements, we implemented four different smart contracts. These smart contracts inherit most of their functionality from an abstract smart contract that provides the common data structures and functionality, named \texttt{Base}. Then, we implement the following classes, that derive from \texttt{Base}:
+Since our framework supports different algorithms with different requirements, we implemented four different smart contracts. These smart contracts inherit most of their functionality from an abstract smart contract that provides the common data structures and functionality, named \texttt{Base}. Then, we implement the following classes, that derive from \texttt{Base}:
 
 \begin{itemize}
     \item \texttt{NoScoring}, which is used when we do not need a scoring mechanism. It only adds a new function to the \texttt{Base} class in order to allow the owner to start a round.
     
     \item \texttt{Scoring}, which is used when we need a scoring mechanism. This smart contract implements the required methods to support the scoring phase, such as scoring submissions and the scoring round.
     
-    \item \texttt{FirstComeFirstServed}, which is used with the "first come, first served" participant selection technique. It overrides some of the \texttt{Base} functions in order to register participants to the round as they submit their updates.
+    \item \texttt{FirstComeFirstServed}, which is used with the "first come, first served" participant selection algorithm. It overrides some of the \texttt{Base} functions in order to register participants to the round as they submit their updates.
     
     \item \texttt{Vertical}, which is used with vertically partitioned data, specifically with the Split-CNN. It incorporates the functionality required to provide for an additional phase, the backpropagation, as well as more information about the head and top models.
 \end{itemize}
