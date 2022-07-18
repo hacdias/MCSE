@@ -4,7 +4,7 @@ In this chapter, we analyze the fifth experiment group, that is, the impact of h
 
 On \autoref{fig:priv_metrics}, we show the metrics regarding the execution time and transaction cost and latency per privacy degree for each of the scoring algorithm.
 
-As we can see per the figure, adding a privacy mechanism increases each round time by approximately $16.6$ seconds. From this 16.6 seconds, 10 seconds directly caused by the differential privacy mechanism. The remaining are caused by slight fluctuations on communication time, such as waiting for all devices to submit their updates after applying the differential privacy. Therefore, we can conclude that there is a trade-off between execution time and privacy level. However, the privacy degree does not seem to influence the execution time significantly.
+As we can see per the figure, adding a privacy mechanism increases each round time by approximately $16.6$ seconds. From this 16.6 seconds, 10 seconds directly caused by the differential privacy mechanism. The remaining are caused by slight fluctuations on communication time, such as waiting for all clients to submit their updates after applying the differential privacy. Therefore, we can conclude that there is a trade-off between execution time and privacy level. However, the privacy degree does not seem to influence the execution time significantly.
 
 Regarding transaction latency and costs, having a privacy mechanism or not in place does not create significant changes. This is expected since the communications with the blockchain remain the same whether or not the clients apply a differential privacy mechanism to their weights or not. 
 
@@ -67,13 +67,13 @@ In terms of communication costs, depicted in \autoref{fig:net_privacy}, there ar
 
 Finally, we look into the computation costs, that is, the RAM and CPU usage across the different types of devices. Since these require a large amount of plots, they are located at the end of the chapter. The privacy mechanisms should only impact the clients, as those are the ones applying the algorithms to their own weights. Therefore, any resource consumption changes should only be visualized in the clients.
 
-As can be seen in \autoref{fig:ram_privacy_clients}, the privacy mechanisms have no significant impact on RAM usage. The mechanism has little to no RAM consumption when compared to the total required for the training process. In contrast, the CPU usage is higher, not necessarily by usage percentage, but by longer usage times. This can be seen in \autoref{fig:cpu_privacy_clients} and is explained by the execution of the privacy mechanism.
+As can be seen in \autoref{fig:ram_privacy_clients}, the privacy mechanisms have no significant impact on RAM usage. The mechanism has little to no RAM consumption when compared to the total required for training. In contrast, the CPU usage is higher, not necessarily by usage percentage, but by longer usage times. This can be seen in \autoref{fig:cpu_privacy_clients} and is explained by the execution of the privacy mechanism.
 
-As aforementioned, there are no expected changes in RAM or CPU usage at the servers or blockchain nodes.  The only difference presented at the remaining devices, servers and blockchain nodes, is that the process took longer to complete since they had to wait for the clients to train and process the weights, which takes longer. This can be visualized in the remaining plots.
+As aforementioned, there are no expected changes in RAM or CPU usage at the servers or blockchain processes. The only difference presented at the remaining processes, servers and blockchain, is that the process took longer to complete since they had to wait for the clients to train and process the weights, which takes longer. This can be visualized in the remaining plots.
 
 \section{Conclusions}
 
-In conclusion, we have seen that using privacy mechanisms increases the computation costs, and therefore, the resource consumption, at the training clients. This leads to longer mean round execution times as each client has to process their weights and add noise. Consequently, there is a clear trade-off between execution time and privacy. However, increasing the privacy degree does not increase the time.
+In conclusion, we have seen that using privacy mechanisms increases the computation costs, and therefore, the resource consumption, at the clients. This leads to longer mean round execution times as each client has to process their weights and add noise. Consequently, there is a clear trade-off between execution time and privacy. However, increasing the privacy degree does not increase the time.
 
 In addition, we visualized that increasing a privacy degree leads to lower accuracy. This is expected since the privacy mechanisms used introduce noise in the weights. However, some of the scoring algorithms have a higher resiliency and are able to still achieve higher accuracy values even with high privacy degrees. This is the case of Marginal Gain and Multi-KRUM, which are the most well-performing algorithms.
 
@@ -84,7 +84,7 @@ Finally, we can argue that adding a privacy preserving mechanism to a BFS system
 \begin{figure}[!h]
     \centering
     \includegraphics[width=\textwidth]{graphics/privacy/ram_client.pdf}
-    \caption{RAM Usage on Training Clients Per Privacy Degree}
+    \caption{Client Process RAM Usage Per Privacy Degree}
     \label{fig:ram_privacy_clients}
 \end{figure}
 
@@ -93,7 +93,7 @@ Finally, we can argue that adding a privacy preserving mechanism to a BFS system
 \begin{figure}[!h]
     \centering
     \includegraphics[width=\textwidth]{graphics/privacy/ram_server.pdf}
-    \caption{RAM Usage on Computing Servers Per Privacy Degree}
+    \caption{Server Process RAM Usage Per Privacy Degree}
     \label{fig:ram_privacy_servers}
 \end{figure}
 
@@ -102,7 +102,7 @@ Finally, we can argue that adding a privacy preserving mechanism to a BFS system
 \begin{figure}[!h]
     \centering
     \includegraphics[width=\textwidth]{graphics/privacy/ram_miner.pdf}
-    \caption{RAM Usage on Training Clients Per Privacy Degree}
+    \caption{Blockchain Process RAM Usage Per Privacy Degree}
     \label{fig:ram_privacy_miners}
 \end{figure}
 
@@ -111,7 +111,7 @@ Finally, we can argue that adding a privacy preserving mechanism to a BFS system
 \begin{figure}[!h]
     \centering
     \includegraphics[width=\textwidth]{graphics/privacy/cpu_client.pdf}
-    \caption{CPU Usage on Training Clients Per Privacy Degree}
+    \caption{Client Process CPU Usage Per Privacy Degree}
     \label{fig:cpu_privacy_clients}
 \end{figure}
 
@@ -120,7 +120,7 @@ Finally, we can argue that adding a privacy preserving mechanism to a BFS system
 \begin{figure}[!h]
     \centering
     \includegraphics[width=\textwidth]{graphics/privacy/cpu_server.pdf}
-    \caption{CPU Usage on Computing Servers Per Privacy Degree}
+    \caption{Server Process CPU Usage Per Privacy Degree}
     \label{fig:cpu_privacy_servers}
 \end{figure}
 
@@ -129,7 +129,7 @@ Finally, we can argue that adding a privacy preserving mechanism to a BFS system
 \begin{figure}[!h]
     \centering
     \includegraphics[width=\textwidth]{graphics/privacy/cpu_miner.pdf}
-    \caption{CPU Usage on Blockchain Nodes Per Privacy Degree}
+    \caption{Blockchain Process CPU Usage Per Privacy Degree}
     \label{fig:cpu_privacy_miners}
 \end{figure}
 

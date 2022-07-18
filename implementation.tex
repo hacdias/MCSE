@@ -47,7 +47,7 @@ The first part of the library is the aggregation, scoring and privacy algorithms
 
 The second part of the library is the utilities to store and retrieve the weights, as well as the smart contract bridge. The weights storage class also provides a common interface such that it is possible to change which storage provider we use. As for our experiments, we use IPFS, explained in \Cref{background:ipfs}, similarly to many other works. The smart contract bridge is a class that creates a 1:1 connection with the functions from the smart contracts.
 
-The third and final part of the library is the \texttt{Trainer}, \texttt{Scorer} and \texttt{Aggregator} classes. These classes implement the main flow of each of these procedures using the modules aforementioned described. For example, the trainer class is initialized with the contract bridge, the weights storage, the model, the data and an optional privacy mechanism. Then, it provides a method \texttt{train()} that executes the training procedure. Similarly, the scorer class provides \texttt{score()} and the aggregator class provides \texttt{aggregator}.
+The third and final part of the library is the \texttt{Trainer}, \texttt{Scorer} and \texttt{Aggregator} classes. These classes implement the main flow of each of these procedures using the modules aforementioned described. For example, the trainer class is initialized with the contract bridge, the weights storage, the model, the data and an optional privacy mechanism. Then, it provides a method \texttt{train()} that executes the training procedure. Similarly, the scorer class provides \texttt{score()} and the aggregator class provides \texttt{aggregate()}.
 
 \section{Testbed}
 
@@ -57,9 +57,9 @@ In the testbed, we have two major components: the client, server and owner scrip
 
 \subsection{Client, Server and Owner Scripts}
 
-The client, server and owner scripts are the processes that will run at the client, server and owner, respectively. These are implemented using the BlockLearning library. In each of these processes, we first load the required data, such as the data set in the clients, and initialize the required algorithms, namely the scoring, aggregation and privacy algorithms.
+The client, server and owner scripts are the processes that will run at the client, server and owner, respectively. These are implemented using the BlockLearning library. In each of these scripts, we first load the required data, such as the data set in the clients, and initialize the required algorithms, namely the scoring, aggregation and privacy algorithms.
 
-Then, depending on the scoring algorithm, we initialize the relevant classes at the correct machines. For example, for the BlockFlow scoring algorithm, the client initializes a \texttt{Trainer} and a \texttt{Scorer}, while the server initializes an \texttt{Aggregator}. In contrast, for Multi-KRUM, the client only initializes a \texttt{Trainer}, while the server initializes an \texttt{Aggregator} and a \texttt{Scorer}. On \autoref{alg:client_loop} you can visualize part of the main loop of the  client script.
+Then, depending on the scoring algorithm, we initialize the relevant classes at the correct machines. For example, for the BlockFlow scoring algorithm, the client initializes a \texttt{Trainer} and a \texttt{Scorer}, while the server initializes an \texttt{Aggregator}. In contrast, for Multi-KRUM, the client only initializes a \texttt{Trainer}, while the server initializes an \texttt{Aggregator} and a \texttt{Scorer}. On \autoref{alg:client_loop} you can visualize part of the main loop of the client script.
 
 \begin{algorithm}
 \caption{Client Script Main Loop}\label{alg:client_loop}

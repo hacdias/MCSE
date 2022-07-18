@@ -1,10 +1,10 @@
-In this chapter, we provide information regarding the design and research methods used to design the framework, as well as the experiments. To be more precise, this chapter focuses on the framework design, the client sampling, the experiments and the metrics.
+In this chapter, we provide information regarding the design of the framework, as well as of the experiments. To be more precise, this chapter focuses on the framework design, the client sampling, the experiments and the metrics.
 
 \section{Framework Design}\label{meth:framework_design}
 
 The modular framework, to which we called BlockLearning, is designed in such a way that new modules can be added, as well as removed or changed, easily. In this framework, the devices, identified by the address of their account in the blockchain, can be classified into three categories: \textit{trainers}, \textit{aggregators} and \textit{scorers}. Additionally, the entity that deploys the contract and is responsible for starting and terminating the rounds is called \textit{owner}.
 
-A device can be categorized as one or more categories. By doing so, the framework provides flexibility to support different architectures and algorithms. For example, BlockFlow's scoring procedure is done at the clients, which are then categorized as trainers and scorers, while the servers are categorized as aggregators. In contrast, Multi-KRUM is executed at the servers, which are then categorized as aggregators and scorers, while the clients are categorized as trainers.
+A device can be categorized as one or more categories. By doing so, the framework provides flexibility to support different architectures and algorithms. For example, BlockFlow's scoring algorithm is done at the clients, which are then categorized as trainers and scorers, while the servers are categorized as aggregators. In contrast, Multi-KRUM is executed at the servers, which are then categorized as aggregators and scorers, while the clients are categorized as trainers.
 
 The following subsections present the execution flow of the framework, as well as the structure and modules of BlockLearning.
 
@@ -20,7 +20,7 @@ The following subsections present the execution flow of the framework, as well a
 The framework supports a modular sequential flow represented on \autoref{fig:blocklearning_steps}. The steps are explained below:
 
 \begin{enumerate}
-    \item In first place, the owner initializes the round. During the round initialization, depending on the participant selection algorithm, the clients that will participate may be already defined, or not.
+    \item In first place, the owner initializes the round. During the round initialization, depending on the participant selection algorithm, the trainers that will participate may be already defined, or not.
     
     \item In second place, the trainers retrieve the information about the round, such as the global weights from the last round, and train the model using their local data. Then, the trainers submit their updates.
     
@@ -57,9 +57,9 @@ The framework is divided into three main parts: the smart contracts, the library
 The first component of the framework is the smart contracts. The smart contracts live on the blockchain and are the main means of communication between clients and servers. In addition, the smart contracts hold information regarding the current status of the round, as well as the updates, scores, aggregations, among others. The smart contracts provide the following functionality:
 
 \begin{itemize}
-    \item \textit{Round Information and Control}: the smart contract must provide information on whether the round is ongoing and which phase it is in: scoring, aggregation or termination. It must allow for enough flexibility such that new phases can be added in the future. In addition, it must allow for rounds to be started and marked as terminated. Round phase advancements are defined through pre-defined conditions that, once met, automatically move the round to the next phase. For example, after all updates are received, the smart contract moves to the next phase.
+    \item \textit{Round Information and Control}: the smart contract must provide information on whether the round is ongoing and which phase it is in: scoring, aggregation or termination. It must allow for enough flexibility such that new phases can be added in the future. In addition, it must allow for rounds to be started and marked as terminated. Round phase advancements are defined through pre-defined conditions that, once met, automatically move the round to the next phase. For example, after all updates are received, the smart contract should move to the next phase.
     
-    \item \textit{Registration Management}: the smart contract must allow devices to register themselves as training clients, aggregators, or scorers in the system. Regarding the owner, it is automatically assigned to whom deployed the contract. Finally, it should provide information about which devices participate in each round.
+    \item \textit{Registration Management}: the smart contract must allow devices to register themselves as trainers, aggregators, or scorers in the system. Regarding the owner, it is automatically assigned to whom deployed the contract. Finally, it should provide information about which devices participate in each round.
     
     \item \textit{Update Submission and Retrieval}: the smart contract must allow trainers to submit their updates, which must include a pointer to the model weights and the amount of data points that were used to train the model. In addition, it can include the training accuracy and testing accuracy for each individual trainer. The submissions must be accessible.
     
@@ -79,7 +79,7 @@ The second part of the framework is the library. The library encodes the algorit
     
     \item \textit{Smart Contract Bridge}: a contract class that provides an interface to the smart contract that lives on the blockchain. With this class, it is possible to call the smart contract functions as if they were local functions.
     
-    \item \textit{Trainer, Scorer} and \textit{Aggregator Procedures}: a class per each device category. This class must register the devices as their category upon initialization. It must also provide methods to execute the training, scoring and aggregation tasks, respectively.
+    \item \textit{Trainer, Scorer} and \textit{Aggregator Classes}: a class per each device category. This class must register the devices as their category upon initialization. It must also provide methods to execute the training, scoring and aggregation tasks, respectively.
 \end{itemize}
 
 \subsection{Testbed}\label{meth:testbed}
@@ -87,7 +87,7 @@ The second part of the framework is the library. The library encodes the algorit
 The third part of the framework is the testbed. The testbed provides the platform to conduct the experiments in a reproducible way. It must include:
 
 \begin{itemize}
-    \item \textit{Client} and \textit{Server Processes}: scripts that will be run on the client and server devices, respectively. These scripts will use the library in order to perform the right tasks according to which algorithm is being used.
+    \item \textit{Client} and \textit{Server Processes}: scripts that will be run at the clients and the servers, respectively. These scripts will use the library in order to perform the right tasks according to which algorithm is being used.
     
     \item \textit{Federated Learning Setup and Deployment}: scripts and tools to easily deploy the client and server machines in a test environment, such as containers.
     
@@ -106,7 +106,7 @@ As previously explained in \Cref{background:archfl}, in horizontally partition d
 
 To simulate a \textit{non-iid} distribution, both in number of samples, as in number of classes at each client, the Dirichlet distribution can be used \cite{tim, 10.48550/arxiv.2006.07242}. The Dirichlet distribution, $Dir(\alpha)$ is a probability distribution characterized by its parameter $\alpha$, which controls the degree of \textit{non-iid}-ness of the distribution. The higher the $\alpha$, the more identically distributed the data will be. The lower the $\alpha$, the more likely it is for each client to only hold samples of a single class.
 
-For our experiments, $\alpha = 0.1$ is used in the Dirichlet distribution as it yields a realistic \textit{non-iid} distribution \cite{10.48550/arxiv.2006.07242}, where some clients only hold many samples of a few classes, while other clients have few samples of many classes. In addition, each client has, on average $2500$ samples, such that some clients have lower amounts, and others have higher amounts, simulating a \textit{non-iid} distribution in regards to the number of samples at each device.
+For our experiments, $\alpha = 0.1$ is used in the Dirichlet distribution as it yields a realistic \textit{non-iid} distribution \cite{10.48550/arxiv.2006.07242}, where some clients only hold many samples of a few classes, while other clients have few samples of many classes. In addition, each client has, on average $2500$ samples, such that some clients have lower amounts, and others have higher amounts, simulating a \textit{non-iid} distribution in regards to the number of samples at each client.
 
 \subsection{Vertical}\label{subsection:verticalpartitioning}
 
@@ -120,11 +120,11 @@ Since the vertical partitioning is more dependent on the data set and ML model i
 
 The conducted experiments can be divided into six groups, of which five compare how using different types of algorithm impact the system. These five groups can be divided as: consensus algorithms, participant selection algorithms, scoring algorithms, number of clients and privacy degrees. The sixth group of experiments is dedicated to show a proof of concept of how vertical federated learning can be applied to a BFS system.
 
-Even though all experiment groups compare different things, there are certain aspects that are common to all of the experiments. Firstly, all experiments are run for 50 rounds. 50 rounds was chosen such that we can compare the accuracy results to other papers in order to ensure that our experiments are within the expected values. Secondly, all experiments are run with 10 computing servers, as well as 10 blockchain nodes. In practical settings, these would likely be the same machines. However, in order to be able to compare the individual effects in the services we run on the computing servers and in the blockchain nodes, these will be treated as separate entities.
+Even though all experiment groups compare different things, there are certain aspects that are common to all of the experiments. Firstly, all experiments are run for 50 rounds. 50 rounds was chosen such that we can compare the accuracy results to other papers in order to validate if our experiments are within the expected values. Secondly, all experiments are run with 10 servers.
 
 \subsection{Consensus Algorithms}
 
-In the first experiment group, we compare different consensus algorithms in order to analyze their impact, if any, in accuracy, convergence, communication and computation costs. To do so, we execute three experiments with 25 training clients, random participants selection and no scoring algorithm. In each experiment, we use a different consensus algorithm: PoA, PoW and QBFT.
+In the first experiment group, we compare different consensus algorithms in order to analyze their impact, if any, in accuracy, convergence, communication and computation costs. To do so, we execute three experiments with 25 clients, random participants selection and no scoring algorithm. In each experiment, we use a different consensus algorithm: PoA, PoW and QBFT.
 
 \subsection{Participant Selection Algorithms}
 
@@ -144,9 +144,9 @@ In the fifth experiment group, for each of the scoring algorithms, we compare th
 
 \subsection{Vertical Federated Learning}
 
-In the sixth and last experiment group, we investigate whether or not it is possible to implement and run a Blockchain-based Federated Learning with vertically partitioned data. Two experiments are run for this group with 2 and 4 clients. The low number of clients is due to the nature of the data set and how we partition the data vertically. In addition, this experiment will not include a scoring or participation selection algorithm.
+In the sixth and last experiment group, we investigate if it is possible to implement and run a Blockchain-based Federated Learning with vertically partitioned data. Two experiments are run for this group with 2 and 4 clients. The low number of clients is due to the nature of the data set and how we partition the data vertically. In addition, this experiment will not include a scoring or participation selection algorithm.
 
-As mentioned in \Cref{background:archfl}, Vertical Federated Learning systems have an additional step where the Private Set Intersection (PSI) of the client's data sets is calculated. In this work, we assume that the PSI is calculated beforehand and that it is already known to all devices. In future works, it would be interesting to integrate a PSI mechanism into the framework.
+As explained in \Cref{background:archfl}, Vertical Federated Learning systems have an additional step where the Private Set Intersection (PSI) of the client's data sets is calculated. In this work, we assume that the PSI is calculated beforehand and that it is already known to all devices. In future works, it would be interesting to integrate a PSI mechanism into the framework.
 
 \section{Metrics}\label{meth:metrics}
 
@@ -158,8 +158,8 @@ To compare the blockchain costs, namely the impact of waiting for transactions, 
 
 To compare the accuracy, we use a global \textit{Accuracy} metric for the model, where the model owner, that is, the one that initiates the process, has some data set with which they can test the model.
 
-To compare communication costs, we define the \textit{Network Traffic Per Round}. This metric is defined by how much network traffic per round is necessary at each device. With this, we can take conclusions on how it would affect different types of devices. For example, if there is a high volume of traffic per round, but the devices have a low network bandwidth, then it is expected for the rounds to take longer on average. This metric is collected at the blockchain nodes, computing servers and at the training clients.
+To compare communication costs, we define the \textit{Network Traffic Per Round}. This metric is defined by how much network traffic is necessary per round and it is collected for the client, server and blockchain processes individually. With this, we can take conclusions on how it would affect different types of devices. For example, if there is a high volume of traffic per round at the client process, but the clients have a low network bandwidth, then it is expected for the rounds to take longer on average.
 
-To compare the computation costs, we collect the \textit{RAM Usage} and \textit{CPU Usage}. Similarly to the communication costs, both these metrics are collected at the blockchain nodes, computing servers and training clients.
+To compare the computation costs, we collect the \textit{RAM Usage} and \textit{CPU Usage}. Similarly to the communication costs, both these metrics are collected at the client, server and blockchain processes. This metrics allows us to compare and visualize how different algorithms impact the computation costs at each process.
 
-It is important to note that while in practical settings the blockchain nodes would be running at the computing servers, we collect the data separately so we can compare on how different algorithms influence the blockchain nodes or the processes running on the computing server individually.
+The last two metrics are collected at the client, server and blockchain processes in order to be able to differentiate the effects of the different algorithms on the different parts of the system. However, it is important to note that, in practical settings, the server process and the blockchain process run on the same device.

@@ -40,11 +40,11 @@ Regarding accuracy, as can be seen in \autoref{fig:accuracy_consensus_algorithms
 
 \section{Communication Costs}
 
-For the communication costs, we analyze the inbound and outbound network traffic per round at the training clients, computing servers and blockchain nodes. This values can be observed in \autoref{fig:net_consensus_algorithms}.
+For the communication costs, we analyze the inbound and outbound network traffic per round at the client, server and blockchain processes. This values can be observed in \autoref{fig:net_consensus_algorithms}.
 
 On one hand, the inbound and outbound traffic for the clients and server has negligible differences when using different consensus algorithms. As mentioned in the previous section, the consensus algorithms have no expected impact on the ML process. Since the clients and servers only concern the ML process, it was expected that the clients and servers would not be affected. The small differences we can observe in the servers, in the order of $< 2$ MB, are likely connected to fluctuations in the random participant selection algorithm. If there are more participants being selected, more data needs to be transmitted, and vice-versa. In this case, 17.9, 18.3 and 17.7 clients participated in each round, on average, for PoA, PoW and QBFT, respectively.
 
-On the other hand, the traffic at the blockchain nodes varies considerably depending on the consensus algorithm. On average, PoW requires more bandwidth per round than PoA, but the difference is very minimal. However, QBFT requires $2$ times more network traffic than PoW and $4$ times more traffic than PoA. QBFT is a three-phase consensus algorithm, which requires a higher amount of network messages to be transmitted before reaching consensus. In addition, the size of the messages also differs. When combining both of this aspects, we can conclude that the expected network traffic per round using the QBFT algorithm would be higher, as verified.
+On the other hand, the traffic at the blockchain process varies considerably depending on the consensus algorithm. On average, PoW requires more bandwidth per round than PoA, but the difference is very minimal. However, QBFT requires $2$ times more network traffic than PoW and $4$ times more traffic than PoA. QBFT is a three-phase consensus algorithm, which requires a higher amount of network messages to be transmitted before reaching consensus. In addition, the size of the messages also differs. When combining both of this aspects, we can conclude that the expected network traffic per round using the QBFT algorithm would be higher, as verified.
 
 \begin{figure}[!ht]
     \centering
@@ -56,7 +56,7 @@ On the other hand, the traffic at the blockchain nodes varies considerably depen
 
 \section{Computation Costs}
 
-Regarding computation costs, we look at both RAM and CPU usage on the training clients, computing servers and blockchain nodes. To do so, we have \autoref{fig:ram_consensus_algorithms} and \autoref{fig:cpu_consensus_algorithms}, that show the mean RAM usage and mean CPU usage, respectively, per consensus algorithm during the execution of the experiments. As mentioned previously, the execution times for PoA and QBFT are lower than for PoW, which can be seen in the figures by not showing more data past minute 19. Additionally, as explained before, the consensus algorithms are not expected to have a direct impact on the clients or the servers.
+Regarding computation costs, we look at both RAM and CPU usage on the client, server and blockchain processes. To do so, we have \autoref{fig:ram_consensus_algorithms} and \autoref{fig:cpu_consensus_algorithms}, that show the mean RAM usage and mean CPU usage, respectively, per consensus algorithm during the execution of the experiments. As mentioned previously, the execution times for PoA and QBFT are lower than for PoW, which can be seen in the figures by not showing more data past minute 19. Additionally, as explained before, the consensus algorithms are not expected to have a direct impact on the clients or the servers.
 
 \begin{figure}[!hpt]
     \centering
@@ -78,11 +78,11 @@ Regarding the clients, the RAM usage and CPU usage do not differ significantly r
 
 Regarding the servers, the same reasoning as for the clients can be applied. On one hand, the RAM usage is consistent across different consensus algorithms. We can, however, notice that when using QBFT, the RAM usage at the servers is slightly higher. However, this is a likely negligible difference, as the difference is minimal ($< 10$ MB) considering the total RAM Usage ($\approx 200$ MB). On the other hand, the CPU usage is similar to what we observed for the clients, with a higher amount of idle moments.
 
-Regarding the blockchain nodes, we can visualize a larger difference, both in RAM usage and CPU usage. For both, PoW consumes a much higher level of resources. On average, PoW consumes $2$ times more then RAM and has a $2$ times higher CPU usage. This can also be explained by the way PoW works by solving complex mathematical puzzles, which require intense computation resources.
+Regarding the blockchain process, we can visualize a larger difference, both in RAM usage and CPU usage. For both, PoW consumes a much higher level of resources. On average, PoW consumes $2$ times more then RAM and has a $2$ times higher CPU usage. This can also be explained by the way PoW works by solving complex mathematical puzzles, which require intense computation resources.
 
 \section{Conclusions and Improvements}
 
-In conclusion, we can observe that different consensus algorithms have no direct impact on the accuracy and computation and communication costs at the clients and servers. However, it has an impact on the time and computation and communication costs at the blockchain nodes. PoA and QBFT are much faster than PoW. In addition, they require less computation power, both in RAM and CPU. However, QBFT consumes incurs more communication costs than both PoA and PoW. Therefore, there is a clear correlation between the computation costs and the time it takes. The higher the communication costs, the higher the transaction latencies, which translates to slower round times.
+In conclusion, we can observe that different consensus algorithms have no direct impact on the accuracy and computation and communication costs at the clients and servers. However, it has an impact on the time and computation and communication costs at the blockchain process. PoA and QBFT are much faster than PoW. In addition, they require less computation power, both in RAM and CPU. However, QBFT consumes incurs more communication costs than both PoA and PoW. Therefore, there is a clear correlation between the computation costs and the time it takes. The higher the communication costs, the higher the transaction latencies, which translates to slower round times.
 
 Assuming the blockchain network is only being used for FL, PoA is the most cost-effective of the consensus algorithms we analyzed. In case the network network is needed for other applications, other properties might be required to be taken into account.
 
