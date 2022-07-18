@@ -46,11 +46,11 @@ Regarding transaction latency and costs, having a privacy mechanism or not in pl
 
 \section{Accuracy and Convergence}
 
-When it comes to accuracy, different scoring mechanisms have different resistances against the degree of privacy. This can be seen in \autoref{fig:accuracy_privacy}.
+When it comes to accuracy, different scoring algorithms have different resistances against the degree of privacy. This can be seen in \autoref{fig:accuracy_privacy}.
 
-On one side of the spectrum, we visualize that not using a scoring mechanism performs the worse with the higher degree of privacy, that is, $\epsilon = 1$. In addition, a lower degree of privacy, $\epsilon = 5$, yields similar results to not using a privacy mechanism at all. The higher the degree of privacy, the higher the noise values that are added to the original weights. Since the weights have added noise, it is expected that the accuracy upon aggregation will be lower the higher the degree of privacy.
+On one side of the spectrum, we visualize that not using a scoring algorithm performs the worse with the higher degree of privacy, that is, $\epsilon = 1$. In addition, a lower degree of privacy, $\epsilon = 5$, yields similar results to not using a privacy mechanism at all. The higher the degree of privacy, the higher the noise values that are added to the original weights. Since the weights have added noise, it is expected that the accuracy upon aggregation will be lower the higher the degree of privacy.
 
-Out of the three scoring mechanisms, Marginal Gain and Multi-KRUM perform the best with higher degrees of privacy. As explained in \Cref{background:scoring}, both of these algorithms discard the worst updates. In contrast, BlockFlow does not. By discarding the worst update, these algorithms always keep the best updates that provide the higher accuracy, even after being added noise. Therefore, Multi-KRUM and Marginal Gain have a higher resiliency towards higher privacy degrees, allowing them to maintain high accuracies while preserving privacy.
+Out of the three scoring algorithms, Marginal Gain and Multi-KRUM perform the best with higher degrees of privacy. As explained in \Cref{background:scoring}, both of these algorithms discard the worst updates. In contrast, BlockFlow does not. By discarding the worst update, these algorithms always keep the best updates that provide the higher accuracy, even after being added noise. Therefore, Multi-KRUM and Marginal Gain have a higher resiliency towards higher privacy degrees, allowing them to maintain high accuracies while preserving privacy.
 
 \section{Communication Costs}
 
@@ -75,7 +75,7 @@ As aforementioned, there are no expected changes in RAM or CPU usage at the serv
 
 In conclusion, we have seen that using privacy mechanisms increases the computation costs, and therefore, the resource consumption, at the training clients. This leads to longer mean round execution times as each client has to process their weights and add noise. Consequently, there is a clear trade-off between execution time and privacy. However, increasing the privacy degree does not increase the time.
 
-In addition, we visualized that increasing a privacy degree leads to lower accuracy. This is expected since the privacy mechanisms used introduce noise in the weights. However, some of the scoring mechanisms have a higher resiliency and are able to still achieve higher accuracy values even with high privacy degrees. This is the case of Marginal Gain and Multi-KRUM, which are the most well-performing algorithms.
+In addition, we visualized that increasing a privacy degree leads to lower accuracy. This is expected since the privacy mechanisms used introduce noise in the weights. However, some of the scoring algorithms have a higher resiliency and are able to still achieve higher accuracy values even with high privacy degrees. This is the case of Marginal Gain and Multi-KRUM, which are the most well-performing algorithms.
 
 Finally, we can argue that adding a privacy preserving mechanism to a BFS system is crucial, specially if the model is trained on sensitive data. One of the main arguments to apply blockchain to a Federated Learning system is the traceability and auditability. To do so, the weights, or their representation in our case, are recorded in the blockchain. This leads to the conclusion that there is a trade-off between traceability and auditability and the requirement for privacy mechanisms, which in turn lead to higher resource consumption.
 

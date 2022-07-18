@@ -106,7 +106,7 @@ The consensus algorithm is one of the most important parts of a Blockchain platf
 
 \section{Blockchain-based Federated Learning}\label{background:bfl}
 
-Recently, the idea of applying blockchain to Federated Learning has emerged. This is motivated by the fact that FL architectures are highly dependent on a single central server, leading to a central point of failure, that can be either overloaded or compromised. With blockchain, the central server can be replaced by multiple decentralized servers that operate the blockchain nodes. In addition, blockchain can provide authentication, traceability, auditability and data preservation.
+Recently, the idea of applying blockchain to FL has emerged. This is motivated by the fact that FL architectures are highly dependent on a single central server, leading to a central point of failure, that can be either overloaded or compromised. With blockchain, the central server can be replaced by multiple decentralized servers that operate the blockchain nodes. In addition, blockchain can provide authentication, traceability, auditability and data preservation.
 
 Since BFL is a new concept, there are different architectures proposed in the literature \cite{10.48550/arxiv.2110.02182}: \textit{Fully Coupled BFL}, \textit{Flexibly Coupled BFL} and \textit{Loosely Coupled BFL}. Even though the modular framework we build in this work is capable of operating in different architectures, we focus on what is called Flexibly Coupled BFL.
 
@@ -159,7 +159,7 @@ Where $\Delta w$ is a submission and $c \rightarrow k$ are the clients $k$ whose
 
 \section{Differential Privacy}\label{background:diff_priv}
 
-In this thesis, we compare the impact of different degrees of privacy for each scoring mechanism. Even though there are different privacy mechanisms, we will be using Local Differential Privacy. This mechanism is the most used across the literature of the algorithms we will be using and can be applied locally without the need to exchange encryption keys with other clients.
+In this thesis, we compare the impact of different degrees of privacy for each scoring algorithm. Even though there are different privacy mechanisms, we will be using Local Differential Privacy. This mechanism is the most used across the literature of the algorithms we will be using and can be applied locally without the need to exchange encryption keys with other clients.
 
 Local Differential Privacy (LDP) is a Differential Privacy technique that ensures a specific degree of privacy. Usually, this is done by using a randomized algorithm $A$ to apply noise to the original data. We say that $A$ provides $\epsilon$-local differential privacy if, and only if, for all subsets $S$ of the image of $A$, and for all pairs of private data $x$ and $x'$:
 

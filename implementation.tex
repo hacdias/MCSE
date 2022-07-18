@@ -7,9 +7,9 @@ The first part of the framework is the smart contracts. As mentioned previously,
 Since our framework supports different algorithms with different requirements, we implemented four different smart contracts. These smart contracts inherit most of their functionality from an abstract smart contract that provides the common data structures and functionality, named \texttt{Base}. Then, we implement the following classes, that derive from \texttt{Base}:
 
 \begin{itemize}
-    \item \texttt{NoScoring}, which is used when we do not need a scoring mechanism. It only adds a new function to the \texttt{Base} class in order to allow the owner to start a round.
+    \item \texttt{NoScoring}, which is used when we do not need a scoring algorithm. It only adds a new function to the \texttt{Base} class in order to allow the owner to start a round.
     
-    \item \texttt{Scoring}, which is used when we need a scoring mechanism. This smart contract implements the required methods to support the scoring phase, such as scoring submissions and the scoring round.
+    \item \texttt{Scoring}, which is used when we need a scoring algorithm. This smart contract implements the required methods to support the scoring phase, such as scoring submissions and the scoring round.
     
     \item \texttt{FirstComeFirstServed}, which is used with the "first come, first served" participant selection algorithm. It overrides some of the \texttt{Base} functions in order to register participants to the round as they submit their updates.
     
@@ -57,9 +57,9 @@ In the testbed, we have two major components: the client, server and owner scrip
 
 \subsection{Client, Server and Owner Scripts}
 
-The client, server and owner scripts are the processes that will run at the client, server and owner, respectively. These are implemented using the BlockLearning library. In each of these processes, we first load the required data, such as the data set in the clients, and initialize the required mechanisms, namely the scoring, aggregation and privacy mechanisms.
+The client, server and owner scripts are the processes that will run at the client, server and owner, respectively. These are implemented using the BlockLearning library. In each of these processes, we first load the required data, such as the data set in the clients, and initialize the required algorithms, namely the scoring, aggregation and privacy algorithms.
 
-Then, depending on the scoring mechanism, we initialize the relevant classes at the correct machines. For example, for the BlockFlow scoring algorithm, the client initializes a \texttt{Trainer} and a \texttt{Scorer}, while the server initializes an \texttt{Aggregator}. In contrast, for Multi-KRUM, the client only initializes a \texttt{Trainer}, while the server initializes an \texttt{Aggregator} and a \texttt{Scorer}. On \autoref{alg:client_loop} you can visualize part of the main loop of the  client script.
+Then, depending on the scoring algorithm, we initialize the relevant classes at the correct machines. For example, for the BlockFlow scoring algorithm, the client initializes a \texttt{Trainer} and a \texttt{Scorer}, while the server initializes an \texttt{Aggregator}. In contrast, for Multi-KRUM, the client only initializes a \texttt{Trainer}, while the server initializes an \texttt{Aggregator} and a \texttt{Scorer}. On \autoref{alg:client_loop} you can visualize part of the main loop of the  client script.
 
 \begin{algorithm}
 \caption{Client Script Main Loop}\label{alg:client_loop}
