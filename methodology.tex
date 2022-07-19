@@ -1,5 +1,16 @@
 In this chapter, we provide information regarding methodology of the experiments. To be more precise, this chapter focuses on the client sampling, the experiment groups and the metrics.
 
+\section{Blockchain Platform}
+
+In this work, we focus on already existing blockchain platforms that do not require internal changes to make the system work. Ethereum will be our platform of choice as it is the most popular and compatible with all the techniques we are comparing.
+
+\section{Model Parameter Storage}\label{background:ipfs}
+
+For this work, we will be using an off-chain model parameter storage, namely the InterPlanetary File System (IPFS). IPFS \cite{10.48550/arxiv.1407.3561} is a decentralized storage system and protocol used by many of the works reviewed in \Cref{chapter:related_work} to store the model parameters and other relevant information that would otherwise be too large to be on the blockchain.
+
+IPFS is a content addressed file system, that is, every file is addressed by its content. It works by attributing a hash, based on the file's content. Using this hash, also known as Content Identifier (CID), the file can be retrieved from the network and guaranteed to be immutable. Instead of storing the entire file in the blockchain, the CID can be stored. Pairing IPFS with the blockchain keeps the system decentralized and distributed, while offloading the storage to a different system.
+
+
 \section{Client Sampling}\label{meth:client_sampling}
 
 The client sampling, that is, the process of choosing which samples are attributed to which client, varies depending on whether we want to partition the data horizontally, or vertically. The following subsections explain how the data is sampled for each of the data partitions.

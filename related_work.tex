@@ -2,20 +2,20 @@ In Blockchain-based Federated Learning (BFL) systems, there are different algori
 
 \section{Consensus Algorithms}\label{related_work:consensus_algorithms}
 
-One of the most important components of blockchain technology is the consensus algorithm. Consensus is the process of reaching an agreement on a single value among different distributed processes \cite{9347812}. These algorithms are designed to be reliable even on networks that have unreliable nodes. In blockchain, the consensus algorithm is used to reach consensus on the next block of the chain \cite{9079513}.
+One of the most important components of blockchain technology is the consensus algorithm. Consensus is the process of reaching an agreement on a single value among different distributed processes \cite{9347812}. These algorithms are designed to be reliable even on networks that have unreliable blockchain nodes. In blockchain, the consensus algorithm is used to reach consensus on the next block of the chain \cite{9079513}.
 
 As it can be seen from \autoref{tab:platf_consensus}, various consensus algorithms have been used for BFL systems. Below is a summary of each of these consensus algorithms.
 
 \begin{itemize}
     \item \textit{Proof of Work (PoW)} has been used for many years and some of its advantages and disadvantages are now clear. On one hand, it is a simple algorithm, for which proofs are hard to create, but easy to verify. Not only is it robust and proven to work, but the cost of attacking a PoW blockchain is extremely high. For an attack to be successful, it needs to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021, ccaf}. In addition, authors of \cite{10.48550/arxiv.2112.07938} mentions the importance of analyzing the constraints and trade-offs of using PoW with BFL.
 
-    \item \textit{Proof of Stake (PoS)}, in contrary to the PoW, does not require high computational resources from the blockchain nodes and therefore the energy consumption can be kept lower. In addition, it allows for fast throughput and blockchain nodes are incentivized to behave correctly through a rewarding system \cite{li_blockchain_2021}. On the other hand, some nodes may have excessive influence over the transaction verification process \cite{li_blockchain_2021}.
+    \item \textit{Proof of Stake (PoS)}, in contrary to the PoW, does not require high computational resources from the blockchain nodes and therefore the energy consumption can be kept lower. In addition, it allows for fast throughput and blockchain nodes are incentivized to behave correctly through a rewarding system \cite{li_blockchain_2021}. On the other hand, some blockchain nodes may have excessive influence over the transaction verification process \cite{li_blockchain_2021}.
     
     \item \textit{Proof of Authority (PoA)} is a highly scalable consensus algorithm with high throughput \cite{binance_academy_2020}. However, one of the main criticisms on the PoA is that it is usually used with a small number of validators, that are manually chosen. Therefore, it has a lesser degree of decentralization. Consequently, PoA is not as common in public blockchain networks as it is for private networks \cite{bPoA}.
 
     \item \textit{Proof of Federated Learning (PoFL)} \cite{9347812, 10.48550/arxiv.2007.15145} and \textit{Proof of Quality (PoQ)} \cite{8843900} are both consensus algorithms that integrate the training process in order to reduce the resources and energy consumption. These are custom algorithms and as such are not readily available on public blockchain platforms. To use them, developers either need to implement their custom blockchain platforms or modify an existing blockchain platform.
 
-    \item \textit{Practical Byzantine Fault Tolerance (PBFT)} allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. However, it will stop working properly if only 33\% or less nodes are running and it can also have high communication costs due to its three-phase protocol nature.
+    \item \textit{Practical Byzantine Fault Tolerance (PBFT)} allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. However, it will stop working properly if only 33\% or less blockchain nodes are running and it can also have high communication costs due to its three-phase protocol nature.
 
     \item \textit{Committee-based Consensus} is a group of consensus algorithms where a selected number of members from a committee are selected in order to achieve consensus in a fast way \cite{qu_blockchain-enabled_2022}. This is usually used on custom blockchain implementations with specific goals, such as minimizing communication costs, in mind \cite{9293091}.
 \end{itemize}
@@ -26,16 +26,7 @@ Another important component of BFL systems is the location, where the model para
 
 With \textit{on-chain storage} \cite{9274451, baffle, demo, 8733825, 9524833, 8894364, 9184854, 8893114}, the smart contract stores the model parameters itself, which means that the parameters themselves will be stored in the blockchain. However, most blockchain platforms have a limit on how large a block can be and, consequently, the amount of data that can be stored per contract is limited \cite{9274451}. In these cases, smart contracts are chunked, i.e., a single contract is split into many different contracts that hold smaller chunks of the parameters \cite{baffle}. In addition, this allows for the new model parameters to be directly calculated through the smart contract as the values are directly accessible  \cite{9274451}.
     
-With \textit{off-chain storage} \cite{10.1145/3319535.3363256, 10.48550/arxiv.2011.07516, 8945913, 10.48550/arxiv.2202.02817, 10.48550/arxiv.2007.03856, 10.48550/arxiv.1910.12603, Peyvandi2022, 9170559}, the smart contract holds a reference to the model parameters in some external (decentralized) storage systems. In this case, the new model parameters cannot be calculated directly on the smart contract, as the smart contracts have limited functionality and are not able to download external information during execution. The most common approach is to have a set of devices performing the aggregation in parallel and submitting their final version. Through the smart contract, the majority of the devices must agree on what is the next global version. Whether these devices are the servers or the clients, it all depends on the architecture of the system.
-
-% \begin{table}[!ht]
-% \begin{tabular}{c|c} \hline \hline
-%                   & Paper \\ \hline \hline
-% On-chain Storage  & \cite{9274451, baffle, demo, 8733825, 9524833, 8894364, 9184854, 8893114}\\ \hline
-% Off-chain Storage & \cite{10.1145/3319535.3363256, 10.48550/arxiv.2011.07516, 8945913, 10.48550/arxiv.2202.02817, 10.48550/arxiv.2007.03856, 10.48550/arxiv.1910.12603, Peyvandi2022, 9170559} \\      \hline
-% \end{tabular}
-% \caption{Model Parameter Storage}\label{tab:storage}
-% \end{table}
+With \textit{off-chain storage} \cite{10.1145/3319535.3363256, 10.48550/arxiv.2011.07516, 8945913, 10.48550/arxiv.2202.02817, 10.48550/arxiv.2007.03856, 10.48550/arxiv.1910.12603, Peyvandi2022, 9170559}, the smart contract holds a reference to the model parameters in some external (decentralized) storage systems. In this case, the new model parameters cannot be calculated directly on the smart contract, as the smart contracts have limited functionality and are not able to download external information during execution. The most common approach is to have a set of devices performing the aggregation in parallel and submitting their aggregation. Through the smart contract, the majority of the devices must agree on what is the next global aggregation. Whether these devices are the servers or the clients, it all depends on the architecture of the system.
 
 Even though most implementations prefer an on-chain storage, these implementations also use custom blockchain implementations \cite{8733825, 9524833, 8894364, 9184854, 8893114}, which means that they can implement a platform that has different restrictions on how much data a smart contract can handle. When it comes to using already existing blockchain platforms such as Ethereum, most implementations prefer off-chain storage using a system such as the InterPlanetary File System\cite{10.48550/arxiv.2007.03856, 8945913, Peyvandi2022, 9170559, 10.1145/3319535.3363256, 10.48550/arxiv.2011.07516}.
 
@@ -72,9 +63,9 @@ The costs of model update scoring have not been considered in most of the publis
 
 \section{Privacy Mechanisms}\label{related_work:privacy}
 
-Even though FL is already more secure than centralized ML in the sense that the raw data is never shared, the model weights are still a vector for attacks such as inference attacks \cite{10.1145/3298981}. Inference attacks are attacks, in which the weights are used to reverse-engineer the original data.
+Even though FL is already more secure than centralized ML in the sense that the raw data is never shared, the model weights can be exploited via inference attacks \cite{10.1145/3298981}. Inference attacks are attacks, in which the weights are used to reverse-engineer the original data.
 
-Additionally, in BFS systems, the weights are visible to all other client or participant since the blockchain provides an immutable, traceable and auditable record of the whole process. Consequently, it is important to reduce the vector of attacks when it comes to the model parameters. To combat this, authors use different privacy mechanisms, such as Differential Privacy \cite{10.48550/arxiv.2007.03856, Peyvandi2022, 9170559} and Homomorphic Encryption \cite{8945913, 8894364}.
+Additionally, in BFS systems, the weights are visible to all other client or participant since the blockchain provides an immutable, traceable and auditable record of the whole process. Consequently, it is important to reduce the surface for attacks when it comes to the model parameters. To combat this, authors use different privacy mechanisms, such as Differential Privacy \cite{10.48550/arxiv.2007.03856, Peyvandi2022, 9170559} and Homomorphic Encryption \cite{8945913, 8894364}.
 
 \section{Conclusions}\label{related_work:conclusions}
 
