@@ -2,9 +2,7 @@ This chapter gives an overview of the fundamental concepts and the algorithms im
 
 \section{Machine Learning}\label{background:machine_learning}
 
-Machine Learning is a sub-field of Artificial Intelligence that builds models based on statistical and algorithmic concepts in order to detect relevant patterns based on a priori experiences \cite{geron_2019}. There are four categories of learning, i.e., \textit{supervised}, \textit{semi-supervised}, \textit{unsupervised} and \textit{reinforcement learning} \cite{Sarker2021}. Each category performs different types of tasks on different types of data. This study focuses only on supervised learning.
-
-% The data is usually structured as vectors in a multi-dimensional space, such that each vector is an \textit{instance} and each dimension is a \textit{feature}.
+Machine Learning is a sub-field of Artificial Intelligence that builds models based on statistical and algorithmic concepts in order to detect relevant patterns based on previously-seen data \cite{geron_2019}. There are four categories of learning, i.e., \textit{supervised}, \textit{semi-supervised}, \textit{unsupervised} and \textit{reinforcement learning} \cite{Sarker2021}. Each category performs different types of tasks on different types of data. This study focuses only on supervised learning.
 
 In supervised learning, algorithms build mathematical models from labeled data, which is data in the format $(X, y)$, where $X$ is the input sample and $y$ is the expected output, or label. During training, algorithms provide the model with the input samples and improve the model by comparing its output with the expected outputs (the so called ground truth). Supervised learning problems can be divided into \textit{regression problems}, if the output is a continuous variable, or \textit{classification problems}, if the output is a discreet variable \cite{Sarker2021}.
 
@@ -96,14 +94,20 @@ As it can be seen in \autoref{tab:platf_consensus}, around half of the implement
 
 \subsection{Consensus Algorithm}\label{background:consensus_algorithms}
 
-The consensus algorithm is one of the most important parts of a Blockchain platform, as it makes it possible for the decentralized blockchain nodes to reach an agreement on what block comes next. Various consensus algorithms can be found in the literature:
+The consensus algorithm is one of the most important components of a Blockchain platform. Consensus is the process of reaching an agreement on a single value among different distributed processes \cite{9347812}. These algorithms are designed to be reliable even on networks that have unreliable blockchain nodes. In blockchain, the consensus algorithm is used to reach consensus on the next block of the chain \cite{9079513}. The following consensus algorithms will be compared in our work:
 
 \begin{itemize}
-    \item The Proof of Work (PoW) consensus algorithm was first introduced in the context of blockchain platforms by Satoshi Nakamoto in Bitcoin \cite{nakamoto2009bitcoin}. It works by means of computation effort proofs, where a set of virtual miners race in solving a complex, yet feasible, mathematical problem. The winner of the race generates a cryptographic proof based on the solution of the problem that can be easily verified by others. Then, the winner adds a new block containing the newly verified transactions to the blockchain. In addition, the winner is rewarded according to some pre-determined rules.
+    \item The \textit{Proof of Work (PoW)} \cite{finney} consensus algorithm was first introduced in the context of blockchain platforms by Satoshi Nakamoto in Bitcoin \cite{nakamoto2009bitcoin}. It works by means of computation effort proofs, where a set of virtual miners race in solving a complex, yet feasible, mathematical problem. The winner of the race generates a cryptographic proof based on the solution of the problem that can be easily verified by others. Then, the winner adds a new block containing the newly verified transactions to the blockchain. In addition, the winner is rewarded according to some pre-determined rules.
     
-    \item The Proof of Authority (PoA) consensus algorithm is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. It works by having a set of validator nodes that are responsible for validating new transactions. In order to ensure the correctness of the validator nodes, they have to stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network owner.
+    On one hand, it is a simple algorithm, for which proofs are hard to create, but easy to verify \cite{li_blockchain_2021}. Not only is it robust and proven to work, but the cost of attacking a PoW blockchain is extremely high \cite{li_blockchain_2021}. For an attack to be successful, it needs to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021, ccaf}.
+    
+    \item The \textit{Proof of Authority (PoA)} \cite{szilagyi_2017} consensus algorithm is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. It works by having a set of validator nodes that are responsible for validating new transactions. In order to ensure the correctness of the validator nodes, they have to stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network owner.
+    
+    On one hand, PoA provides high throughput and high scalability \cite{binance_academy_2020}. On the other hand, the main criticism of PoA is that it is usually has a small number of validators, that are manually chosen. Therefore, it has a lesser degree of decentralization. Consequently, PoA is not as common in public blockchain networks as it is for private networks \cite{bPoA}.
 
-    \item The QBFT Byzantine Fault Tolerance (QBFT) \cite{10.48550/arxiv.2002.03613} consensus algorithm is similar to the Practical Byzantine Fault Tolerance (PBFT) algorithm, which is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus. The different between QBFT and PBFT is that in the former the set of validators is dynamic, while in the latter, it is static. The network reaches a consensus once $2f+1$ nodes agree.
+    \item The \textit{QBFT Byzantine Fault Tolerance (QBFT)} \cite{10.48550/arxiv.2002.03613} consensus algorithm is similar to the Practical Byzantine Fault Tolerance (PBFT) \cite{Castro99practicalbyzantine} algorithm, which is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus. The different between QBFT and PBFT is that in the former the set of validators is dynamic, while in the latter, it is static. The network reaches a consensus once $2f+1$ nodes agree.
+    
+    One one hand, QBFT allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. On the other hand, it will stop working properly if only 33\% or less blockchain nodes are running and it can also have high communication costs due to its three-phase protocol nature \cite{li_blockchain_2021}.
 \end{itemize}
 
 \section{Blockchain-based Federated Learning}\label{background:bfl}
@@ -129,7 +133,15 @@ For the participants selection algorithms, only random selection and first come-
 \subsection{Scoring and Aggregation Algorithms}
 \label{background:scoring}
 
-Scoring algorithms are used to give each client, or its model update, a score. Based on this score, the submission may have more or less impact on the aggregation, if any at all. In addition, scores are used for reward mechanisms in systems where public models are being trained and clients need some sort of incentive to keep participating \cite{8945913, 8832210, 8905038, 9006344}. In this section, we explain briefly how each of the scoring algorithms that will be compared works and if they influence the aggregation algorithm.
+During the training process, each client produces its model parameter updates and communicates them to the servers through the blockchain. These parameters are then aggregated. However, there are different security aspects that should be taken into account here as the parameter updates creates a possibility for performing different attacks such as poisoning attacks \cite{9134967} and plagiarism attacks \cite{10.48550/arxiv.2009.09338}.
+
+\begin{itemize}
+    \item \textit{Poisoning attacks} happen when clients willingly send parameter updates that decrease the quality of the model. They may have been generated using an unreliable data set, or done on purpose. To avoid other participants to provide unreliable data to degrade the model performance, there are dynamic verification techniques \cite{10.48550/arxiv.2110.02182, 10.48550/arxiv.2104.10501} that allow to ignore low quality data.
+    
+    \item \textit{Plagiarism attacks} happen when lazy clients plagiarize other client's models updates without really training their models. These attacks can be addressed via pseudo-noise algorithms \cite{9403374}. In addition, plagiarism attacks within the same round can be avoided by secure communication methods, such as differential privacy \cite{10.48550/arxiv.2009.09338}, through which plagiarism attacks where a client reuses parameters from a previous round can be avoided by simply comparing the different client's updates.
+\end{itemize}
+
+To mitigate the poisoning and plagiarism attacks, different scoring algorithms were developed. Scoring algorithms are used to give each client, or its model update, a score. Based on this score, the submission may have more or less impact on the aggregation, if any at all. In addition, scores are used for reward mechanisms in systems where public models are being trained and clients need some sort of incentive to keep participating \cite{8945913, 8832210, 8905038, 9006344}. In this section, we explain briefly how each of the scoring algorithms that will be compared works and if they influence the aggregation algorithm.
 
 \subsubsection{BlockFlow Score}
 
@@ -157,6 +169,12 @@ The Multi-KRUM algorithm \cite{9170559, Peyvandi2022, 9292450} works by giving e
 \end{equation}
 
 , where $\Delta w$ is a submission and $c \rightarrow k$ are the clients $k$ whose submission $\Delta w_k$ are the $R-f-2$ closest to $\Delta w_c$. In this formula, $R$ is the total number of submissions, while $f$ represents the amount of Byzantine clients. After giving each submission a score, the $R-f$ clients with the lowest scores are chosen and the remaining are rejected. Please note that Byzantine fault tolerant systems behave correctly when no more than $f$ out of $3f+1$ replicas fail.
+
+\section{Privacy Mechanisms}
+
+Even though FL is already more secure than centralized ML in the sense that the raw data is never shared, the model weights can be exploited via inference attacks \cite{10.1145/3298981}. Inference attacks are attacks, in which the weights are used to reverse-engineer the original data.
+
+Additionally, in BFS systems, the weights are visible to all other client or participant since the blockchain provides an immutable, traceable and auditable record of the whole process. Consequently, it is important to reduce the surface for attacks when it comes to the model parameters. 
 
 \section{Differential Privacy}\label{background:diff_priv}
 

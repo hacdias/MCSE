@@ -1,26 +1,12 @@
-In Blockchain-based Federated Learning (BFL) systems, there are different algorithms that need to be taken into consideration when building the system. In this chapter, we go over these algorithms and their variations used in the literature.
+In Blockchain-based Federated Learning (BFL) systems, there are different algorithms that need to be taken into consideration when building the system. In this chapter, we go over these algorithms and their variations used in the literature in order to find the gap that we will try to fill.
 
 \section{Consensus Algorithms}\label{related_work:consensus_algorithms}
 
-One of the most important components of blockchain technology is the consensus algorithm. Consensus is the process of reaching an agreement on a single value among different distributed processes \cite{9347812}. These algorithms are designed to be reliable even on networks that have unreliable blockchain nodes. In blockchain, the consensus algorithm is used to reach consensus on the next block of the chain \cite{9079513}.
+As it can be seen from \autoref{tab:platf_consensus}, various consensus algorithms have been used for BFL systems. Below is a summary of each of these consensus algorithms. In most works, authors chose to use an already existing consensus algorithm, such as Proof of Work \cite{10.48550/arxiv.2007.03856, 9233457, 8733825, 10.48550/arxiv.2112.07938, 9134967, 10.48550/arxiv.1912.04859, 9079513, 9223754, 9399813}, Proof of Stake \cite{9159643, 10.48550/arxiv.2101.03300, 8998397, 10.48550/arxiv.1912.04859, 9399813, 9170559, 9311394, 9170905} and Proof of Authority \cite{9274451, baffle, demo, 8945913}. In addition, in the majority of the works that used an already existing consensus algorithm, the BFL system is built on top of an already existing blockchain platform.
 
-As it can be seen from \autoref{tab:platf_consensus}, various consensus algorithms have been used for BFL systems. Below is a summary of each of these consensus algorithms.
+There are works \cite{9347812, 10.48550/arxiv.2007.15145, 8843900} that integrate the consensus algorithm of the blockchain with the model training process in order to preserve energy and resource consumption \cite{9293091}. However, they are either not publicly available, or cannot be easily applied to already existing blockchain platforms because they require internal changes.
 
-\begin{itemize}
-    \item \textit{Proof of Work (PoW)} has been used for many years and some of its advantages and disadvantages are now clear. On one hand, it is a simple algorithm, for which proofs are hard to create, but easy to verify. Not only is it robust and proven to work, but the cost of attacking a PoW blockchain is extremely high. For an attack to be successful, it needs to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021, ccaf}. In addition, authors of \cite{10.48550/arxiv.2112.07938} mentions the importance of analyzing the constraints and trade-offs of using PoW with BFL.
-
-    \item \textit{Proof of Stake (PoS)}, in contrary to the PoW, does not require high computational resources from the blockchain nodes and therefore the energy consumption can be kept lower. In addition, it allows for fast throughput and blockchain nodes are incentivized to behave correctly through a rewarding system \cite{li_blockchain_2021}. On the other hand, some blockchain nodes may have excessive influence over the transaction verification process \cite{li_blockchain_2021}.
-    
-    \item \textit{Proof of Authority (PoA)} is a highly scalable consensus algorithm with high throughput \cite{binance_academy_2020}. However, one of the main criticisms on the PoA is that it is usually used with a small number of validators, that are manually chosen. Therefore, it has a lesser degree of decentralization. Consequently, PoA is not as common in public blockchain networks as it is for private networks \cite{bPoA}.
-
-    \item \textit{Proof of Federated Learning (PoFL)} \cite{9347812, 10.48550/arxiv.2007.15145} and \textit{Proof of Quality (PoQ)} \cite{8843900} are both consensus algorithms that integrate the training process of the model with the blockchain consensus algorithm in order to reduce the resources and energy consumption. These are custom algorithms and as such are not readily available on public blockchain platforms. To use them, developers either need to implement their custom blockchain platforms or modify an existing blockchain platform.
-
-    \item \textit{Practical Byzantine Fault Tolerance (PBFT)} allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. However, it will stop working properly if only 33\% or less blockchain nodes are running and it can also have high communication costs due to its three-phase protocol nature \cite{li_blockchain_2021}.
-
-    \item \textit{Committee-based Consensus} is a group of consensus algorithms where a selected number of members from a committee of validators are selected in order to achieve consensus in a fast way \cite{qu_blockchain-enabled_2022}. This is usually used on custom blockchain implementations with specific goals, such as minimizing communication costs, in mind \cite{9293091}.
-\end{itemize}
-
-Unfortunately, as also noted by \cite{9403374}, most of this works do not show how using different consensus algorithms may affect the execution time, accuracy, as well the communication and computation costs. While some works, such as \cite{9293091}, focus on creating new consensus algorithms to reduce the communication costs, there is not a clear comparison when it comes to already existing consensus algorithms.
+Finally, even though there are some works that analyze the resource and energy consumption of blockchain consensus algorithm in the context of BFL systems, there is a lack of analysis for already existing consensus algorithms. This is also mentioned by the surveys \cite{9403374, 10.48550/arxiv.2112.07938}. Therefore, this work intends to fill the gap by providing an impact analysis of different consensus algorithms on already existing blockchain platforms.
 
 \section{Model Parameter Storage}\label{related_work:param_storage}
 
@@ -34,39 +20,23 @@ Even though most implementations prefer an on-chain storage, these implementatio
 
 \section{Participants Selection Algorithms}\label{related_work:participants_selection}
 
-Usually, only some clients are asked to submit a model update in each round. The process of choosing the clients that participate in each round can vary and have different costs.
-
-In most cases, the number of clients and which clients specifically participate are chosen \textit{randomly} \cite{Peyvandi2022, demo, 9293091}. In some other systems, clients are allowed to take initiative, operating in a \textit{first come, first served} basis \cite{9184854, FANG20221}. In these systems, a pre-defined number of required clients is set and once enough clients have submitted their model updates, the aggregation takes place.
+Usually, only some clients are asked to submit a model update in each round. The process of choosing the clients that participate in each round can vary and have different costs. In most works, such as \cite{Peyvandi2022, demo, 9293091}, the number of clients and which clients specifically participate are chosen \textit{randomly}. In other systems \cite{9184854, FANG20221}, clients are allowed to take initiative, operating in a \textit{first come, first served} basis. The survey \cite{9403374} mentions that there is a lack of analysis on how the selection of the participants impacts the accuracy of the BFL system, as well as the communication and computation costs.
 
 \section{Scoring and Aggregation Algorithms}\label{related_work:scoring_techniques}
 
-During the training process, each client produces its model parameter updates and communicates them to the servers through the blockchain. These parameters are then aggregated. However, there are different security aspects that should be taken into account here as the parameter updates creates a possibility for performing different attacks such as poisoning attacks \cite{9134967} and plagiarism attacks \cite{10.48550/arxiv.2009.09338}.
+Different solutions can be found in the literature regarding verification techniques. The authors of \cite{9159643} created a committee-based verification mechanism. To implement it, they deploy a verification smart contract on the blockchain, which periodically elects different clients as committee members. Then, the committee is responsible for voting if the submitted model updates are valid or not.
 
-\begin{itemize}
-    \item \textit{Poisoning attacks} happen when clients willingly send parameter updates that decrease the quality of the model. They may have been generated using an unreliable data set, or done on purpose. To avoid other participants to provide unreliable data to degrade the model performance, there are dynamic verification techniques \cite{10.48550/arxiv.2110.02182, 10.48550/arxiv.2104.10501} that allow to ignore low quality data.
-    
-    \item \textit{Plagiarism attacks} happen when lazy clients plagiarize other client's models updates without really training their models. These attacks can be addressed via pseudo-noise algorithms \cite{9403374}. In addition, plagiarism attacks within the same round can be avoided by secure communication methods, such as differential privacy \cite{10.48550/arxiv.2009.09338}, through which plagiarism attacks where a client reuses parameters from a previous round can be avoided by simply comparing the different client's updates.
-\end{itemize}
+The authors of \cite{8945913} implement a verification algorithm based on the trend of the validation error accuracy. To implement it, the model updates of each client are validated using a public validation data set known to both servers and clients. The result of this validation also influences the reward distribution.
 
-Different solutions can be found in the literature regarding verification techniques. In \cite{9293091, 10.1007/978-981-15-9213-3_12}, the authors implement their own blockchain systems, which allows them to design their own consensus algorithm dedicated to BFL. This kind of consensus algorithms can use properties from the training process directly in order to validate the updates, and, consequently, either reject or accept them \cite{9293091, 10.1007/978-981-15-9213-3_12}.
-    
-The authors of \cite{9159643} created a committee-based verification mechanism. To implement it, they deploy a verification smart contract on the blockchain, which periodically elects different clients as committee members. Then, the committee is responsible for voting if the submitted model updates are valid or not.
-
-The authors of \cite{8945913} implement a verification algorithm based on the trend of the validation error accuracy. To implement it, the model updates of each client are validated using a public validation data set known to both servers and clients. The result of this validation will also influence the reward distribution.
-
-Scores-based systems \cite{10.48550/arxiv.2011.07516, 9170559, Peyvandi2022, 9292450}, also known as reputation-based systems, were, by far, the most common among the literature. These work by giving clients with consistently high quality data and updates higher amounts of points. Then, the updates with less points are either rejected, or they have a smaller influence on the aggregation.
+Scores-based systems \cite{10.48550/arxiv.2011.07516, 9170559, Peyvandi2022, 9292450}, also known as reputation-based systems, were, by far, the most common among the literature and also the only ones that can be applied to already existing blockchain platforms. These work by giving clients with consistently high quality data and updates higher amounts of points. Then, the updates with less points are either rejected, or they have a smaller influence on the aggregation.
 
 In most these works, as also noted by \cite{9403374, 10.48550/arxiv.2110.02182}, the costs of scoring algorithms have not been considered. It is important to understand the trade-off between communication and computation costs, and the usage of the different scoring algorithms. The authors of \cite{10.48550/arxiv.2110.02182} also mention that there is a lack of comparison of the different security models of the system when using different scoring algorithms.
 
 \section{Privacy Mechanisms}\label{related_work:privacy}
 
-Even though FL is already more secure than centralized ML in the sense that the raw data is never shared, the model weights can be exploited via inference attacks \cite{10.1145/3298981}. Inference attacks are attacks, in which the weights are used to reverse-engineer the original data.
+The majority of the reviewed works did not mention which privacy mechanism they used. However, we found Differential Privacy \cite{10.48550/arxiv.2007.03856, Peyvandi2022, 9170559} to be the most common mechanism, followed by Homomorphic Encryption \cite{8945913, 8894364}. In addition, the authors of \cite{9403374} also point out the lack of consideration for how privacy mechanisms may impact the system, both in terms of accuracy, as well as resource consumption. From our review, we can confirm that this is still the case.
 
-Additionally, in BFS systems, the weights are visible to all other client or participant since the blockchain provides an immutable, traceable and auditable record of the whole process. Consequently, it is important to reduce the surface for attacks when it comes to the model parameters. To combat this, authors use different privacy mechanisms, such as Differential Privacy \cite{10.48550/arxiv.2007.03856, Peyvandi2022, 9170559} and Homomorphic Encryption \cite{8945913, 8894364}.
-
-\section{Remarks}
-
-In \cite{9403374}, the authors point out the lack of consideration for how different aspects of the system, such as privacy mechanisms, scoring algorithms, impact the system in terms of resource usage. From the reviewed work, we can still see that it is still the case and that these aspects, for the best of our knowledge, have not been considered on the latest literature.
+\section{Other Remarks}
 
 In addition, there are several works \cite{10.1145/3422337.3447837, 8945913, 10.48550/arxiv.1910.12603, 10.48550/arxiv.2110.02182} designing BFL frameworks, but very few of them provide the source code or build a framework that is intended to be used by others.sign Providing the source code is extremely important when it comes to reproducibility and verification, so that others can analyze it and do further research using it.
 
@@ -74,7 +44,7 @@ Finally, as it can be seen in \autoref{tab:data_distribution}, only work \cite{1
 
 \section{Conclusions}\label{related_work:conclusions}
 
-From what mentioned above, we can draw the following conclusions. Firstly, there is a clear lack on how different components of a BFL system, such as consensus algorithms, scoring algorithms, number of clients, impact the accuracy, communication and computation costs of the system. Consequently, this work intends to fill in this gap by providing a detailed analysis on how some of these algorithms impact execution time, convergence, accuracy, communication and computation costs of the system.
+From the literature review, we can draw the following conclusions. Firstly, there is a clear lack on how different components of a BFL system, such as consensus algorithms, scoring algorithms, number of clients, impact the accuracy, communication and computation costs of the system. Consequently, this work intends to fill in this gap by providing a detailed analysis on how some of these algorithms impact execution time, convergence, accuracy, communication and computation costs of the system.
 
 Secondly, even though there are many works on designing BFL frameworks, very few are released to the public, or modular. We, therefore, will work on designing and implementing a modular BFL framework that can be easily changed to support new algorithms and will be available to the public to empower future research.
 
