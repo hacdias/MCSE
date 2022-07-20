@@ -21,7 +21,6 @@
 \usepackage{minted}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-
 \usepackage{tikz, blindtext}
 
 \definecolor{scarlat}{HTML}{c72125}
@@ -47,6 +46,7 @@
 
 \newskip\bigskipamount \bigskipamount =20pt plus 4pt minus 4pt
 % \setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{4}
 
 \begin{document}
 \pagenumbering{roman}
@@ -72,16 +72,10 @@
 \chapter{Related Work}\label{chapter:related_work}
 \input{related_work}
 
-\chapter{Methodology}\label{chapter:methodology}
-\input{methodology}
+\chapter{Framework Design and Implementation}\label{chapter:framework}
+\input{framework}
 
-\chapter{Framework Design}\label{chapter:design}
-\input{framework_design}
-
-\chapter{Framework Implementation}\label{chapter:implementation}
-\input{implementation}
-
-\chapter{Evaluation}\label{chapter:evaluation}
+\chapter{Experimental Setup and Evaluation}\label{chapter:evaluation}
 \input{evaluation}
 
 \chapter{Impact Analysis of Consensus Algorithms}\label{chapter:analysis:consensus_algorithms}

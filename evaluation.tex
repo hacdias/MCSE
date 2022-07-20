@@ -1,8 +1,8 @@
-In this chapter, we provide information on the evaluation of the experiments described in the previous chapters. Below, we indicate which data set is used, how it is partitioned, which models are used, among other details. In the end, we provide an overview of all of the executed experiments, compared to the literature.
+In this chapter, we provide information regarding the experimental setup and evaluation of the experiments. To be more precise, this chapter explains which data set we use, how the data is partitioned, which models are used in the experiments, the software and hardware specifications of the experimental environment, as well as which are the experiments we execute.
 
-\section{Data Set}
+\section{Data Set}\label{eval:data_set}
 
-The data set used for the experiments is the MNIST\cite{lecun2010mnist} data set. The MNIST data set includes 70 000 images of handwritten digits from 0 to 9, where each image is 28 by 28 pixels. Some samples can be visualized in \autoref{fig:mnist}.
+The data set used for the experiments is the MNIST \cite{lecun2010mnist} data set. The MNIST data set includes 70 000 images of handwritten digits from 0 to 9, where each image is 28 by 28 pixels. Some samples can be visualized in \autoref{fig:mnist}.
 
 \begin{figure}[!htp]
     \centering
@@ -12,13 +12,21 @@ The data set used for the experiments is the MNIST\cite{lecun2010mnist} data set
     \label{fig:mnist}
 \end{figure}
 
-Not only is it a widely known data set, but also used by the majority of the reviewed works, as can be seen in \autoref{tab:data_distribution}. Since we will compare our accuracy with the original works in order to validate our results, we need to ensure that the configurations are as similar as possible.
+Not only is it a widely known data set, but also used by the majority of the reviewed works, as can be seen in \autoref{tab:data_distribution}. To be able to compare our accuracy with the original works in order to validate our results, we use the same data set.
 
-\section{Data Partitioning}
+\section{Client Sampling}\label{eval:client_sampling}
 
-In this section, we show the horizontal and vertical data partitioning according to the methods described in \Cref{chapter:methodology}. To divide the data horizontally, we used a publicly available tool\footnote{\url{https://github.com/TsingZ0/PFL-Non-IID}} that supports partitioning the MNIST data set directly using the Dirichlet distribution. We did so for 5, 10, 25 and 50 clients.
+The client sampling, that is, the process of dividing the samples among the clients, depends on how data is partitioned across federated learning clients. Data may be partitioned horizontally or vertically in federated learning systems. In the following subsections, we explain how the data is sampled for each of the data partitions.
 
-On \autoref{fig:horizontal_dist}, you can visualize the \textit{non-iid} horizontal partitioning for 10 clients. It is possible to see how \textit{non-iid} the distribution is, both in terms of samples amount and in terms of class distribution. For example, client 7 has many samples from classes 2 and 4, while having none of the remaining classes. At the same time, client 10 has a few samples from classes 0, 1, 2 and 9 and many from class 7.
+\subsection{Horizontal}
+
+In horizontally partitioned data, as explained in \Cref{background:archfl}, different clients have different samples that share the same feature space. Additionally, in a distributed system, it is expected that the clients are heterogeneous in terms of their computational characteristics and data. Therefore, it is safe to assume that the data distribution in a distributed setting is \textit{non-iid}.
+
+To simulate a \textit{non-iid} distribution, both in terms of number of samples, as number of classes at each client, we use the Dirichlet distribution \cite{tim, 10.48550/arxiv.2006.07242}. The Dirichlet distribution, $Dir(\alpha)$, is a probability distribution characterized by its parameter $\alpha$, which controls the degree of \textit{non-iid}-ness of the distribution. The higher the $\alpha$, the more identically distributed the data will be. The lower the $\alpha$, the more likely it is for each client to only hold samples of a single class.
+
+For our experiments, we set $\alpha = 0.1$ in the Dirichlet distribution as it yields a realistic \textit{non-iid} distribution \cite{10.48550/arxiv.2006.07242}, where some clients hold many samples of a few classes, while other clients have few samples of many classes. Moreover, the clients have, on average, 2500 samples each. Some clients have more samples, some have less, simulating a \textit{non-iid} distribution.
+
+In order to perform the horizontal client sampling, we used a publicly available tool \cite{tsingz0} that supports sampling from the MNIST data set directly using the Dirichlet distribution. We did so for 5, 10, 25 and 50 clients. On \autoref{fig:horizontal_dist}, you can visualize the sample distribution for 10 clients. It is possible to see how \textit{non-iid} the distribution is, both in terms of samples amount and in terms of class distribution. For example, client 7 has many samples from classes 2 and 4, while having none of the remaining classes. At the same time, client 10 has a few samples from classes 0, 1, 2 and 9 and many from class 7.
 
 \begin{figure}[!ht]
     \centering
@@ -28,7 +36,13 @@ On \autoref{fig:horizontal_dist}, you can visualize the \textit{non-iid} horizon
     \label{fig:horizontal_dist}
 \end{figure}
 
-Regarding vertically partitioning data, it was mentioned in \Cref{subsection:verticalpartitioning} that more details would be provided in the present chapter. The vertical data partitioning highly depends on both the model and the data set. For this experiment, we will use a Split-CNN which will be introduced in the next section. To use such model, the owner is expected to have the labels, while the clients are expected to some features of each sample. In the case of the MNIST data set, we can think of the features as vertical segments of the image. To divide a 28 by 28 image sample between 2 clients, for example, we split the image into two 14 by 28 segments, as depicted in \autoref{fig:vertical_dist}.
+\subsection{Vertical}\label{subsection:verticalpartitioning}
+
+Vertically partitioned data is significantly different from horizontally partition data, in the sense that the clients share intersecting sample spaces, but different feature spaces. Therefore, it is not possible to simply divide the samples among the clients.
+
+For the vertical data partition, we use the work done in \cite{10.48550/arxiv.2104.00489}. Firstly, we choose how many samples to assign each client. We chose the same number as for the horizontal partitioning, i.e., $2500$ samples. Then, the samples are randomly chosen from the original data set. Subsequently, each sample is assigned a unique identifier (ID) that will be used as label when giving the data set to each client. Only the servers have access to the true labels. After choosing the IDs, the feature space $F$ is divided into $C$ parts $F_c$, where $C$ is the number of clients. Finally, the features $F_c$, with $c \in C$ are assigned to each of the clients.
+
+The vertical data partitioning highly depends on both the model and the data set. For this experiment, we will use a Split-CNN which will be introduced in the next section. To use such model, the owner is expected to have the labels, while the clients are expected to have some features of each sample. In the case of the MNIST data set, we can think of the features as vertical segments of the image. To divide a 28 by 28 image sample between 2 clients, for example, we split the image into two 14 by 28 segments, as depicted in \autoref{fig:vertical_dist}.
 
 \begin{figure}[!ht]
     \centering
@@ -38,9 +52,11 @@ Regarding vertically partitioning data, it was mentioned in \Cref{subsection:ver
     \label{fig:vertical_dist}
 \end{figure}
 
-\section{Machine Learning Models}
+\section{Machine Learning Models}\label{eval:ml_models}
 
 The models used on this work are simple models based on previous literature. The goal of this work is not to provide the most efficient, or accurate, model. Therefore, we do not dive into the details of the models. The models used for horizontal and vertical training are succinctly explained below.
+
+\subsection{Horizontal Model}
 
 For horizontal training, we use a simple Convolutional Neural Network (CNN) with three levels of convolution intercalated with max pooling to reduce overfitting. These layers are followed by a flattening layer and two dense layers that culminate in the output. The layer details can be seen in \autoref{tab:cnn}.
 
@@ -60,6 +76,8 @@ For horizontal training, we use a simple Convolutional Neural Network (CNN) with
     \caption{CNN Model}
     \label{tab:cnn}
 \end{table}
+
+\subsection{Vertical Model}
 
 For vertical training, we use a dual-headed, or four-headed, Split-CNN \cite{10.1145/3297858.3304038, 10.48550/arxiv.2104.00489}, depending on whether we have two, or four, clients. The model at the clients is the head model, while the model at the servers is the tail model. To train this model, each client gives their input data to the models and collects the output of the last layer. Then, this intermediate output is sent to the servers, which are then given to the tail model. The servers calculate the gradients, which are then backpropagated to the clients. For more details, please consult the original works where the workings of this model are given in more detail. On \autoref{tab:splitnn} you can see the details of the dual-headed Split-CNN model.
 
@@ -97,7 +115,7 @@ For vertical training, we use a dual-headed, or four-headed, Split-CNN \cite{10.
 
 \section{Hardware and Software Specifications}
 
-The experiments were executed in a remote machine whose hardware and software specifications can be found in \autoref{tab:temps}. Due to resource limitations, it was not possible to have a machine with GPU. Furthermore, if we consider that FL systems are being run in IoT clients, it is unlikely that such low-powered devices would have a GPU available. In addition, the MNIST data set and the models in use are relatively simple, which means that they can be easily trained using a CPU. Nonetheless, it is worth mentioning that the training process would be faster in machines with a GPU.
+The experiments were executed in a remote machine whose hardware and software specifications can be found in \autoref{tab:temps}. Due to resource limitations, it was not possible to have a machine with GPU. Furthermore, if we consider that FL systems are being run in IoT clients, it is unlikely that such low-powered devices would have a GPU available. In addition, the MNIST data set and the models we use are relatively simple, which means that they can be easily trained using a CPU. Nonetheless, it is worth mentioning that the training process would likely be faster in machines with a GPU.
 
 \begin{table}[!h]
     \begin{subtable}[h]{0.59\textwidth}
@@ -131,10 +149,74 @@ The experiments were executed in a remote machine whose hardware and software sp
      \label{tab:temps}
 \end{table}
 
+\section{Metrics}\label{eval:metrics}
+
+To compare the different experiments, we define a set of metrics regarding to the different aspects we are comparing: execution time, accuracy, communication and computation costs.
+
+\subsection{Execution Time}
+
+To compare execution time, we define two metrics: the \textit{End-to-end (E2E) Execution Time} and the \textit{Mean Round Execution Time}. The former is defined by the time it takes for an experiment to execute from start to end. The latter is defined by the mean time it takes to complete a round, which can be calculated by dividing the E2E Execution Time by the number of rounds of the experiment.
+
+\subsection{Transaction Costs and Latency}
+
+To compare the blockchain costs, namely the impact of waiting for transactions, we define two metrics: the \textit{Mean Transaction Latency} and the \textit{Mean Transaction Cost}. The former is defined by the mean time it takes between submitting a transaction and it being accepted by the network. The latter measures the computation effort to execute a transaction, which, in the case of Ethereum, is measured in \textit{Gas}.
+
+Both the transaction latency and transaction cost values are retrieved directly from the Blockchain. Ethereum provides information on how much time transactions take to be accepted, as well as how much each transaction costs. Then, we just calculate the mean.
+
+\subsection{Accuracy}
+
+To compare the accuracy, we use a global \textit{Accuracy} metric for the model, where the model owner, that is, the one that initiates the process, has some data set with which they can test the model. The logs produced by the model owner contain the accuracy and are used to extract the accuracy of each round.
+
+\subsection{Communication and Computation Costs}
+
+To compare communication costs, we define the \textit{Network Traffic Per Round}. This metric is defined by how much network traffic flows to and from each process and it is collected for the client, server and blockchain processes individually. By knowing the network traffic required for each process, we can draw conclusions on how it would affect different types of devices. For example, if there is a high volume of traffic per round at the client process, and the clients are low-powered devices with low network bandwidth, then we would expect that each round takes longer since less traffic can go through the device at a single point in time.
+
+To compare the computation costs, we collect the \textit{RAM Usage} and \textit{CPU Usage}. Similarly to the communication costs, both these metrics are collected at the client, server and blockchain processes. This metrics allows us to compare and visualize how different algorithms impact the computation costs at each process.
+
+The communication and computation costs metrics are collected at the client, server and blockchain processes in order to be able to differentiate the effects of the different algorithms on the different parts of the system. However, it is important to note that, in practical settings, the server process and the blockchain process run on the same device.
+
+To collect these metrics, we use \texttt{docker stats}, which is a command provided by Docker, the platform used for BlockLearning's Testbed. The statistics command provides a live stream of the container's resource consumption, namely the CPU percentage, the RAM memory usage, and the network traffic in and out.
+
+\section{Experiment Groups}\label{meth:experiments}
+
+The conducted experiments, visible on \autoref{tab:experiments}, can be divided into six groups, of which five analyze how using different types of algorithm impact the system's performance in terms of accuracy, convergence, communication, and computation costs. These five groups relate to impact analysis of:
+
+\begin{enumerate}
+    \item \textit{Consensus Algorithms}: PoA, PoW and QBFT.
+    
+    \item \textit{Participant Selection Algorithms}: random selection and first-come first-served.
+    
+    \item \textit{Scoring Algorithms}: BlockFlow, Marginal Gain, Multi-KRUM, as well as without a scoring algorithm.
+    
+    \item \textit{Number of Clients}: 5, 10, 25, 50, selected based on the current literature and available resources we have at our disposal to execute the experiments.
+    
+    \item \textit{ Privacy Degrees}: 1 and 5, as well as without any privacy mechanism.
+\end{enumerate}
+
+In all experiments, the remaining aspects remain constant. For example, when comparing scoring algorithms, the consensus algorithm is fixed. Below are the default choices for each of the variable aspects above that is applied to the remaining experiments:
+
+\begin{itemize}
+    \item \textit{Consensus Algorithm}: PoA is used since it is expected to be faster and more resource efficient, as discussed in \Cref{related_work:consensus_algorithms}.
+    
+    \item \textit{Participant Selection Algorithm}: random selection is used as it was the most common among the reviewed experiments.
+    
+    \item \textit{Number of Clients}: 25 clients is used as it provides a good equilibrium between the execution time and the resources we have available for our experiment.
+    
+    \item \textit{Privacy Degree}: no privacy mechanism is applied on the remaining experiments in order to understand how the other aspects impact the system without this variable.
+\end{itemize}
+
+In the sixth and last experiment group, we investigate if it is possible to implement and run a Blockchain-based Federated Learning with vertically partitioned data. We perform two experiments, with 2 and 4 clients. The low number of clients is due to the nature of the data set and how we partition the data vertically. In addition, this experiment will not include a scoring or participation selection algorithm.
+
+As explained in \Cref{background:archfl}, Vertical Federated Learning systems have an additional step, in which the Private Set Intersection (PSI) of the client's data sets is calculated. In this work, we assume that the PSI is calculated beforehand and that it is already known to all devices. The PSI calculation can be done in different ways and it is its own area of research of Computer Science. The related works we analyzed either did not provide information on how this was calculated, or also assumed that is has been calculated beforehand. In future works, it would be interesting to integrate a PSI mechanism into the framework.
+
+All experiments are run for 50 rounds such that we can compare the accuracy results to other papers. This way, we can validate if our experiments are within the expected values. Secondly, all experiments are run with 10 servers that run both the server process and the blockchain process. Thirdly, all experiments, except for those where the number of clients are compared, are run with 25 clients.
+
 \section{Results}
 
-\autoref{tab:experiments} presents a summary of all of our experiments, as well as other works. On it, it is possible to see the configuration of all of the experiments that were executed. Due to space limitations, not all information is presented on the table. All experiments use the MNIST data set, except for the works \cite{10.48550/arxiv.2007.03856, 10.48550/arxiv.2011.07516} whose data set is unknown. In addition, all the experiments were executed with 50 rounds, except for \cite{9170559} which is also unknown. We can see that our results, in terms of accuracy, are within the range of the original works of the scoring algorithms. Therefore, we can validate our results.
+\autoref{tab:experiments} presents a summary of all of our experiments, as well as other works. On it, it is possible to see the configuration of all of the experiments that were executed. Due to space limitations, not all information is presented on the table. All experiments use the MNIST data set, except for the works \cite{10.48550/arxiv.2007.03856, 10.48550/arxiv.2011.07516} whose data set is unknown. In addition, all the experiments were executed with 50 rounds, except for \cite{9170559} which is also unknown.
 
-The detailed analysis of the results of each experiment are presented in the following chapters. \Cref{chapter:analysis:consensus_algorithms} presents the analysis on the consensus algorithms experiments. \Cref{fig:participations_client} analyzes the results on the participant selection algorithms experiments. \Cref{chapter:analysis:scoring} presents the analysis on the scoring algorithms experiments. \Cref{chapter:analysis:clients} analyzes the results on the impact of the number of clients. \Cref{chapter:analysis:privacy} presents the results and analysis of the impact of different privacy degrees. Finally, \Cref{chapter:vertical} presents the results of the Proof of Concept of Vertical Federated Learning applied in a Blockchain-based Federated Learning environment.
+On \autoref{tab:experiments}, we can see that our results, in terms of accuracy, are within the range of the original works of the scoring algorithms. Since we do not have enough details regarding the implementations of the works we compare to, this is the only way to validate our results.
+
+The detailed impact analyzis of each of the experiment groups are presented from \Cref{chapter:analysis:consensus_algorithms} through \Cref{chapter:analysis:privacy}. On \Cref{chapter:vertical}, we present the results of the Proof of Concept of Vertical Federated Learning applied in a Blockchain-based Federated Learning environment.
 
 \input{tables/experiments}

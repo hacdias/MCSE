@@ -1,0 +1,219 @@
+In this chapter, we provide detailed information regarding the design of our modular framework, as well as its implementation.
+
+\section{Blockchain Platform}
+
+In this work, we focus on already existing blockchain platforms that do not require internal changes to make the system work. The Ethereum is our platform of choice as it is the most popular and compatible with all the techniques we use for our experiments and comparison with the related work.
+
+\section{Architecture}
+
+Even though the modular framework we build in this work is capable of operating in different architectures, we focus on what is called Flexibly Coupled BFL.
+
+\section{BlockLearning Framework's Design}\label{framework:design}
+
+The modular framework, to which we called BlockLearning, is designed in such a way that modules can be added, as well as removed or changed, easily. In this framework, the devices, identified by the address of their account in the blockchain, can be classified into three categories: \textit{trainers}, \textit{aggregators} and \textit{scorers}. Additionally, the entity that deploys the contract and is responsible for starting and terminating the rounds is called \textit{owner}.
+
+A device can be categorized as one or more categories. By doing so, the framework provides flexibility to support different architectures and algorithms. For example, BlockFlow's scoring algorithm is done at the clients, which are then categorized as trainers and scorers, while the servers are categorized as aggregators. In contrast, Multi-KRUM is executed at the servers, which are then categorized as aggregators and scorers, while the clients are categorized as trainers.
+
+% The following sections present the execution flow of the framework, as well as the structure and modules of BlockLearning.
+
+% \section{Execution Flow}\label{meth:exec_flow}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1\textwidth]{graphics/sequence.pdf}
+    \caption{BlockLearning Flow}
+    \label{fig:blocklearning_steps}
+\end{figure}
+
+The framework supports a modular sequential flow represented in \autoref{fig:blocklearning_steps}. The steps are explained below:
+
+\begin{enumerate}
+    \item In first place, the owner initializes the round. During the round initialization, depending on the participant selection algorithm, the trainers that will participate may have been selected already, or not.
+    
+    \item In second place, the trainers retrieve the information such as the global weights from the last round and train the model using their local data. Then, the trainers submit their model updates.
+    
+    \item In third place, if a scoring algorithm is enabled, the scorers retrieve the updates and calculate the scores. Then, they submit their scores.
+    
+    \item In fourth place, the aggregators retrieve the model updates and execute the aggregation algorithm and submit the aggregation results.
+    
+    \item In fifth place, if we are using vertically partitioned data, and depending on the model in use, the trainers may have to confirm back-propagation. Note that this step is tightly connected to the model we will be using for Vertical Federated Learning, which will be introduced later. Nonetheless, it shows how modular the system can be and how steps can be easily added at different points of the flow for different purposes.
+    
+    \item Finally, the round is marked as terminated by the owner. At this point, the smart contract decides which is the final aggregation for the model based on the submissions by the aggregators.
+\end{enumerate}
+
+\subsection{Threat Model}
+
+In the last step of the execution flow, the smart contract decides the final aggregation values based on the submissions by the aggregators. For this, at least 50\% of the aggregators must agree on the same aggregation in order for it to be accepted. Therefore, the framework offers a 50\% threat model.
+
+Even though 50\% is not the ideal threat model, it is an improvement compared to classic FL, in which the central aggregator is a central point of failure that needs to be available, reliable, and trusted at all times. In this framework, an attacker would have to control over 51\% of the servers in order to be able to influence the outcome of the aggregation, and therefore, or the training.
+
+In addition, the framework should allow for the threat threshold to be changed. By default, it is 50\%. However, if a user prefers that all aggregators must agree on the same aggregation, they should be able to do so.
+
+\subsection{Structure and Modules}\label{meth:struct_modules}
+
+The framework is divided into three main components: the smart contracts, the library, and the testbed. These are depicted on \autoref{fig:blocklearning_modules} and will be individually explained on the following subsections.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1\textwidth]{graphics/modules.pdf}
+    \caption{BlockLearning's  Structure and Modules}
+    \label{fig:blocklearning_modules}
+\end{figure}
+
+\subsubsection{Smart Contracts}\label{meth:smart_contracts}
+
+The first component of the framework is the smart contracts. The smart contracts live on the blockchain and are the main means of communication between FL clients and servers. In addition, the smart contracts hold information regarding the current status of the round, as well as the updates, scores, aggregations, among others. The smart contracts provide the following functionality:
+
+\begin{itemize}
+    \item \textit{Round Information and Control}: the smart contract must provide information on whether the round is ongoing and which phase, i.e., scoring, aggregation, or termination phase, it is in. It must allow for flexibility such that new phases can be added in the future. In addition, it must allow for rounds to be started and marked as terminated. Round phase advancements are defined through pre-defined conditions that, once met, automatically move the round to the next phase. For example, after all updates are received, the smart contract should move to the next phase.
+    
+    \item \textit{Registration Management}: the smart contract must allow devices to register themselves as trainers, aggregators, or scorers in the system. Regarding the owner, it is automatically assigned to whom deployed the contract. Finally, it should provide information about which devices participate in each round.
+    
+    \item \textit{Update Submission and Retrieval}: the smart contract must allow trainers to submit their updates, which must include a pointer to the model weights and the amount of data points that were used to train the model. In addition, it can include the training accuracy and testing accuracy for each individual trainer. The submissions must be accessible.
+    
+    \item \textit{Scores Submission and Retrieval}: the smart contract must allow scorers to submit their scores. It must be possible to know which scorer scored which update and they must be accessible.
+    
+    \item \textit{Aggregation Submission and Retrieval}: the smart contract must allow aggregators to submit the aggregations, which contain a pointer to the weights. The aggregations must be accessible.
+\end{itemize}
+
+\subsubsection{Library}\label{meth:library}
+
+The second component of the framework is the library. The library encodes the algorithms, utilities, and building blocks necessary to implement the process that runs on the clients and the servers. It must include:
+
+\begin{itemize}
+    \item \textit{Aggregation, Scoring} and \textit{Privacy Algorithms}: for which a common interface must be implemented, such that adding new algorithms is easy and simple and they are interchangeable in the code.
+    
+    \item \textit{Weights Storage and Retrieval}: utilities to load and store weights on the decentralized storage provider. These must also provide an interface in order to make it easy to change the storage provider by providing a different implementation.
+    
+    \item \textit{Smart Contract Bridge}: a contract class that provides an interface to the smart contract that lives on the blockchain. With this class, it should be possible to call the smart contract functions as if they were local functions.
+    
+    \item \textit{Trainer, Scorer} and \textit{Aggregator Classes}: a class per each device category. This class must register the devices as their category upon initialization. It must also provide methods to execute the training, scoring and aggregation tasks, respectively.
+\end{itemize}
+
+\subsubsection{Testbed}\label{meth:testbed}
+
+The third component of the framework is the testbed. The testbed provides the platform to conduct the experiments in a reproducible way. It must include:
+
+\begin{itemize}
+    \item \textit{Client} and \textit{Server Processes}: scripts that will be run at the clients and the servers, respectively. These scripts will use the library in order to perform the right tasks according to which algorithm is being used.
+    
+    \item \textit{Federated Learning Setup and Deployment}: scripts and tools to easily deploy the client and server machines in a test environment, such as containers.
+    
+    \item \textit{Blockchain Setup and Deployment}: scripts and tools to easily deploy the blockchain network in a test environment, as well as deploy the contract to such network.
+\end{itemize}
+
+In addition, the testbed must also include tools to collect the required statistics and logs that can be later processed to retrieve the previously discussed metrics.
+
+\section{BlockLearning Framework's Implementation}
+
+In this section, we go over the implementation details of the BlockLearning framework, following the guidelines defined in \Cref{framework:design}. The complete implementation is publicly available on GitHub\footnote{\url{https://github.com/hacdias/blocklearning}}.
+
+\subsection{Smart Contracts}
+
+As mentioned previously, this work uses the Ethereum \cite{wood2014ethereum} blockchain platform. Therefore, the smart contracts must be implemented in a programming language that supports Ethereum. We chose the Solidity \cite{solidity} programming language as it is the most well-known with the widest support.
+
+Since our framework supports different algorithms with different requirements, we implemented four different smart contracts. These smart contracts inherit most of their functionality from an abstract smart contract that provides the common data structures and functionality, named \texttt{Base}. Then, we implement the following classes, that derive from \texttt{Base}:
+
+\begin{itemize}
+    \item \texttt{NoScoring}, which is used when we do not need a scoring algorithm. It only adds a new function to the \texttt{Base} class in order to allow the owner to start a round.
+    
+    \item \texttt{Scoring}, which is used when we need a scoring algorithm. This smart contract implements the required methods to support the scoring phase, such as scoring submissions and the scoring round.
+    
+    \item \texttt{FirstComeFirstServed}, which is used with the first-come first-served participant selection algorithm. It overrides some of the \texttt{Base} functions in order to register participants to the round as they submit their updates.
+    
+    \item \texttt{Vertical}, which is used with vertically partitioned data, specifically with the Split-CNN. It incorporates the functionality required to provide for an additional phase, the backpropagation, as well as more information about the head and top models.
+\end{itemize}
+
+A class diagram with the public interfaces of the contracts, as well as the data types, is depicted in \autoref{fig:contracts-uml}.
+
+\begin{figure}[!ht]
+    \centering
+    \centering
+    \includegraphics[width=1\textwidth]{graphics/smart-contract-uml.pdf}
+    \caption{Smart Contracts Class Diagram}
+    \label{fig:contracts-uml}
+\end{figure}
+
+An interesting aspect to note is that score and accuracy values are stored as integers. Currently, Solidity does not support floating point numbers. To preserve fidelity, the original values are multiplied by a large integer, $10^{18}$. Then, when the values are retrieved from the smart contract, they are divided by the same value in order to get the original value.
+
+\subsection{Library}
+
+The library is implemented in the Python \cite{10.5555/1593511} programming language. The main motivation for using Python is that many well-known Machine Learning libraries, such as TensorFlow \cite{tensorflow2015-whitepaper} and PyTorch \cite{NEURIPS2019_9015} are implemented in Python, as well as many data processing tools.
+
+The first part of the library is the aggregation, scoring and privacy algorithms. Each of these categories of algorithms has a specific interface to which each algorithm must conform to. By having a common interface, we can implement new algorithms, or change existing ones, easily. The interfaces are as follows:
+
+\begin{itemize}
+    \item \texttt{aggregate(trainers, updates, scorers, scores) $\rightarrow$ weights}\\
+    The aggregators must provide a function \texttt{aggregate} that receives an array with the trainer addresses, an array with the updates sorted by the same order as the trainers, an array with the scorers and an array with the scores sorted by the same order as the scorers. It is important to note that the scorers and the scores are optional arguments since a scoring algorithm is not always required. The function returns an array with the aggregated weights. % BlockFlow, FedAvg, Multi-KRUM
+    
+    \item \texttt{score(round, trainers, updates) $\rightarrow$ trainers, scores}\\
+    The scorers must provide a function \texttt{score} that receives an integer with the round number, an array with the trainer addresses, as well as an array of updates that are sorted by the same order as the trainer addresses. The function returns an array with the trainers and their submission scores. % Multi-KRUM, MarginalGain, Accuracy (BlockFlow)
+    
+    \item \texttt{privatize(x) $\rightarrow$ y}\\
+    The privacy mechanisms must provide a function \texttt{score} that receives an array of the weights \texttt{x} and returns the privatized weights \texttt{y}. % Gaussian
+\end{itemize}
+
+The second part of the library is the utilities to store and retrieve the weights, as well as the smart contract bridge. The weights storage class also provides a common interface such that it is possible to change which storage provider we use. As for our experiments, we use IPFS, explained in \Cref{background:ipfs}, similarly to many other works. The smart contract bridge is a class that creates a 1:1 connection with the functions from the smart contracts.
+
+The third and final part of the library is the \texttt{Trainer}, \texttt{Scorer} and \texttt{Aggregator} classes. These classes implement the main flow of each of these procedures using the modules aforementioned described. For example, the trainer class is initialized with the contract bridge, the weights storage, the model, the data and an optional privacy mechanism. Then, it provides a method \texttt{train()} that executes the training procedure. Similarly, the scorer class provides \texttt{score()} and the aggregator class provides \texttt{aggregate()}.
+
+\subsection{Testbed}
+
+The testbed, that is, the platform to conduct the experiments. It was mostly implemented using the aforementioned library and Docker \cite{docker}. Docker is a platform that allows to easily deploy applications in an isolated setting through what is called a container, allowing us to simulate multiple devices in the same network. Each container runs an image, which is the name given to the piece of software than runs on the container.
+
+In the testbed, we have two major components: the client, server and owner scripts, the federated learning environment deployment and the blockchain deployment. These are discussed on the following subsections.
+
+\subsubsection{Client, Server and Owner Scripts}
+
+The client, server and owner scripts are the processes that will run at the client, server and owner, respectively. These are implemented using the BlockLearning library. In each of these scripts, we first load the required data, such as the data set in the clients, and initialize the required algorithms, namely the scoring, aggregation and privacy algorithms.
+
+Then, depending on the scoring algorithm, we initialize the relevant classes at the correct machines. For example, for the BlockFlow scoring algorithm, the client initializes a \texttt{Trainer} and a \texttt{Scorer}, while the server initializes an \texttt{Aggregator}. In contrast, for Multi-KRUM, the client only initializes a \texttt{Trainer}, while the server initializes an \texttt{Aggregator} and a \texttt{Scorer}. On \autoref{alg:client_loop} you can visualize part of the main loop of the client script.
+
+\begin{algorithm}
+\caption{Client Script Main Loop}\label{alg:client_loop}
+\begin{algorithmic}
+\Require $s \in$ \{\O, BlockFlow, MarginalGain\}
+\State $T \gets $ Initialize Trainer
+\If{$s$ is not \O}
+    \State $S \gets $ Initialize Scorer
+\EndIf
+\While{True}
+    \State $P \gets$ Get Phase From Smart Contract
+    \If{$P$ is Waiting For Updates}
+        \State Execute Training Procedure $T$
+    \ElsIf{$P$ is Waiting For Scores}
+        \State Execute Scoring Procedure $S$
+    \EndIf
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Blockchain Setup and Deployment}
+
+The Blockchain setup and deployment is done using already existing tools and our library. As previously mentioned, we use Docker containers in order to run the experiments. Moreover, we use Docker Compose in order to deploy multiple containers at once and orchestrate the deployment process.
+
+We use different Ethereum implementations, depending on the consensus algorithm since they are not all available within the sample implementation. Ethereum's main implementation, \texttt{go-ethereum} \cite{go-ethereum}, provides PoA and PoW. For QBFT, we use a fork called \texttt{quorum}\cite{quorum}, which is mostly identical to \texttt{go-ethereum} but supports QBFT.
+
+Moreover, the Blockchain setup and deployment follows the following steps:
+
+\begin{enumerate}
+    \item \textit{Generate Accounts}. In first place, the Ethereum accounts for the clients and servers are generated using the provided \texttt{go-ethereum} toolkit. Each account is pre-loaded with $100$ ETH, the Ethereum currency, so that clients or servers will not run out of currency to submit their transactions.
+    
+    \item \textit{Build Images}. In second place, we build the Docker images that will be used to deploy the Blockchain network. This images are based on the images provided by each of the Ethereum's implementations that we use. In addition, they pre-load the account information, as well as some additional configuration to ensure that all nodes are connected when the network is bootstrapped.
+    
+    \item \textit{Deploy Network}. In third place, the network is deployed using Docker Compose and the configured amount of nodes.
+    
+    \item \textit{Deploy Contract}. Finally, the contract is deployed to the network using Truffle, which is a tool designed to help developers developing and deploying smart contracts.
+\end{enumerate}
+
+Finally, we would like to mention that originally we were planning on testing the PoS consensus algorithm too. However, the only fork providing PoS support does not work in private network settings\footnote{\url{https://github.com/bnb-chain/bsc/issues/861}}. Therefore, it was not possible to run an experiment with PoS.
+
+\subsubsection{Federated Learning Setup and Deployment}
+
+Similarly to the Blockchain setup and deployment, we also use Docker Compose for the Federated Learning system. The process is identical as in the previous section, except that we only build the images and deploy the Federated Learning network.
+
+\section{Model Parameter Storage}\label{background:ipfs}
+
+For this work, we will be using an off-chain model parameter storage, namely the InterPlanetary File System (IPFS). IPFS \cite{10.48550/arxiv.1407.3561} is a decentralized storage system and protocol used by many of the works reviewed in \Cref{chapter:related_work} to store the model parameters and other relevant information that would otherwise be too large to be on the blockchain.
+
+IPFS is a content addressed file system, which implies that, every file is addressed by its content. It works by attributing a hash, based on the file's content. Using this hash, also known as Content Identifier (CID), the file can be retrieved from the network and guaranteed to be immutable. Instead of storing the entire file in the blockchain, the CID can be stored. Pairing IPFS with the blockchain keeps the system decentralized and distributed, while offloading the storage to a different system.

@@ -6,7 +6,7 @@ Machine Learning is a sub-field of Artificial Intelligence that builds models ba
 
 % The data is usually structured as vectors in a multi-dimensional space, such that each vector is an \textit{instance} and each dimension is a \textit{feature}.
 
-In supervised learning, algorithms build mathematical models from labeled data, which is data in the format $(X, y)$, where $X$ is the input sample and $y$ is the expected output. During training, algorithms provide the model with the input samples and improve the model by comparing its output with the expected outputs (the so called ground truth). Supervised learning problems can be divided into \textit{regression problems}, if the output is a continuous variable, or \textit{classification problems}, if the output is a discreet variable \cite{Sarker2021}.
+In supervised learning, algorithms build mathematical models from labeled data, which is data in the format $(X, y)$, where $X$ is the input sample and $y$ is the expected output, or label. During training, algorithms provide the model with the input samples and improve the model by comparing its output with the expected outputs (the so called ground truth). Supervised learning problems can be divided into \textit{regression problems}, if the output is a continuous variable, or \textit{classification problems}, if the output is a discreet variable \cite{Sarker2021}.
 
 \section{Federated Learning}\label{background:federated_learning}
 
@@ -32,7 +32,7 @@ horizontal, (ii) vertical, and (iii) federated Transfer Learning. We focus on th
 
 In \textit{Horizontal Federated Learning} (HFL), clients with the same data structure collaborate to build a single model. In other words, the different data sets in the different clients share the same feature space, but not the sample space. For example, two banks branches operating in different cities have similar businesses (feature space), but different clients (sample space). The architecture of HFL, depicted in \autoref{fig:hfl_arch}, consists of multiple clients training a model, while the central server performs the aggregation of all local updates.
 
-In \textit{Vertical Federated Learning} (VFL), clients share an intersecting sample space, but different feature spaces. For example, two different banks with different products operating in the same city have a similar client base (sample space), but different informations about each client (feature space). The architecture of VFL, depicted in \autoref{fig:vfl_arch}, is similar to the one of HFL. However, it requires an additional step, the Private Set Intersection (PSI), since the clients do not share the exact same sample space. PSI is a protocol by which multiple clients can calculate the common samples without sharing their raw data \cite{wei2022vertical}.
+In \textit{Vertical Federated Learning} (VFL), clients share an intersecting sample space, but different feature spaces. For example, two different banks with different products operating in the same city have a similar client base (sample space), but different informations about each client (feature space). The architecture of VFL, depicted in \autoref{fig:vfl_arch}, is similar to the one of HFL. However, it requires an additional step, the Private Set Intersection (PSI) \cite{wei2022vertical}, since the clients do not share the exact same sample space. PSI is a protocol by which multiple clients can calculate the common samples without sharing their raw data \cite{wei2022vertical}.
 
 \begin{figure}[!htp]
     \centering
@@ -129,7 +129,7 @@ For the participants selection algorithms, only random selection and first come-
 \subsection{Scoring and Aggregation Algorithms}
 \label{background:scoring}
 
-Scoring algorithms are used to give each client, or its submission, a score. Based on this score, the submission may have more or less impact on the aggregation, if any at all. In addition, scores are used for reward mechanisms in systems where public models are being trained and clients need some sort of incentive to keep participating \cite{8945913, 8832210, 8905038, 9006344}. In this section, we explain briefly how each of the scoring algorithms that will be compared works and if they influence the aggregation algorithm.
+Scoring algorithms are used to give each client, or its model update, a score. Based on this score, the submission may have more or less impact on the aggregation, if any at all. In addition, scores are used for reward mechanisms in systems where public models are being trained and clients need some sort of incentive to keep participating \cite{8945913, 8832210, 8905038, 9006344}. In this section, we explain briefly how each of the scoring algorithms that will be compared works and if they influence the aggregation algorithm.
 
 \subsubsection{BlockFlow Score}
 
