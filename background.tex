@@ -25,9 +25,9 @@ After each round of training, the central server aggregates the local updates. U
 
 % Where $n_k$ is the number of samples that the client $k$ used to train and $w_{t+1}^k$ the weights of client $k$ at round $t+1$.
 
-\subsection{Architectures of Federated Learning}\label{background:archfl}
+\subsection{Categories of Federated Learning}\label{background:archfl}
 
-According to \cite{10.1145/3298981, 10.1145/3412357}, with respect to the different data partition among the clients, the federated Learning techniques can be broadly divided into three main architectures, i.e., (i) 
+According to \cite{10.1145/3298981, 10.1145/3412357}, with respect to the different data partition among the clients, the federated Learning techniques can be broadly divided into three main categories, i.e., (i) 
 horizontal, (ii) vertical, and (iii) federated Transfer Learning. We focus on the first two categories.
 
 In \textit{Horizontal Federated Learning} (HFL), clients with the same data structure collaborate to build a single model. In other words, the different data sets in the different clients share the same feature space, but not the sample space. For example, two banks branches operating in different cities have similar businesses (feature space), but different clients (sample space). The architecture of HFL, depicted in \autoref{fig:hfl_arch}, consists of multiple clients training a model, while the central server performs the aggregation of all local updates.
@@ -101,7 +101,7 @@ The consensus algorithm is one of the most important parts of a Blockchain platf
 \begin{itemize}
     \item The Proof of Work (PoW) consensus algorithm was first introduced in the context of blockchain platforms by Satoshi Nakamoto in Bitcoin \cite{nakamoto2009bitcoin}. It works by means of computation effort proofs, where a set of virtual miners race in solving a complex, yet feasible, mathematical problem. The winner of the race generates a cryptographic proof based on the solution of the problem that can be easily verified by others. Then, the winner adds a new block containing the newly verified transactions to the blockchain. In addition, the winner is rewarded according to some pre-determined rules.
     
-    \item The Proof of Authority (PoA) consensus algorithm is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. In this system, there is a set of validator nodes that are responsible for validating the new transactions that stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network owner.
+    \item The Proof of Authority (PoA) consensus algorithm is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. It works by having a set of validator nodes that are responsible for validating new transactions. In order to ensure the correctness of the validator nodes, they have to stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network owner.
 
     \item The QBFT Byzantine Fault Tolerance (QBFT) \cite{10.48550/arxiv.2002.03613} consensus algorithm is similar to the Practical Byzantine Fault Tolerance (PBFT) algorithm, which is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus. The different between QBFT and PBFT is that in the former the set of validators is dynamic, while in the latter, it is static. The network reaches a consensus once $2f+1$ nodes agree.
 \end{itemize}
@@ -110,7 +110,7 @@ The consensus algorithm is one of the most important parts of a Blockchain platf
 
 Recently, the idea of applying blockchain to FL has emerged. This is motivated by the fact that FL architectures are highly dependent on a single central server, leading to a central point of failure, that can be either overloaded or compromised. With blockchain, the central server can be replaced by multiple decentralized servers that operate the blockchain nodes. In addition, blockchain can provide authentication, traceability, auditability and data preservation.
 
-As stated in \cite{10.48550/arxiv.2110.02182}, so far different types of architectures have been proposed for it, i.e., \textit{Fully Coupled BFL}, \textit{Flexibly Coupled BFL} and \textit{Loosely Coupled BFL}.
+As stated in \cite{10.48550/arxiv.2110.02182}, so far different architectures have been proposed for BFL systems and they can be grouped into three main categories: \textit{Fully Coupled BFL}, \textit{Flexibly Coupled BFL} and \textit{Loosely Coupled BFL}.
 
 \begin{figure}[!ht]
     \centering
