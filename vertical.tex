@@ -1,10 +1,11 @@
-In this chapter, we analyze the sixth and last experiment group, that is, the proof of concept of Vertical Blockchain-based Federated Learning. The goal of this experiment is to prove that, even though there is a lack of Blockchain-based Federated Learning systems applied to vertically partitioned data, it is possible.
+% In this chapter, we analyze the sixth and last experiment group, that is, the proof of concept of Vertical Blockchain-based Federated Learning. 
+The goal of this chapter is to prove that, even though there is a lack of Blockchain-based Federated Learning systems applied to vertically partitioned FL systems, it is possible to do so.
 
-This experiment was run with two different amounts of clients: 2 and 4, with a dual-headed, and four-headed, Split-CNN model, respectively. By having two experiments in this group, we can still draw some comparisons. In addition, most Vertical Federated Learning models from the literature were applied to 2 clients. Therefore, it is interesting to see that it is possible to easily apply the model to more clients.
+This experiment was performed with two different number of clients: 2 and 4, with a dual-headed, and four-headed Split-CNN model, respectively. In addition, most Vertical Federated Learning models from the literature were applied to 2 clients. Therefore, it is interesting to see that it is possible to easily apply the model to more clients.
 
-\section{Execution Time, Transaction Cost and Latency}
+\section{Execution Time, Transaction Cost, and Transaction Latency}
 
-The execution time and transaction metrics can be seen in \autoref{tab:metrics_vertical}. It is observable that the more clients we have, the longest it takes for a round to be completed and, therefore, the entire learning process. This is a conclusion that was taken in a previous chapter too.
+The execution time and transaction metrics can be seen in \autoref{tab:metrics_vertical}. It is observable that the more the clients, the longer a round takes to be completed. As such the entire learning process takes longer. This is a conclusion that was taken in a previous chapters, too.
 
 Regarding the transaction latency and cost, we can see that both are similar to what has been seen in previous chapters. Since the number of clients is low, we did not expect to have significant differences in either of them.
 

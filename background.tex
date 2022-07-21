@@ -6,7 +6,7 @@ Machine Learning is a sub-field of Artificial Intelligence that builds models ba
 
 In supervised learning, algorithms build mathematical models from labeled data, which is data in the format $(X, y)$, where $X$ is the input sample and $y$ is the expected output, or label. During training, algorithms provide the model with the input samples and improve the model by comparing its output with the expected outputs (the so called ground truth). Supervised learning problems can be divided into \textit{regression problems}, if the output is a continuous variable, or \textit{classification problems}, if the output is a discreet variable \cite{Sarker2021}.
 
-\section{Federated Learning}\label{background:federated_learning}
+\subsection{Federated Learning}\label{background:federated_learning}
 
 Federated Learning is a ML technique, in which different distributed clients collaboratively train a model under the supervision of a centralized server. Clients are distributed heterogeneous devices with their own computing resources and they are responsible for producing and maintaining their own data \cite{9084352}. The data is assumed to be non independent or non identically distributed (\textit{non-iid}).
 
@@ -103,7 +103,7 @@ The consensus algorithm is one of the most important components of a Blockchain 
     
     \item The \textit{Proof of Authority (PoA)} \cite{szilagyi_2017} consensus algorithm is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. It works by having a set of validator nodes that are responsible for validating new transactions. In order to ensure the correctness of the validator nodes, they have to stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network owner.
     
-    On one hand, PoA provides high throughput and high scalability \cite{binance_academy_2020}. On the other hand, the main criticism of PoA is that it is usually has a small number of validators, that are manually chosen. Therefore, it has a lesser degree of decentralization. Consequently, PoA is not as common in public blockchain networks as it is for private networks \cite{bPoA}.
+    On one hand, PoA provides high throughput and high scalability \cite{bPoA}. On the other hand, the main criticism of PoA is that it is usually has a small number of validators, that are manually chosen. Therefore, it has a lesser degree of decentralization. Consequently, PoA is not as common in public blockchain networks as it is for private networks \cite{bPoA}.
 
     \item The \textit{QBFT Byzantine Fault Tolerance (QBFT)} \cite{10.48550/arxiv.2002.03613} consensus algorithm is similar to the Practical Byzantine Fault Tolerance (PBFT) \cite{Castro99practicalbyzantine} algorithm, which is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus. The different between QBFT and PBFT is that in the former the set of validators is dynamic, while in the latter, it is static. The network reaches a consensus once $2f+1$ nodes agree.
     
@@ -114,7 +114,7 @@ The consensus algorithm is one of the most important components of a Blockchain 
 
 Recently, the idea of applying blockchain to FL has emerged. This is motivated by the fact that FL architectures are highly dependent on a single central server, leading to a central point of failure, that can be either overloaded or compromised. With blockchain, the central server can be replaced by multiple decentralized servers that operate the blockchain nodes. In addition, blockchain can provide authentication, traceability, auditability and data preservation.
 
-As stated in \cite{10.48550/arxiv.2110.02182}, so far different architectures have been proposed for BFL systems and they can be grouped into three main categories: \textit{Fully Coupled BFL}, \textit{Flexibly Coupled BFL} and \textit{Loosely Coupled BFL}.
+As stated in \cite{10.48550/arxiv.2110.02182}, so far three different architectures groups have been proposed for BFL systems: \textit{Fully Coupled BFL}, \textit{Flexibly Coupled BFL} and \textit{Loosely Coupled BFL}.
 
 \begin{figure}[!ht]
     \centering
@@ -124,11 +124,7 @@ As stated in \cite{10.48550/arxiv.2110.02182}, so far different architectures ha
     \label{fig:bfl_arch}
 \end{figure}
 
-In Fully Coupled BFL architecture,
-
-In a Flexibly Coupled BFL architecture, the blockchain nodes are decoupled from the clients, and run by separate servers. This servers are also responsible for maintaining the blockchain nodes and use the blockchain to store information such as aggregations, scores, among others. The architecture is depicted in \autoref{fig:bfl_arch}.
-
-In Loosely Coupled BFL architecture,
+In Fully Coupled BFL, the distributed clients are the only devices in the network and act as both clients and servers, performing the training and aggregation, as well as running the blockchain nodes. In Loosely Coupled BFL, the central server still exists and blockchain is only used to manage the reputation of clients. Flexibly Coupled BFL provides a middle ground between both, where there are servers and clients in the network. The servers are responsible for maintaining the blockchain nodes and use the blockchain to store information such as aggregations, scores, among others. The architecture is depicted in \autoref{fig:bfl_arch}.
 
 \subsection{Participants Selection Algorithms}
 
@@ -174,17 +170,17 @@ The Multi-KRUM algorithm \cite{9170559, Peyvandi2022, 9292450} works by giving e
 
 , where $\Delta w$ is a submission and $c \rightarrow k$ are the clients $k$ whose submission $\Delta w_k$ are the $R-f-2$ closest to $\Delta w_c$. In this formula, $R$ is the total number of submissions, while $f$ represents the amount of Byzantine clients. After giving each submission a score, the $R-f$ clients with the lowest scores are chosen and the remaining are rejected. Please note that Byzantine fault tolerant systems behave correctly when no more than $f$ out of $3f+1$ replicas fail.
 
-\section{Privacy Mechanisms}
+\subsection{Privacy Mechanisms}
 
-Even though FL is already more secure than centralized ML in the sense that the raw data is never shared, the model weights can be exploited via inference attacks \cite{10.1145/3298981}. Inference attacks are attacks, in which the weights are used to reverse-engineer the original data.
+Even though FL is already more secure than centralized ML in the sense that the raw data is never shared, the model weights can be exploited via inference attacks \cite{10.1145/3298981}. Inference attacks are attacks in which the weights are used to reverse-engineer the original data.
 
-Additionally, in BFS systems, the weights are visible to all other client or participant since the blockchain provides an immutable, traceable and auditable record of the whole process. Consequently, it is important to reduce the surface for attacks when it comes to the model parameters. 
+Additionally, in BFS systems, the weights are visible to all other client or participant since the blockchain provides an immutable, traceable and auditable record of the whole process. Consequently, it is important to reduce the surface for attacks when it comes to the model parameters.
 
-\section{Differential Privacy}\label{background:diff_priv}
+\subsubsection{(Local) Differential Privacy}\label{background:diff_priv}
 
-In this thesis, we compare the impact of different degrees of privacy for each scoring algorithm. Even though there are different privacy mechanisms, we will be using Local Differential Privacy. This mechanism is the most used across the literature of the algorithms we will be using and can be applied locally without the need to exchange encryption keys with other clients.
+Differential Privacy (DP) \cite{hvdiffpriv} is a set of mathematical constrains that algorithms must observe in order to ensure a certain degree of privacy. In other words, some data is differentially private if, by looking at it, we cannot retrieve identifiable information about the original source.
 
-Local Differential Privacy (LDP) is a Differential Privacy technique that ensures a specific degree of privacy. Usually, this is done by using a randomized algorithm $A$ to apply noise to the original data. We say that $A$ provides $\epsilon$-local differential privacy if, and only if, for all subsets $S$ of the image of $A$, and for all pairs of private data $x$ and $x'$:
+Local Differential Privacy \cite{10.48550/arxiv.2009.09338, 9415623} is a model of Differential Privacy that ensures a specific degree of privacy, usually by using a randomized algorithm $A$ to apply noise to the original data \cite{wei2022vertical}. We say that $A$ provides $\epsilon$-local differential privacy if, and only if, for all subsets $S$ of the image of $A$, and for all pairs of private data $x$ and $x'$:
 
 \begin{equation}
     \label{eq:e-ldp}
@@ -192,3 +188,6 @@ Local Differential Privacy (LDP) is a Differential Privacy technique that ensure
 \end{equation}
 
 , where the probability is taken from the randomized algorithm. The lower the $\epsilon$, the higher the degree of privacy.
+
+
+

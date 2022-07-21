@@ -1,10 +1,13 @@
-In this thesis, we explored different algorithms of Blockchain-based Federated Learning (BFL) systems, as well as how those properties impact the system in terms of execution time, accuracy and resource consumption. In addition, we also designed and implemented a modular framework for BFL such that we could perform our experiments, as well as empower future research. Specifically, we started this thesis by setting the main research question of \textit{"What is the impact of different consensus, participant selection and scoring algorithms in a Blockchain-based Federated Learning system on execution time, convergence and accuracy, as well as communication and computation costs?"}. The answer to this question will be discussed further ahead.
+BFL was initially introduced in order to facilitate desirable properties such as traceability, auditability, immutability, persistency, authentication and decentralization. Even though applying blockchain to a Federated Learning system brings these advantages, it also brings some trade-offs. Therefore, in this thesis, we explored how different algorithms used in Blockchain-based Federated Learning (BFL) systems impact the system 's performance in terms of execution time, accuracy and resource consumption. 
 
-\section{Evaluation Summary}\label{conclusions:evaluation}
+Our analysis of related work revealed that even though there are many works on designing BFL frameworks, a very few of them are
+released to the public, or are modular. We, therefore, designed and implemented the very first open-source modular BFL framework that allows many aspects of the system to be easily customized and supports multiple architectures. By making it available to the public, it has the potential to empower future research.
 
-BFL was initially introduced in order to facilitate desirable properties such as traceability, auditability, immutability, persistency, authentication and decentralization. Even though applying blockchain to a Federated Learning system brings these advantages, it also brings some trade-offs. To test this, we designed and implemented the first open-source modular framework that allows many aspects of the system to be easily customized, as well as supporting multiple architectures.
+\section{Observations From our Impact Analysis}\label{conclusions:evaluation}
 
-In first place, we analyzed the impact of different consensus algorithm. We concluded that different consensus algorithms play a large role on the energy consumption. In terms of computation costs, PoW presented the highest consumption, while QBFT and PoA presented lower consumption. Regarding communication costs, QBFT requires up to three times more network traffic compared to its counterparts. Consequently, we can conclude that PoA is the most cost-efficient algorithm. However, it is criticized due to the degree of decentralization it provides due to the way the validator nodes are chosen. Therefore, we can conclude there is a \textit{trade-off between the degree of decentralization and the energy costs of the consensus algorithm}.
+
+
+Firstly, we analyzed the impact of different consensus algorithms, i.e., POW, POA, and QBFT. We concluded that different consensus algorithms play a large role in the energy consumption. In terms of computation costs, the PoW algorithm presented the highest consumption, while QBFT and PoA presented lower consumption. Regarding communication costs, QBFT had up to three times more network traffic compared to its counterparts. Consequently, we concluded that the PoA algorithm is the most cost-efficient algorithm. However, it is criticized for the degree of decentralization it provides due to the way the validator nodes are chosen. Therefore, we concluded that there is a \textit{trade-off between the degree of decentralization and the energy costs of the consensus algorithm}.
 
 In third place, we analyzed the impact of different participant selection algorithms, which revealed to be similar in terms of energy consumption. However, randomly selecting participants revealed to be fairer and provide more stable accuracy convergence, as it gives every client an equal chance of participating in a round as long as the randomness is provided by a uniform distribution.
 
@@ -14,9 +17,11 @@ In fifth place, we analyzed the impact of the number of clients and the privacy 
 
 In sixth, we provided a proof of concept of how Vertical Federated Learning can be applied to a BFL system.
 
-\section{General Conclusion}\label{conclusions:general}
+\section{Looking Back to the Main Research Question}\label{conclusions:general}
 
-Overall, we answer our main research question by saying that the addition of the blockchain, namely Ethereum, has impacts both in terms of execution time and resource consumption. The average transaction latency we observed was around $1.5$ seconds. In each round, there are at least $C+S+2$ transactions, where $C$ and $S$ are the number of clients, and servers, respectively. Even though the clients and the servers execute their process in parallel, the transactions latency add up, increasing the execution time. Therefore, we conclude there is a general \textit{trade-off between the benefits of the blockchain and the execution time}.
+The main research question of this thesis was \textit{"What is the impact of different consensus, participant selection and scoring algorithms in a Blockchain-based Federated Learning system on execution time, convergence and accuracy, as well as communication and computation costs?"}. 
+
+Overall, our extensive experiments answered this by revealing that the addition of the blockchain, namely Ethereum, has impacts both in terms of execution time and resource usage. The average transaction latency we observed was around $1.5$ seconds. In each round, there are at least $C+S+2$ transactions, where $C$ and $S$ are the number of clients, and servers, respectively. Even though the clients and the servers execute their process in parallel, the transactions latency add up, increasing the execution time. Therefore, we conclude there is a general \textit{trade-off between the benefits of the blockchain and the execution time}.
 
 After all, when adding the blockchain, we are adding a new layer to a system that would otherwise have a single centralized server. In order to achieve decentralization, we require more than one machine to replace the central server. Moreover, this machines must reach a consensus in terms of storage and execution. The costs of getting a system that provides traceability, auditability, immutability, persistency, authentication and decentralization are translated in higher energy costs and execution times.
 
@@ -24,16 +29,16 @@ After all, when adding the blockchain, we are adding a new layer to a system tha
 
 \section{Contributions}\label{conclusions:contributions}
 
-The contributions of this work are as follows:
+The contributions of this thesis are as follows:
 
 \begin{enumerate}
-    \item Designed and implemented the first open-source modular framework for BFL that can be easily adapted to support new scoring, aggregation and privacy algorithms. This framework can be used to empower future research.
+    \item Design and implementation of the first open-source modular framework for BFL that can be easily adapted to support new scoring, aggregation, and privacy algorithms. This framework can be used to empower future research.
     
-    \item Provided the first comparative study of how different aspects of BFL, namely consensus, participant selection and scoring algorithms, impact the accuracy, execution time and communication and computation costs.
+    \item The first comparative study of how different aspects of BFL, namely consensus algorithms, participant selection, and scoring algorithms, impact the model accuracy, execution time and communication and computation costs.
     
-    \item Provided the first comparative study of how the number of clients and different degrees of privacy impact the accuracy, execution time and communication and computation costs of different scoring algorithms.
+    \item The first comparative study of how the number of clients and different degrees of privacy impact the accuracy, execution time and communication and computation costs of different scoring algorithms.
     
-    \item Designed and implemented the first open-source proof-of-concept of a Blockchain-based Vertical Federated Learning.
+    \item A proof-of-concept of a Blockchain-based Vertical Federated Learning.
 \end{enumerate}
 
 \section{Future Work}\label{conclusions:future_work}

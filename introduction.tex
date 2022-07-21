@@ -18,15 +18,13 @@ By combining Blockchain to Federated Learning, not only can the central orchestr
     \item \textit{Authentication}. Blockchain ensures the authentication of data and messages due to the verification mechanisms in place, such as the usage of private keys to sign transactions \cite{qu_blockchain-enabled_2022}.
 \end{itemize}
 
-In BFL, there are certain aspects to take into account that influence the outcome of the learning process, as well as the resources consumed. With Federated Learning being increasingly adopted in IoT networks, where low powered devices with low resources are the norm, it is important to ensure the system consumes the least amount of resources.
-
 Blockchain platforms can implement different consensus algorithms, which can lead to very different resource consumption \cite{ccaf}, as well as different degrees of latency \cite{Alqahtani_2021}. Two other important aspects in BFL systems are the participant selection and the scoring algorithms. While the former indicates how the participants are chosen to submit their updates in each round, the latter aids on scoring each client's model update in order to identify which ones are the best and should be included in the final aggregation. All this algorithms influence the accuracy, convergence, and resource consumption. At the same time, each algorithm performs differently with different amounts of devices, as well as with different degrees of privacy, leading to different accuracy results, as well as resource consumption.
 
 \section{Problem Statement}\label{intro:problem}
 
-The goal of this thesis is to bridge the gap on the impact analysis of different algorithms of BFL systems, namely consensus, participant selection and scoring algorithms, on the execution time, accuracy, convergence, communication and computation costs of the system. In addition, this thesis aims to investigate how different scoring algorithms are impacted in terms of the aforementioned aspects when different amounts of clients and privacy degrees are used.
+To the best of our knowledge, there is very little literature on the impact of different algorithms of BFL systems, namely consensus, participant selection and scoring algorithms, on the execution time, accuracy, convergence, communication and computation costs of the system. In addition, there is no research on how different scoring algorithms are impacted in terms of the aforementioned aspects when different amounts of clients and privacy degrees are used. With BFL being increasingly adopted in IoT networks, where low powered devices with low resources are the norm, it is important to ensure the system consumes the least amount of resources, especially regarding the clients.
 
-Additionally, motivated by the lack of any open-source framework for BFL, this thesis' second goal is to design and implement the first open-source modular framework for BFL using Ethereum\cite{wood2014ethereum} and TensorFlow\cite{tensorflow2015-whitepaper}. This framework can be easily adapted to support multiple architectures, as well as different algorithms for participant selection, scoring, or for aggregation. In addition, this framework should also support multiple types of data partition, such as horizontal and vertical.
+Additionally, even though there is literature on designing BFL frameworks, none of them are open source, or modular enough to support different algorithms. Such framework could be used to empower future research on new algorithms, as well as help those who want to implement their own BFL system.
 
 \section{Research Questions}\label{intro:questions}
 
@@ -48,7 +46,7 @@ This research question can be further sub-divided into four sub-questions:
     \item \textit{How can we build a Blockchain-based Federated Learning framework that supports different data partition formats, such as vertical and horizontal?}
 \end{enumerate}
 
-\section{Outline}\label{intro:outline}
+\section{Thesis Contributions and Outline}\label{intro:outline}
 
 The remainder of the thesis is structured as follows. \Cref{chapter:background} provides definitions and fundamental concepts about BFL, as well as background information of the algorithms and mechanisms that will be explored. \Cref{chapter:related_work} reviews the existing work regarding algorithms and mechanisms used in BFL systems. \Cref{chapter:framework} explains the design and implementation of the framework. \Cref{chapter:evaluation} provides information regarding the experimental setup of the experiments. \Cref{chapter:analysis:consensus_algorithms} provides the impact analysis of using different consensus algorithms. \Cref{chapter:horizontal} provides the impact analysis of using different scoring algorithms, as well as how they behave with different number of clients and privacy degrees. \Cref{chapter:vertical} provides analysis of the proof of concept of Vertical Federated Learning applied in a BFL system. Finally, \Cref{chapter:conclusion} discusses the results, contributions and provides directions for future works.
 
