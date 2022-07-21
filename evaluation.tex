@@ -188,9 +188,11 @@ The conducted experiments, visible on \autoref{tab:experiments}, can be divided 
     
     \item \textit{Scoring Algorithms}: BlockFlow, Marginal Gain, Multi-KRUM, as well as without a scoring algorithm.
     
-    \item \textit{Number of Clients}: 5, 10, 25, 50, selected based on the current literature and available resources we have at our disposal to execute the experiments.
+        \begin{enumerate}
+            \item \textit{Number of Clients}: 5, 10, 25, 50, selected based on the current literature and available resources we have at our disposal to execute the experiments.
     
-    \item \textit{ Privacy Degrees}: 1 and 5, as well as without any privacy mechanism.
+            \item \textit{Privacy Degrees}: 1 and 5, as well as without any privacy mechanism.
+        \end{enumerate}
 \end{enumerate}
 
 In all experiments, the remaining aspects remain constant. For example, when comparing scoring algorithms, the consensus algorithm is fixed. Below are the default choices for each of the variable aspects above that is applied to the remaining experiments:
@@ -217,6 +219,6 @@ All experiments are run for 50 rounds such that we can compare the accuracy resu
 
 On \autoref{tab:experiments}, we can see that our results, in terms of accuracy, are within the range of the original works of the scoring algorithms. Since we do not have enough details regarding the implementations of the works we compare to, this is the only way to validate our results.
 
-The detailed impact analyzis of each of the experiment groups are presented from \Cref{chapter:analysis:consensus_algorithms} through \Cref{chapter:analysis:privacy}. On \Cref{chapter:vertical}, we present the results of the Proof of Concept of Vertical Federated Learning applied in a Blockchain-based Federated Learning environment.
+The detailed impact analysis, as well we the Proof of Concept of Vertical Federated Learning applied in a Blockchain-based Federated Learning environment are presented in the chapters that follow.
 
 \input{tables/experiments}
