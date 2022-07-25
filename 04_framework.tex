@@ -24,8 +24,6 @@ The framework supports a modular sequential flow represented in \autoref{fig:blo
     
     \item The aggregators retrieve the model updates and execute the aggregation algorithm and submit the aggregation results to the blockchain.
     
-    \item For the vertically partitioned data, and depending on the model in use, the trainers may have to confirm back-propagation. Note that this step is tightly connected to the model we will be using for Vertical Federated Learning, which will be introduced later. This shows how modular the system can be and how steps can easily be added at different points of the flow for different purposes.
-    
     \item Finally, the model owner sends a transaction to the blockchain in order to terminate the round. At this point, the smart contract checks if the majority of the aggregators agreed on the aggregation. If so, the round is marked as terminated. Otherwise, the round fails, indicating that the aggregators did not reach an agreement, which may indicate that some of the aggregators are compromised.
 \end{enumerate}
 
@@ -102,8 +100,6 @@ Since our framework supports different algorithms, we need four different smart 
     \item \texttt{RandomSelectionScoring}, which is used when we need a scoring algorithm. This smart contract implements the required methods to support the scoring phase, such as scoring submissions and the scoring round. In addition, it adds a function to allow the model owner to start a round with random participant selection.
     
     \item \texttt{FirstComeFirstServedNoScoring}, which is used with the first-come first-served participant selection algorithm with no scoring mechanism. It adds a function to allow the model owner to start a round with first-come first-served participant selection.
-    
-    \item \texttt{VerticalSplitCNN}, which is used with vertically partitioned data, specifically with a Split-CNN model. It incorporates the functionality required to provide for an additional phase, the backpropagation, as well as more information about the head and top models.
 \end{itemize}
 
 A class diagram with the public interfaces of the contracts, as well as the data types, is depicted in \autoref{fig:contracts-uml}. From the diagram, we can see that the smart contract provides round information and control, registration management, updates submission and retrieval, scores submission and retrieval, as well as aggregation submission and retrieval. One may note that the scores submission and retrieval are only implemented in \texttt{RandomSelectionScoring} as the remaining smart contracts are not used with scoring mechanisms.

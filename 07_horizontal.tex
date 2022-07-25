@@ -1,4 +1,4 @@
-In this chapter, we analyze the impact of using different participant selection and scoring algorithms on a Blockchain-based Federated Learning (BFS) system with horizontal data partition. In addition, for each scoring algorithm, we analyze how they behave and how the system is impacted by different number of clients, as well as privacy degrees. Due to the high number of plots, the communication and computation costs plots are placed in \Cref{chapter:horizontal_appendix}.
+In this chapter, we analyze the impact of using different participant selection and scoring algorithms on a Blockchain-based Federated Learning (BFS) system with horizontal data partition. In addition, for each scoring algorithm, we analyze how they behave and how the system is impacted by different number of clients, as well as privacy degrees. Due to the high number of plots, the communication and computation costs plots are placed at the end of the chapter.
 
 \section{Participant Selection Algorithms}
 
@@ -53,9 +53,33 @@ As it can be seen from \autoref{fig:accuracy_selection}, even though both algori
 
 \autoref{fig:net_selection} illustrates the network traffic per round for client, servers, and the blockchain processes. This algorithms solely influences which and how many clients are selected per round. Therefore, the individual communication traffic of each process is not expected to change significantly as long as the number of participants per round does not change significantly. In these experiments, we observe form \autoref{fig:participations_client} that the difference of clients participating per round is smaller than $5$. This small difference explains why the inbound traffic at the server process is slightly higher, since the server has to download weights from a higher number of clients in order to perform the aggregation.
 
+\begin{figure}[!hpt]
+    \centering
+    \centering
+    \includegraphics[width=0.8\textwidth]{graphics/selection/net.pdf}
+    \caption{Network Traffic Per Round Per Participant Selection Algorithm}
+    \label{fig:net_selection}
+\end{figure}
+
 \subsection{Computation Costs}
 
 \autoref{fig:ram_selection} and \autoref{fig:cpu_selection} show the RAM usage and CPU usage per each process, respectively. Similarly to what was observed regarding the communication costs, the RAM usage at the server is slightly higher, which is explained by the additional weights to perform the aggregation. One may note that this difference happens due to the randomness of the process. In other runs, it is possible that the number of selected devices would be lower and therefore the difference would be smaller.
+
+\begin{figure}[!hpb]
+    \centering
+    \centering
+    \includegraphics[width=0.8\textwidth]{graphics/selection/ram.pdf}
+    \caption{RAM Usage Per Participant Selection Algorithm}
+    \label{fig:ram_selection}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \centering
+    \includegraphics[width=0.8\textwidth]{graphics/selection/cpu.pdf}
+    \caption{CPU Usage Per Participant Selection Algorithm}
+    \label{fig:cpu_selection}
+\end{figure}
 
 \subsection{Conclusions}
 
@@ -113,6 +137,14 @@ The Marginal Gain and Multi-KRUM algorithms both reject the worst submissions in
 
 Communication costs also vary massively depending on which  scoring algorithm is used. Some place more strain on the clients, where others place more strain on the servers. \autoref{fig:net_scoring} presents the network traffic per round per scoring algorithm on the clients, servers, and blockchain processes.
 
+\begin{figure}[!ht]
+    \centering
+    \centering
+    \includegraphics[width=0.8\textwidth]{graphics/scoring/net.pdf}
+    \caption{Network Traffic Per Round Per Scoring Algorithm}
+    \label{fig:net_scoring}
+\end{figure}
+
 Regarding the clients, there is a large difference in terms of the network traffic when comparing no scoring algorithm and the Multi-KRUM with the BlockFlow and Marginal Gain. On the one hand, the Multi-KRUM has similar traffic requirements to using no scoring algorithm on the clients because the scoring algorithm is executed on the servers. On the other hand, the BlockFlow and Marginal Gain have higher inbound traffic at the clients, while the outbound traffic remains similar. This can be explained by the fact that both BlockFlow and Marginal Gain algorithms are executed by the clients. Consequently, each client has to download the weights from all other clients in each round in order to calculate the score, leading to a higher inbound traffic.
 
 Regarding the servers, there is not much difference between algorithms, except for the Multi-KRUM, which calculates the scores on the server. Therefore, the server downloads the weights of each client and requires additional time to calculate the scores, compared to the remaining algorithms that only download the weights once for the aggregation.
@@ -128,6 +160,22 @@ Regarding the clients, all algorithms require similar amounts of RAM. The algori
 Regarding the servers, it is clear that Multi-KRUM, being the only scoring algorithm that runs on the server, requires higher amount of RAM. However, the difference ($\approx 15$ MB) is not significant when considering that the servers have large amount of resources at their disposal. In addition, the Multi-KRUM also shows higher level of CPU usage, with frequent spikes to $100\%$.
 
 Finally, regarding the blockchain, the difference of CPU and RAM usages among the different scoring algorithms is negligible. Even though the blockchain receives more transactions in total, it does not reflect on the RAM and CPU usage. The blockchain, by itself, already produces blocks at a constant rate. Therefore, the number of transactions required for the BFL system does not change significantly the CPU or RAM usage.
+
+\begin{figure}[!hpt]
+    \centering
+    \centering
+    \includegraphics[width=0.8\textwidth]{graphics/scoring/ram.pdf}
+    \caption{RAM Usage Per Scoring Algorithm}
+    \label{fig:ram_scoring}
+\end{figure}
+
+\begin{figure}[!hpb]
+    \centering
+    \centering
+    \includegraphics[width=0.8\textwidth]{graphics/scoring/cpu.pdf}
+    \caption{CPU Usage Per Scoring Algorithm}
+    \label{fig:cpu_scoring}
+\end{figure}
 
 \subsubsection{Conclusions and Improvements}
 
@@ -197,7 +245,7 @@ When it comes to the algorithm that performs best, the conclusions drawn from \C
 
 As it can be seen from \autoref{fig:net_clients}, the communication costs vary with the number of clients. Firstly, we observe that in terms of incoming traffic at the client process, there are significant differences depending on the scoring algorithm used.
 
-\begin{figure}[!hb]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=\textwidth]{graphics/clients/traffic.pdf}
     \caption{Network Traffic Per Number of Clients}
@@ -286,6 +334,13 @@ Out of the three scoring algorithms, the Marginal Gain and Multi-KRUM perform th
 
 In terms of communication costs, as illustrated in \autoref{fig:net_privacy}, there are no significant differences depending on the privacy degree used. Adding noise to the weights does not necessarily increase their sizes and, for that reason, the network traffic costs are not expected to change significantly.
 
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/traffic.pdf}
+    \caption{Network Traffic Per Privacy Degree}
+    \label{fig:net_privacy}
+\end{figure}
+
 \subsubsection{Computation Costs}
 
 \autoref{fig:ram_privacy_clients}, \autoref{fig:ram_privacy_servers}, \autoref{fig:ram_privacy_miners} show the RAM usage at the clients, servers, and blockchain processes, while \autoref{fig:cpu_privacy_clients}, \autoref{fig:cpu_privacy_servers}, \autoref{fig:cpu_privacy_miners} show the CPU usage at the clients, servers, and blockchain processes, respectively. Since the privacy algorithm is only executed by the client process, we only expect the computation costs, namely the CPU usage, to increase at the client process. Overall, we can observe that this is true as there are no significant changes in the RAM or CPU usage for the servers and blockchain processes.
@@ -299,3 +354,111 @@ In conclusion, we see that using a privacy algorithm increases the computation c
 In addition, one may notice that increasing the privacy degree leads to the lower model accuracy. This is expected since the privacy algorithm used introduce noise to the weights. However, some of the scoring algorithms are still able to achieve higher model accuracy values even with higher privacy degrees. This is the case for the Marginal Gain and Multi-KRUM, which are the most well-performing algorithms.
 
 Finally, we can argue that adding a privacy preserving algorithm to a BFS system is crucial, specially if the model is trained with sensitive data. One of the main arguments to apply blockchain to a Federated Learning system is the traceability and auditability. To do so, the weights, or their representation in our case, are recorded in the blockchain, which means they are visible and retrievable by anyone in the network. This implies that there is a trade-off between traceability and auditability and the requirement for privacy mechanisms, which in turn leads to higher resource usage.
+
+\clearpage
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/clients/ram_client.pdf}
+    \caption{Client Process RAM Usage Per Number of Clients}
+    \label{fig:ram_clients_clients}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/clients/ram_server.pdf}
+    \caption{Server Process RAM Usage Per Number of Clients}
+    \label{fig:ram_clients_servers}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/clients/ram_miner.pdf}
+    \caption{Blockchain Process RAM Usage Per Number of Clients}
+    \label{fig:ram_clients_miners}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/clients/cpu_client.pdf}
+    \caption{Client Process CPU Usage Per Number of Clients}
+    \label{fig:cpu_clients_clients}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/clients/cpu_server.pdf}
+    \caption{Server Process CPU Usage Per Number of Clients}
+    \label{fig:cpu_clients_servers}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/clients/cpu_miner.pdf}
+    \caption{Blockchain Process CPU Usage Per Number of Clients}
+    \label{fig:cpu_clients_miners}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/ram_client.pdf}
+    \caption{Client Process RAM Usage Per Privacy Degree}
+    \label{fig:ram_privacy_clients}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/ram_server.pdf}
+    \caption{Server Process RAM Usage Per Privacy Degree}
+    \label{fig:ram_privacy_servers}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/ram_miner.pdf}
+    \caption{Blockchain Process RAM Usage Per Privacy Degree}
+    \label{fig:ram_privacy_miners}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/cpu_client.pdf}
+    \caption{Client Process CPU Usage Per Privacy Degree}
+    \label{fig:cpu_privacy_clients}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/cpu_server.pdf}
+    \caption{Server Process CPU Usage Per Privacy Degree}
+    \label{fig:cpu_privacy_servers}
+\end{figure}
+
+\vfill
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{graphics/privacy/cpu_miner.pdf}
+    \caption{Blockchain Process CPU Usage Per Privacy Degree}
+    \label{fig:cpu_privacy_miners}
+\end{figure}
