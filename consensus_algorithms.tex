@@ -16,7 +16,7 @@ Mean Transaction Latency (s)    & 1.549  & 1.821  & 1.558  \\ \hline
 Mean Transaction Cost (Gas)     & 183124 & 227052 & 182880 \\ \hline
 % Median Cost Per Transaction (Gas)   & 185198 & 229866 & 185068 \\ \hline \hline
 \end{tabular}
-\caption{Execution Time, Transaction Cost, and Latency Per Consensus Algorithms}
+\caption{Execution Time, Transaction Cost, and Latency of Consensus Algorithms}
 \label{tab:metrics_consensus_algorithms}
 \end{table}
 
@@ -84,7 +84,7 @@ Regarding the blockchain process, we observe a larger difference, both in terms 
 
 In conclusion, we can observe that different consensus algorithms have no direct impact on the model accuracy and computation and communication costs at the clients and servers. However, they have an impact on the time and computation and communication costs at the blockchain process. PoA and QBFT are much faster than PoW. In addition, they require less computation power, both in RAM and CPU. However, QBFT consumes incurs more communication costs than both PoA and PoW. Therefore, there is a clear correlation between the computation costs and the time it takes. The higher the communication costs, the higher the transaction latencies, which translates to slower round times.
 
-Assuming the blockchain network is only being used for FL, PoA is the most cost-effective of the consensus algorithms we analyzed.
+Assuming that the blockchain network is only being used for FL, PoA is the most cost-effective of the consensus algorithms we analyzed.
 
 It is also worth pointing out that, as discussed in \Cref{chapter:related_work}, PoA is criticized for not being as decentralized as the other algorithms due to the way the validator nodes are chosen. If a higher degree of decentralization is required, as in a public network for example, PoW and QBFT may be better options. There is therefore a trade-off between the degree of decentralization and the communication and computation consumption.
 

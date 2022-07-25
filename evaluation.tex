@@ -40,9 +40,9 @@ In order to perform the horizontal client sampling, we used a publicly available
 
 Vertically partitioned data is significantly different from horizontally partition data, in the sense that the clients share intersecting sample spaces, but different feature spaces. Therefore, it is not possible to simply divide the samples among the clients.
 
-For the vertical data partition, we use the work reported in \cite{10.48550/arxiv.2104.00489}. Firstly, we choose how many samples to assign to each client. We chose the same number as for the horizontal partitioning, i.e., $2500$ samples. Then, the samples are randomly chosen from the original data set. Subsequently, each sample is assigned a unique identifier (ID) that will be used as label when giving the data samples to each client. Only the servers have access to the grouth truth labels. After assigning the IDs, the feature space $F$ will be divided into $C$ parts $F_c$, where $C$ is the number of clients. Finally, the features $F_c$, with $c \in C$ will be assigned to each of the clients.
+For the vertical data partition, we use the work reported in \cite{10.48550/arxiv.2104.00489}. Firstly, we choose how many samples to assign to each client. We chose the same number as for the horizontal partitioning, i.e., $2500$ samples. Then, the samples are randomly chosen from the original data set. Subsequently, each sample is assigned a unique identifier (ID) that will be used as label when giving the data samples to each client. Only the servers have access to the ground truth labels. After assigning the IDs, the feature space $F$ will be divided into $C$ parts $F_c$, where $C$ is the number of clients. Finally, the features $F_c$, with $c \in C$ will be assigned to each of the clients.
 
-For vertical data partitioning, we divide the data set as in \cite{10.48550/arxiv.2104.00489} to use it with a Split-CNN \cite{10.1145/3297858.3304038} model, which will be introduced in the next section. To use this model, the owner is expected to have the labels, while the clients are expected to have some features of each sample. For the MNIST data set, we can think of the features as vertical columns of the image. To divide a 28 by 28 image sample between 2 clients, for example, we split the image into two 14 by 28 segments, as depicted in \autoref{fig:vertical_dist}.
+For vertical data partitioning, we divide the data set as in \cite{10.48550/arxiv.2104.00489} to use it with a Split-CNN \cite{10.1145/3297858.3304038} model, which will be introduced in the next section. To use this model, the model owner is expected to have the labels, while the clients are expected to have some features of each sample. For the MNIST data set, we can think of the features as vertical fragments of the image. To divide a 28 by 28 image sample between 2 clients, for example, we split the image into two 14 by 28 segments, as depicted in \autoref{fig:vertical_dist}.
 
 \begin{figure}[!ht]
     \centering
@@ -151,7 +151,7 @@ The experiments were executed in a remote machine, whose hardware and software s
 
 \section{Performance Evaluation Metrics}\label{eval:metrics}
 
-We select the following metrics for our performance evaluation:  execution time, model accuracy, communication cost, and computation cost.
+We select the following metrics for our performance evaluation: execution time, model accuracy, communication cost, and computation cost.
 
 \subsection{Execution Time}
 
@@ -180,7 +180,7 @@ To collect these metrics, we use \texttt{docker stats}, which is a command provi
 
 \section{Experiment Groups}\label{meth:experiments}
 
-The conducted experiments, listen in \autoref{tab:experiments}, can be divided into three groups, of which two analyze how using different types of algorithm impact the system's performance in terms of accuracy, convergence, communication, and computation costs. These two groups relate to impact analysis of:
+The conducted experiments, listed in \autoref{tab:experiments}, can be divided into three groups, of which two analyze how using different types of algorithms impact the system's performance in terms of model accuracy, convergence, communication, and computation costs. These two groups relate to impact analysis of:
 
 \begin{enumerate}
     \item \textit{Consensus Algorithms}: PoA, PoW, and QBFT. Consensus algorithms are a component of the blockchain and they are expected to impact Horizontal Federated Learning and Vertical Federated Learning equally.
@@ -188,7 +188,7 @@ The conducted experiments, listen in \autoref{tab:experiments}, can be divided i
     \item \textit{Horizontal Federated Learning}
     
     \begin{enumerate}
-        \item \textit{Participant Selection Mechanisms}: random selection and first-come first-served.
+        \item \textit{Participant Selection Mechanisms}: random selection versus first-come first-served.
         
         \item \textit{Scoring Algorithms}: BlockFlow, Multi-KRUM, Marginal Gain, as well as without any scoring algorithm. For each scoring algoritm, we also analyse the impact of:
         

@@ -30,7 +30,7 @@ horizontal, (ii) vertical, and (iii) federated Transfer Learning. We focus on th
 
 In \textit{Horizontal Federated Learning} (HFL), clients with the same data structure collaborate to build a single model. In other words, the different data sets in the different clients share the same feature space, but not the sample space. For example, two banks branches operating in different cities have similar businesses (feature space), but different clients (sample space). The architecture of HFL, depicted in \autoref{fig:hfl_arch}, consists of multiple clients training a model, while the central server performs the aggregation of all local updates.
 
-In \textit{Vertical Federated Learning} (VFL), clients share an intersecting sample space, but different feature spaces. For example, two different banks with different products operating in the same city have a similar client base (sample space), but different informations about each client (feature space). The architecture of VFL, depicted in \autoref{fig:vfl_arch}, is similar to the one of HFL. However, it requires an additional step, the Private Set Intersection (PSI) \cite{wei2022vertical}, since the clients do not share the exact same sample space. PSI is a protocol by which multiple clients can calculate the common samples without sharing their raw data \cite{wei2022vertical}.
+In \textit{Vertical Federated Learning} (VFL), clients share an intersecting sample space, but different feature spaces. For example, two different banks with different products operating in the same city have a similar client base (sample space), but different information about each client (feature space). The architecture of VFL, depicted in \autoref{fig:vfl_arch}, is similar to the one of HFL. However, it requires an additional step, calculating the Private Set Intersection (PSI) \cite{wei2022vertical}, since the clients do not share the exact same sample space. PSI is a protocol by which multiple clients can calculate the common samples without sharing their raw data \cite{wei2022vertical}.
 
 \begin{figure}[!htp]
     \centering
@@ -84,7 +84,7 @@ As mentioned beforehand, a blockchain is maintained by several nodes in a peer-t
 
 \subsection{Smart Contracts}\label{background:smart_contracts}
 
-Smart contracts \cite{8500488} are small computer programs that live within the blockchain and automatically run when predetermined conditions are met. As they live in the blockchain, they are trustless and are typically used to automate the execution of agreements. This way, every party involved in the agreement is certain that it will be honored once the conditions of the agreement are met. Some blockchain platforms, such as Ethereum \cite{wood2014ethereum}, provide functionality for smart contracts.
+Smart contracts \cite{8500488} are small computer programs that live within the blockchain and automatically run when predetermined conditions are met. As they live in the blockchain, they are trustless and are typically used to automate the execution of agreements. This way, every party involved in the agreement is certain that it will be honored once the conditions of the agreement are met. Some blockchain platforms, such as the Ethereum \cite{wood2014ethereum}, provide functionality for smart contracts.
 
 \subsection{Blockchain Platforms}\label{background:blockchain_platforms}
  
@@ -99,22 +99,22 @@ The consensus algorithm is one of the most important components of a Blockchain 
 \begin{itemize}
     \item The \textit{Proof of Work (PoW)} \cite{finney} consensus algorithm was first introduced in the context of blockchain platforms by Satoshi Nakamoto in Bitcoin \cite{nakamoto2009bitcoin}. It works by means of computation effort proofs, where a set of virtual miners race in solving a complex, yet feasible, mathematical problem. The winner of the race generates a cryptographic proof based on the solution of the problem that can be easily verified by others. Then, the winner adds a new block containing the newly verified transactions to the blockchain. In addition, the winner is rewarded according to some pre-determined rules.
     
-    On one hand, it is a simple algorithm, for which proofs are hard to create, but easy to verify \cite{li_blockchain_2021}. Not only is it robust and proven to work, but the cost of attacking a PoW blockchain is extremely high \cite{li_blockchain_2021}. For an attack to be successful, it needs to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021, ccaf}.
+    On the one hand, it is a simple algorithm, for which proofs are hard to create, but easy to verify \cite{li_blockchain_2021}. Not only is it robust and proven to work, but the cost of attacking a PoW blockchain is extremely high \cite{li_blockchain_2021}. For an attack to be successful, it needs to control more than half of the network \cite{li_blockchain_2021}. On the other hand, PoW consumes extreme amounts of energy and it is hard to scale \cite{edwood_2020, li_blockchain_2021, ccaf}.
     
     \item The \textit{Proof of Authority (PoA)} \cite{szilagyi_2017} consensus algorithm is a reputation-based consensus algorithm that is most commonly used in private blockchain networks. It works by having a set of validator nodes that are responsible for validating new transactions. In order to ensure the correctness of the validator nodes, they have to stake their own reputation. In addition, the validators are known trusted entities that are manually chosen by the network owner.
     
-    On one hand, PoA provides high throughput and high scalability \cite{bPoA}. On the other hand, the main criticism of PoA is that it is usually has a small number of validators, that are manually chosen. Therefore, it has a lesser degree of decentralization. Consequently, PoA is not as common in public blockchain networks as it is for private networks \cite{bPoA}.
+    On the one hand, PoA provides high throughput and high scalability \cite{bPoA}. On the other hand, the main criticism of PoA is that it is usually has a small number of validators, that are manually chosen. Therefore, it has a lesser degree of decentralization. Consequently, PoA is not as common in public blockchain networks as it is for private networks \cite{bPoA}.
 
     \item The \textit{QBFT Byzantine Fault Tolerance (QBFT)} \cite{10.48550/arxiv.2002.03613} consensus algorithm is similar to the Practical Byzantine Fault Tolerance (PBFT) \cite{Castro99practicalbyzantine} algorithm, which is a three-phase protocol that allows a network with $3f+1$ nodes, where $f$ is the maximum amount of faulty nodes, to reach consensus. The different between QBFT and PBFT is that in the former the set of validators is dynamic, while in the latter, it is static. The network reaches a consensus once $2f+1$ nodes agree.
     
-    One one hand, QBFT allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. On the other hand, it will stop working properly if only 33\% or less blockchain nodes are running and it can also have high communication costs due to its three-phase protocol nature \cite{li_blockchain_2021}.
+    One the one hand, QBFT allows for high consensus efficiency in high throughput networks \cite{li_blockchain_2021}. On the other hand, it will stop working properly if only 33\% or less blockchain nodes are running and it can also have high communication costs due to its three-phase protocol nature \cite{li_blockchain_2021}.
 \end{itemize}
 
 \section{Blockchain-based Federated Learning}\label{background:bfl}
 
 Recently, the idea of applying blockchain to FL has emerged. This is motivated by the fact that FL architectures are highly dependent on a single central server, leading to a central point of failure, that can be either overloaded or compromised. With blockchain, the central server can be replaced by multiple decentralized servers that operate the blockchain nodes. In addition, blockchain can provide authentication, traceability, auditability and data preservation.
 
-As stated in \cite{10.48550/arxiv.2110.02182}, so far three different architectures groups have been proposed for BFL systems: \textit{Fully Coupled BFL}, \textit{Flexibly Coupled BFL} and \textit{Loosely Coupled BFL}.
+As stated in \cite{10.48550/arxiv.2110.02182}, so far three different architectures groups have been proposed for BFL systems: \textit{Fully Coupled BFL}, \textit{Flexibly Coupled BFL}, and \textit{Loosely Coupled BFL}. In Fully Coupled BFL, the distributed clients are the only devices in the network and act as both clients and servers, performing the training and aggregation, as well as running the blockchain nodes. In Loosely Coupled BFL, the central server still exists and blockchain is only used to manage the reputation of clients. Flexibly Coupled BFL provides a middle ground between both, where there are servers and clients in the network. The servers are responsible for maintaining the blockchain nodes and use the blockchain to store information such as aggregations, scores, among others. The architecture is depicted in \autoref{fig:bfl_arch}.
 
 \begin{figure}[!ht]
     \centering
@@ -124,7 +124,7 @@ As stated in \cite{10.48550/arxiv.2110.02182}, so far three different architectu
     \label{fig:bfl_arch}
 \end{figure}
 
-In Fully Coupled BFL, the distributed clients are the only devices in the network and act as both clients and servers, performing the training and aggregation, as well as running the blockchain nodes. In Loosely Coupled BFL, the central server still exists and blockchain is only used to manage the reputation of clients. Flexibly Coupled BFL provides a middle ground between both, where there are servers and clients in the network. The servers are responsible for maintaining the blockchain nodes and use the blockchain to store information such as aggregations, scores, among others. The architecture is depicted in \autoref{fig:bfl_arch}.
+
 
 \subsection{Participants Selection Algorithms}
 
