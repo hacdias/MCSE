@@ -180,33 +180,25 @@ To collect these metrics, we use \texttt{docker stats}, which is a command provi
 
 \section{Experiment Groups}\label{meth:experiments}
 
-The conducted experiments, listed in \autoref{tab:experiments}, can be divided into six groups, of which five experiments relate to the horizontal FL and one relates to the vertical FL. analyze how using different types of algorithm impact the system's performance in terms of accuracy, convergence, communication, and computation costs. These five groups relate to impact analysis of:
+The conducted experiments, listen in \autoref{tab:experiments}, can be divided into three groups, of which two analyze how using different types of algorithm impact the system's performance in terms of accuracy, convergence, communication, and computation costs. These two groups relate to impact analysis of:
 
 \begin{enumerate}
-    \item \textit{Consensus Algorithms}: PoA, PoW and QBFT.
+    \item \textit{Consensus Algorithms}: PoA, PoW, and QBFT. Consensus algorithms are a component of the blockchain and they are expected to impact Horizontal Federated Learning and Vertical Federated Learning equally.
     
-    \item \textit{Participant Selection Algorithms}: random selection and first-come first-served.
+    \item \textit{Horizontal Federated Learning}
     
-    \item \textit{Scoring Algorithms}: BlockFlow, Marginal Gain, Multi-KRUM, as well as without a scoring algorithm.
-    
+    \begin{enumerate}
+        \item \textit{Participant Selection Mechanisms}: random selection and first-come first-served.
+        
+        \item \textit{Scoring Algorithms}: BlockFlow, Multi-KRUM, Marginal Gain, as well as without any scoring algorithm. For each scoring algoritm, we also analyse the impact of:
+        
         \begin{enumerate}
             \item \textit{Number of Clients}: 5, 10, 25, 50, selected based on the current literature and available resources we have at our disposal to execute the experiments.
-    
-            \item \textit{Privacy Degrees}: 1 and 5, as well as without any privacy mechanism.
+            
+            \item \textit{Privacy Degree}: 1 and 5, as well as without any privacy mechanism.
         \end{enumerate}
+    \end{enumerate}
 \end{enumerate}
-
-In all experiments, the remaining aspects remain constant. For example, when comparing scoring algorithms, the consensus algorithm is fixed. Below are the default choices for each of the variable aspects above that is applied to the remaining experiments:
-
-\begin{itemize}
-    \item \textit{Consensus Algorithm}: PoA is used since it is expected to be faster and more resource efficient, as discussed in \Cref{related_work:consensus_algorithms}.
-    
-    \item \textit{Participant Selection Algorithm}: random selection is used as it was the most common among the reviewed experiments.
-    
-    \item \textit{Number of Clients}: 25 clients is used as it provides a good equilibrium between the execution time and the resources we have available for our experiment.
-    
-    \item \textit{Privacy Degree}: no privacy mechanism is applied on the remaining experiments in order to understand how the other aspects impact the system without this variable.
-\end{itemize}
 
 In the sixth and last experiment group, we investigate if it is possible to implement and run a Blockchain-based Federated Learning with vertically partitioned data. We perform two experiments, with 2 and 4 clients. The low number of clients is due to the nature of the data set and how we partition the data vertically. In addition, this experiment will not include a scoring or participation selection algorithm.
 
