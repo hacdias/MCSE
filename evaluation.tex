@@ -40,9 +40,9 @@ In order to perform the horizontal client sampling, we used a publicly available
 
 Vertically partitioned data is significantly different from horizontally partition data, in the sense that the clients share intersecting sample spaces, but different feature spaces. Therefore, it is not possible to simply divide the samples among the clients.
 
-For the vertical data partition, we use the work reported in \cite{10.48550/arxiv.2104.00489}. Firstly, we choose how many samples to assign to each client. We chose the same number as for the horizontal partitioning, i.e., $2500$ samples. Then, the samples are randomly chosen from the original data set. Subsequently, each sample is assigned a unique identifier (ID) that will be used as label when giving the data samples to each client. Only the servers have access to the true labels. After assigning the IDs, the feature space $F$ will be divided into $C$ parts $F_c$, where $C$ is the number of clients. Finally, the features $F_c$, with $c \in C$ will be assigned to each of the clients.
+For the vertical data partition, we use the work reported in \cite{10.48550/arxiv.2104.00489}. Firstly, we choose how many samples to assign to each client. We chose the same number as for the horizontal partitioning, i.e., $2500$ samples. Then, the samples are randomly chosen from the original data set. Subsequently, each sample is assigned a unique identifier (ID) that will be used as label when giving the data samples to each client. Only the servers have access to the grouth truth labels. After assigning the IDs, the feature space $F$ will be divided into $C$ parts $F_c$, where $C$ is the number of clients. Finally, the features $F_c$, with $c \in C$ will be assigned to each of the clients.
 
-The vertical data partitioning highly depends on both the FL model and the data set. We therefore will use a Split-CNN, which will be introduced in the next section. To use this model, the owner is expected to have the labels, while the clients are expected to have some features of each sample. For the MNIST data set, we can think of the features as vertical segments of the image. To divide a 28 by 28 image sample between 2 clients, for example, we split the image into two 14 by 28 segments, as depicted in \autoref{fig:vertical_dist}.
+For vertical data partitioning, we divide the data set as in \cite{10.48550/arxiv.2104.00489} to use it with a Split-CNN \cite{10.1145/3297858.3304038} model, which will be introduced in the next section. To use this model, the owner is expected to have the labels, while the clients are expected to have some features of each sample. For the MNIST data set, we can think of the features as vertical columns of the image. To divide a 28 by 28 image sample between 2 clients, for example, we split the image into two 14 by 28 segments, as depicted in \autoref{fig:vertical_dist}.
 
 \begin{figure}[!ht]
     \centering
@@ -58,7 +58,7 @@ The models used on this work are simple models found in related work. The goal o
 
 \subsection{Horizontal Model}
 
-For the horizontal FL, we use a simple Convolutional Neural Network (CNN) with three levels of convolution intercalated with max pooling to reduce overfitting. These layers are followed by a flattening layer and two dense layers that culminate in the output. More details about the architecture parameters can be found in \autoref{tab:cnn}.
+For the horizontal FL, we use a simple Convolutional Neural Network (CNN) \cite{cnn} with three levels of convolution intercalated with max pooling to reduce overfitting. These layers are followed by a flattening layer and two dense layers that culminate in the output. More details about the architecture parameters can be found in \autoref{tab:cnn}. To train this model, both servers and clients have the same model. Then, the clients train the the model with their own data set. Subsequently, the clients send the weights to the servers by submitting their local model update to the blockchain via the smart contract. Finally, the servers aggregate the weights and publish the global model weights through the smart contract.
 
 \begin{table}[!h]
     \begin{tabular}{c|c}
