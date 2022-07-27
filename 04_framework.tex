@@ -4,7 +4,7 @@ In this chapter, we provide detailed information regarding the design of our mod
 
 The modular framework, to which we called BlockLearning, is designed in such a way that modules can be added, as well as removed or changed, easily. In this framework, the devices, identified by the address of their account in the blockchain, can be classified into three categories: \textit{trainers}, \textit{aggregators} and \textit{scorers}. Additionally, the entity that deploys the contract and is responsible for starting and terminating the rounds is called \textit{model owner}.
 
-A device can be categorized as one or more categories. By doing so, the framework provides flexibility to support different architectures and algorithms. For example, BlockFlow's scoring algorithm is executed by the clients, which are then categorized as trainers and scorers, while the servers are categorized as aggregators. In contrast, Multi-KRUM is executed by the servers, which are then categorized as aggregators and scorers, while the clients are categorized as trainers.
+A device, such as a client or a server, can be categorized as one or more categories. For example, BlockFlow's scoring algorithm is executed by the clients, which are then categorized as trainers and scorers, while the servers are categorized as aggregators. In contrast, Multi-KRUM is executed by the servers, which are then categorized as aggregators and scorers, while the clients are categorized as trainers. By allowing to categorize each device with more than one category, the framework provides flexibility to support different architectures and algorithms.
 
 \begin{figure}[!ht]
     \centering
@@ -31,7 +31,7 @@ In the last step of the execution flow, the smart contract checks if the majorit
 
 \subsection{Structure and Modules}\label{meth:struct_modules}
 
-The framework is divided into three main components: the smart contracts, the library, and the testbed. These are depicted on \autoref{fig:blocklearning_modules} and will be individually explained on the following subsections.
+The framework is divided into three main software components: the smart contracts, the library, and the testbed. The structure of the framework, as well as its modules, is depicted on \autoref{fig:blocklearning_modules}. Each of the components plays a different part in the overall system in order to support the logical flow shown in \autoref{fig:blocklearning_steps}. In the following subsections, each of the components will be individually explained in more detail.
 
 \begin{figure}[!ht]
     \centering

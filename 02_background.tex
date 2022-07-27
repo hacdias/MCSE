@@ -128,7 +128,13 @@ As stated in \cite{10.48550/arxiv.2110.02182}, so far three different architectu
 
 \subsection{Participants Selection Algorithms}
 
-For the participants selection algorithms, only random selection and first come-first served basis selection will be compared. In the former, both the amount of participants and the participants themselves are selected randomly before the start of each round. In the latter, each participant takes initiative to register for the the next round. Once the limit is reached, no more participants are allowed.
+Participant selection algorithms are algorithms that are used to decide how many and which clients are selected to participate in each round. There are two main participant selection algorithms:
+
+\begin{itemize}
+    \item \textit{Random selection}, where both the number of participants, as well as the participants themselves are selected randomly before the start of each round.
+    
+    \item \textit{First-come first-served}, where the number of participants $n$ is chosen randomly before the start of each round. Then, the first $n$ clients to take initiative to join the round will participate.
+\end{itemize}
 
 \subsection{Scoring and Aggregation Algorithms}
 \label{background:scoring}
@@ -141,7 +147,7 @@ During the training process, each client produces its model parameter updates an
     \item \textit{Plagiarism attacks} happen when lazy clients plagiarize other client's models updates without really training their models. These attacks can be addressed via pseudo-noise algorithms \cite{9403374}. In addition, plagiarism attacks within the same round can be avoided by secure communication methods, such as differential privacy \cite{10.48550/arxiv.2009.09338}, through which plagiarism attacks where a client reuses parameters from a previous round can be avoided by simply comparing the different client's updates.
 \end{itemize}
 
-To mitigate the poisoning and plagiarism attacks, different scoring algorithms were developed. Scoring algorithms are used to give each client, or its model update, a score. Based on this score, the submission may have more or less impact on the aggregation, if any at all. In addition, scores are used for reward mechanisms in systems where public models are being trained and clients need some sort of incentive to keep participating \cite{8945913, 8832210, 8905038, 9006344}. In this section, we explain briefly how each of the scoring algorithms that will be compared works and if they influence the aggregation algorithm.
+To mitigate the poisoning and plagiarism attacks, different scoring algorithms were developed. Scoring algorithms are used to give each client, or its model update, a score. Based on this score, the submission may have more or less impact on the aggregation, if any at all. In addition, scores are used for reward mechanisms in systems where public models are being trained and clients need some sort of incentive to keep participating \cite{8945913, 8832210, 8905038, 9006344}. In this section, we explain briefly how each of the scoring algorithms works and if they influence the aggregation algorithm.
 
 \subsubsection{BlockFlow Score}
 

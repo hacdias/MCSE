@@ -35,3 +35,13 @@ Firstly, it would be interesting to build a GUI for BlockLearning that, not only
 Secondly, it would be worth investigating more methods of scoring algorithms that do not require evaluating the model with them. Both Marginal Gain and BlockFlow require that the model is evaluated by the clients, which consumes more resources and takes some time. On the other hand, Multi-KRUM scores updates by comparing the weight values directly. It would be interesting to see if such a method could be applied on the clients and if would bring the resource consumption down at the clients.
 
 Finally, research in Blockchain-based Vertical Federated Learning should continue. Vertical Federated Learning solves a unique problem where multiple parties have different features on the same samples. The proof of concept provided in this work uses a very specific model that would not be applicable to many use cases. Therefore, more work into different types of model and architectures is required in order to understand the full potential.
+
+\section{Results}
+
+\autoref{tab:experiments} presents a summary of all of our experiments, as well as other works. On it, it is possible to see the configuration of all of the experiments that were executed. Due to space limitations, not all information is presented in the table. All experiments use the MNIST data set, except for the works \cite{10.48550/arxiv.2007.03856, 10.48550/arxiv.2011.07516} whose data set is unknown. In addition, all the experiments were executed with 50 rounds, except for \cite{9170559} which is also unknown.
+
+From \autoref{tab:experiments}, it can be noted that our experiment results, in terms of model accuracy, are within the range of the state of the art works of the scoring algorithms. Since we do not have enough details regarding the implementations of the works we compare to, this is the only way to validate our results.
+
+The detailed impact analysis, as well we the Proof of Concept of Vertical Federated Learning applied in a Blockchain-based Federated Learning environment are presented in the follwoing chapters.
+
+\input{tables/experiments}

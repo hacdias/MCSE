@@ -2,7 +2,7 @@ In this chapter, we analyze the impact of using different participant selection 
 
 \section{Participant Selection Algorithms}
 
-In this set of experiments, all properties of the system are static, except for the participant selection algorithm, which can be either random selection or first-come first-served.
+In this set of experiments, all properties of the system are fixed, except for the participant selection algorithm, which can be either random selection or first-come first-served.
 
 Both algorithms choose the number of clients in the same way, via a uniform random distribution. However, the clients themselves are chosen differently. Consequently, it is possible that the distribution of chosen clients is slightly different, which may affect the system performance. \autoref{fig:participations_client} illustrates client participation (represented by the bars), as well as the average number of participation per client (represented by the lines). It is clear from the plot that the distributions are different.
 
@@ -87,7 +87,7 @@ From this set of experiments, we conclude that random selection performs better 
 
 \section{Scoring Algorithms}
 
-In this set of experiments, all properties of the system are static, except for the scoring algorithm, which varies between BlockFlow, Marginal Gain, Multi-KRUM, or no scoring algorithm. Then, we analyze the impact of using different numbers of clients, as well as different privacy degrees.
+In this set of experiments, all properties of the system are fixed, except for the scoring algorithm, which varies between BlockFlow, Marginal Gain, Multi-KRUM, or no scoring algorithm. Then, we analyze the impact of using different numbers of clients, as well as different privacy degrees.
 
 \subsection{Overall Comparison}\label{horizontal:scoring_overall}
 
@@ -189,7 +189,7 @@ As a future improvement, servers can cache the client's update weights. Specific
 
 \subsection{Number of Clients}\label{horizontal:number_of_clients}
 
-In this section, we analyze the impact of different numbers of clients on the scoring algorithms. For this comparison, all properties of the system are static, except for the amount of clients, which varies between 5, 10, 25 and 50, per each scoring algorithm.
+In this section, we analyze the impact of different numbers of clients on the scoring algorithms. For this comparison, all properties of the system are fixed, except for the amount of clients, which varies between 5, 10, 25 and 50, per each scoring algorithm.
 
 \subsubsection{Execution Time, Transaction Cost, and Transaction Latency}
 
@@ -282,11 +282,7 @@ In this section, we analyze the impact of different privacy degrees on each scor
 
 As it can be seen from \autoref{fig:priv_metrics}, having a privacy mechanism increases the execution time of each round by approximately $16.6$ seconds. In addition, the privacy degree itself does not seem to influence the execution time significantly.
 
-% Therefore, we can conclude that there is a trade-off between execution time and privacy.
-
 Regarding the transaction latency and costs, there are no significant differences. The privacy mechanism is executed by the clients before they submit their model update, and does not change the number of transactions. Consequently, it has no impact on the blockchain process itself.
-
-% From this 16.6 seconds, 10 seconds directly caused by the differential privacy mechanism. The remaining are caused by slight fluctuations on communication time, such as waiting for all clients to submit their updates after applying the differential privacy.
 
 \begin{figure}[!hpt]
     \centering

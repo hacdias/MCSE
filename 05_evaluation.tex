@@ -151,7 +151,7 @@ The experiments were executed in a remote machine, whose hardware and software s
 
 \section{Performance Evaluation Metrics}\label{eval:metrics}
 
-We select the following metrics for our performance evaluation: execution time, model accuracy, communication cost, and computation cost.
+We select the following metrics for our performance evaluation: execution time, transaction costs, transaction latency, model accuracy and convergence, communication costs, and computation costs.
 
 \subsection{Execution Time}
 
@@ -169,10 +169,9 @@ To compare the model accuracy, we use a global \textit{Accuracy} metric for the 
 
 \subsection{Communication and Computation Costs}
 
-To compare the communication costs, we define the \textit{Network Traffic Per Round} metric, which is defined by how much network traffic flows to and from each process. It is collected for the client, server, and blockchain processes individually. By knowing the network traffic required for each process, we can draw conclusions regarding effects on different types of devices. For example, if there is a high volume of traffic per round at the client process, and the clients are resource-constrained IoT devices with low network bandwidth, then it is expected that each round takes longer since less traffic can go through the device at a single point in time.
+To compare the communication costs, we define the \textit{Network Traffic Per Round} metric, which is defined by how much network traffic flows to and from each process. It is collected for the client, server, and blockchain processes individually. By knowing the network traffic required for each process, we can draw conclusions regarding how the network traffic impacts different types of devices. For example, if there is a high volume of traffic per round at the client process, and the clients are resource-constrained IoT devices with low network bandwidth, then it is expected that each round takes longer since less traffic can go through the device at a single point in time.
 
-To compare the computation costs, we collect the \textit{RAM Usage} and \textit{CPU Usage}. 
-% Similarly to the communication costs, both of these metrics are collected at the client, server, and blockchain processes. This metrics allows us to compare and visualize how different algorithms impact the computation costs at each process.
+To compare the computation costs, we collect the \textit{RAM Usage} and \textit{CPU Usage}.
 
 The communication and computation costs metrics are collected at the client, server, and blockchain processes in order to be able to differentiate the effects of the different algorithms on the different parts of the system. However, it is important to note that, in practical settings, the server process and the blockchain process run on the same device.
 
@@ -180,7 +179,7 @@ To collect these metrics, we use \texttt{docker stats}, which is a command provi
 
 \section{Experiment Groups}\label{meth:experiments}
 
-The conducted experiments, listed in \autoref{tab:experiments}, can be divided into three groups, of which two analyze how using different types of algorithms impact the system's performance in terms of model accuracy, convergence, communication, and computation costs. These two groups relate to impact analysis of:
+The conducted experiments can be divided into three groups, of which two analyze how using different types of algorithms impact the system's performance in terms of model accuracy, convergence, communication, and computation costs. These two groups relate to impact analysis of:
 
 \begin{enumerate}
     \item \textit{Consensus Algorithms}: PoA, PoW, and QBFT. Consensus algorithms are a component of the blockchain and they are expected to impact Horizontal Federated Learning and Vertical Federated Learning equally.
@@ -200,18 +199,8 @@ The conducted experiments, listed in \autoref{tab:experiments}, can be divided i
     \end{enumerate}
 \end{enumerate}
 
-In the sixth and last experiment group, we investigate if it is possible to implement and run a Blockchain-based Federated Learning with vertically partitioned data. We perform two experiments, with 2 and 4 clients. The low number of clients is due to the nature of the data set and how we partition the data vertically. In addition, this experiment will not include a scoring or participation selection algorithm.
+In the third and last experiment group, we investigate if it is possible to implement and run a Blockchain-based Federated Learning with vertically partitioned data. To do so, we analyze how to extend the BlockLearning framework in order to support the Split-CNN model. Then, we implement the required extensions to the framework. Finally, we execute the experiments and compare the results with the original work where the Split-CNN model was used with the MNIST dataset in order to validate our experiment.
 
 As explained in \Cref{background:archfl}, Vertical Federated Learning systems have an additional step, in which the Private Set Intersection (PSI) of the client's data sets is calculated. In this work, we assume that the PSI is calculated beforehand and that it is already known to all devices. The PSI calculation can be done in different ways and it is its own area of research of Computer Science. The related works we analyzed either did not provide information on how this was calculated, or also assumed that is has been calculated beforehand. In future works, it would be interesting to integrate a PSI mechanism into the framework.
 
 All experiments were performed for 50 rounds so that we can compare the model accuracy results to other papers. This way, we can validate if our experiments are within the expected values. Secondly, all experiments were performed with 10 servers that run both the server process and the blockchain process. Thirdly, all experiments, except for those where the number of clients are compared, are run with 25 clients.
-
-\section{Results}
-
-\autoref{tab:experiments} presents a summary of all of our experiments, as well as other works. On it, it is possible to see the configuration of all of the experiments that were executed. Due to space limitations, not all information is presented in the table. All experiments use the MNIST data set, except for the works \cite{10.48550/arxiv.2007.03856, 10.48550/arxiv.2011.07516} whose data set is unknown. In addition, all the experiments were executed with 50 rounds, except for \cite{9170559} which is also unknown.
-
-From \autoref{tab:experiments}, it can be noted that our experiment results, in terms of model accuracy, are within the range of the state of the art works of the scoring algorithms. Since we do not have enough details regarding the implementations of the works we compare to, this is the only way to validate our results.
-
-The detailed impact analysis, as well we the Proof of Concept of Vertical Federated Learning applied in a Blockchain-based Federated Learning environment are presented in the follwoing chapters.
-
-\input{tables/experiments}
