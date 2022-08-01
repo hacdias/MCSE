@@ -40,10 +40,6 @@ In order to perform the horizontal client sampling, we used a publicly available
 
 Vertically partitioned data is significantly different from horizontally partition data, in the sense that the clients share intersecting sample spaces, but different feature spaces. Therefore, it is not possible to simply divide the samples among the clients.
 
-For the vertical data partition, we use the work reported in \cite{10.48550/arxiv.2104.00489}. Firstly, we choose how many samples to assign to each client. We chose 20 000 samples in order to match the original work \cite{10.48550/arxiv.2104.00489} we will be comparing to. Then, the samples are randomly chosen from the original data set. Subsequently, each sample is assigned a unique identifier (ID) that will be used as label when giving the data samples to each client. Only the servers have access to the ground truth labels. After assigning the IDs, the feature space $F$ will be divided into $C$ parts $F_c$, where $C$ is the number of clients. Finally, the features $F_c$, with $c \in C$ will be assigned to each of the clients.
-
-For vertical data partitioning, we divide the data set as in \cite{10.48550/arxiv.2104.00489} to use it with a Split-CNN \cite{10.1145/3297858.3304038} model, which will be introduced in the next section. To use this model, the model owner is expected to have the labels, while the clients are expected to have some features of each sample. For the MNIST data set, we can think of the features as vertical fragments of the image. To divide a 28 by 28 image sample between 2 clients, for example, we split the image into two 14 by 28 segments, as depicted in \autoref{fig:vertical_dist}.
-
 \begin{figure}[!ht]
     \centering
     \centering
@@ -52,13 +48,25 @@ For vertical data partitioning, we divide the data set as in \cite{10.48550/arxi
     \label{fig:vertical_dist}
 \end{figure}
 
+For the vertical data partition, we use the work reported in \cite{10.48550/arxiv.2104.00489}. Firstly, we choose how many samples to assign to each client. We chose 20,000 samples in order to match the original work \cite{10.48550/arxiv.2104.00489} we will be comparing to. Then, the samples are randomly chosen from the original data set. Subsequently, each sample is assigned a unique identifier (ID) that will be used as label when giving the data samples to each client. Only the servers have access to the ground truth labels. After assigning the IDs, the feature space $F$ will be divided into $C$ parts $F_c$, where $C$ is the number of clients. Finally, the features $F_c$, with $c \in C$ will be assigned to each of the clients.
+
+For vertical data partitioning, we divide the data set as in \cite{10.48550/arxiv.2104.00489} to use it with a Split-CNN \cite{10.1145/3297858.3304038} model, which will be introduced in the next section. To use this model, the model owner is expected to have the labels, while the clients are expected to have some features of each sample. For the MNIST data set, we can think of the features as vertical fragments of the image. To divide a 28 by 28 image sample between 2 clients, for example, we split the image into two 14 by 28 segments, as depicted in \autoref{fig:vertical_dist}.
+
 \section{Machine Learning Models}\label{eval:ml_models}
 
 The models used on this work are simple models found in related work. The goal of this work is not to provide the most efficient or accurate FL model. Therefore, we do not dive into the details of the models. The models used for horizontal and vertical training are succinctly explained below.
 
 \subsection{Horizontal Model}
 
-For the horizontal FL, we use a simple Convolutional Neural Network (CNN) \cite{cnn} with three levels of convolution intercalated with max pooling to reduce overfitting. These layers are followed by a flattening layer and two dense layers that culminate in the output. More details about the architecture parameters can be found in \autoref{tab:cnn}. To train this model, both servers and clients have the same model. Then, the clients train the the model with their own data set. Subsequently, the clients send the weights to the servers by submitting their local model update to the blockchain via the smart contract. Finally, the servers aggregate the weights and publish the global model weights through the smart contract.
+For the horizontal FL, we use a simple Convolutional Neural Network (CNN) \cite{cnn} with three levels of convolution intercalated with max pooling to reduce overfitting. These layers are followed by a flattening layer and two dense layers that culminate in the output. The architecture is depicted in \autoref{fig:model_cnn} and more details about its parameters can be found in \autoref{tab:cnn}. To train this model, both servers and clients have the same model. Then, the clients train the the model with their own data set. Subsequently, the clients send the weights to the servers by submitting their local model update to the blockchain via the smart contract. Finally, the servers aggregate the weights and publish the global model weights through the smart contract.
+
+\begin{figure}[!hb]
+    \centering
+    \centering
+    \includegraphics[width=1\textwidth]{graphics/model-cnn.pdf}
+    \caption{CNN Model Architecture}
+    \label{fig:model_cnn}
+\end{figure}
 
 \begin{table}[!h]
     \begin{tabular}{c|c}
@@ -79,7 +87,15 @@ For the horizontal FL, we use a simple Convolutional Neural Network (CNN) \cite{
 
 \subsection{Vertical Model}
 
-For the vertical FL, we use a dual-headed, or four-headed, Split-CNN \cite{10.1145/3297858.3304038, 10.48550/arxiv.2104.00489}, depending on whether we have two or four clients. The model at the clients is the head model, while the model at the servers is the tail model. To train this model, each client gives its input data to the models and collects the output of the last layer. Then, this intermediate output is sent to the servers, which are then given to the tail model. The servers calculate the gradients, which are then backpropagated to the clients. For more details, please consult the original works where the workings of this model are given in more detail. More details about the architecture parameters can be found in \autoref{tab:splitnn}.
+For the vertical FL, we use a dual-headed, or four-headed, Split-CNN \cite{10.1145/3297858.3304038, 10.48550/arxiv.2104.00489}, depending on whether we have two or four clients. The model at the clients is the head model, while the model at the servers is the tail model. To train this model, each client gives its input data to the models and collects the output of the last layer. Then, this intermediate output is sent to the servers, which are then given to the tail model. The servers calculate the gradients, which are then backpropagated to the clients. For more details, please consult the original works where the workings of this model are given in more detail. The architecture is depicted in \autoref{fig:model_splitcnn} and more details about its parameters can be found in \autoref{tab:splitnn}.
+
+\begin{figure}[!ht]
+    \centering
+    \centering
+    \includegraphics[width=1\textwidth]{graphics/model-splitcnn.pdf}
+    \caption{Split-CNN Model Architecture}
+    \label{fig:model_splitcnn}
+\end{figure}
 
 \begin{table}[!h]
     \begin{subtable}[h]{0.49\textwidth}
