@@ -44,13 +44,14 @@
 	article-number = 2663,
 	abstract     = {The adoption of machine learning and deep learning is on the rise in the cybersecurity domain where these AI methods help strengthen traditional system monitoring and threat detection solutions. However, adversaries too are becoming more effective in concealing malicious behavior amongst large amounts of benign behavior data. To address the increasing time-to-detection of these stealthy attacks, interconnected and federated learning systems can improve the detection of malicious behavior by joining forces and pooling together monitoring data. The major challenge that we address in this work is that in a federated learning setup, an adversary has many more opportunities to poison one of the local machine learning models with malicious training samples, thereby influencing the outcome of the federated learning and evading detection. We present a solution where contributing parties in federated learning can be held accountable and have their model updates audited. We describe a permissioned blockchain-based federated learning method where incremental updates to an anomaly detection machine learning model are chained together on the distributed ledger. By integrating federated learning with blockchain technology, our solution supports the auditing of machine learning models without the necessity to centralize the training data. Experiments with a realistic intrusion detection use case and an autoencoder for anomaly detection illustrate that the increased complexity caused by blockchain technology has a limited performance impact on the federated learning, varying between 5 and 15\%, while providing full transparency over the distributed training process of the neural network. Furthermore, our blockchain-based federated learning solution can be generalized and applied to more sophisticated neural network architectures and other use cases.}
 }
-@misc{10.48550/arxiv.2007.03856,
+@article{10.48550/arxiv.2007.03856,
 	title        = {BlockFLow: An Accountable and Privacy-Preserving Solution for Federated Learning},
 	author       = {Mugunthan, Vaikkunth and Rahman, Ravi and Kagal, Lalana},
 	year         = 2020,
 	publisher    = {arXiv},
 	doi          = {10.48550/ARXIV.2007.03856},
 	url          = {https://arxiv.org/abs/2007.03856},
+	journal={ArXiv},
 	copyright    = {arXiv.org perpetual, non-exclusive license},
 	keywords     = {Machine Learning (cs.LG), Cryptography and Security (cs.CR), Machine Learning (stat.ML), FOS: Computer and information sciences, FOS: Computer and information sciences}
 }
@@ -518,15 +519,14 @@
 	copyright    = {arXiv.org perpetual, non-exclusive license},
 	keywords     = {Cryptography and Security (cs.CR), Machine Learning (cs.LG), FOS: Computer and information sciences, FOS: Computer and information sciences}
 }
-@misc{10.48550/arxiv.1602.05629,
+@inproceedings{10.48550/arxiv.1602.05629,
 	title        = {Communication-Efficient Learning of Deep Networks from Decentralized Data},
 	author       = {McMahan, H. Brendan and Moore, Eider and Ramage, Daniel and Hampson, Seth and Arcas, Blaise Agüera y},
-	year         = 2016,
-	publisher    = {arXiv},
-	doi          = {10.48550/ARXIV.1602.05629},
-	url          = {https://arxiv.org/abs/1602.05629},
-	copyright    = {arXiv.org perpetual, non-exclusive license},
-	keywords     = {Machine Learning (cs.LG), FOS: Computer and information sciences, FOS: Computer and information sciences}
+	booktitle    = {Proc. of the 20th International Conference on Artificial Intelligence and Statistics },
+	year         = 2017,
+	volume       = {54},
+	number       = {},
+	pages        = {1273--1282},
 }
 @misc{nakamoto2009bitcoin,
 	title        = {Bitcoin: A peer-to-peer electronic cash system},

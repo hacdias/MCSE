@@ -27,7 +27,7 @@ The framework supports a modular sequential flow represented in \autoref{fig:blo
     \item Finally, the model owner sends a transaction to the blockchain in order to terminate the round. At this point, the smart contract checks if the majority of the aggregators agreed on the aggregation. If so, the round is marked as terminated. Otherwise, the round fails, indicating that the aggregators did not reach an agreement, which may indicate that some of the aggregators are compromised.
 \end{enumerate}
 
-In the last step of the execution flow, the smart contract checks if the majority of the aggregators agree on the aggregation. The majority is defined by \textit{at least 50\%}. Therefore, the framework offers a 50\% threat model. However, the threat threshold can be changed, changing the threat threshold.
+In the last step of the execution flow, the smart contract checks if the majority of the aggregators agree on the aggregation. The majority is defined by \textit{at least 50\%}. Therefore, the framework offers a 50\% threat model. However, the threat threshold can be changed, changing the threat model.
 
 \subsection{Structure and Modules}\label{meth:struct_modules}
 
