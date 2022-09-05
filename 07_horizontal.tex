@@ -16,7 +16,7 @@ Both algorithms choose the number of clients in the same way, via a uniform rand
 
 On one hand, random selection presents a more uniform distribution, where each client was selected a similar number of times. On the other hand, first-come first-served presents a more skewed distribution, where some clients, such as client 1, participate many times and others, such as client 12, participate very few times. To support this observation, we calculated the standard deviation. For the random selection, the standard deviation is approximately 2.49, while for the first-come first-served it is 11.84.
 
-From this observations, we can conclude that, by letting clients take initiative to join a round, like what happens in first-come first-served, it is possible that some will end up participating more than others. By participating more often, the clients will have more influence on the global model, which can lead to skewed results.
+From this observations, we can conclude that, by letting clients take initiative to join a round, similarly to what happens in first-come first-served, it is possible that some will end up participating more than others. By participating more often, the clients will have more influence on the global model, which can lead to skewed results.
 
 \subsection{Execution Time, Transaction Cost, and Transaction Latency}
 
