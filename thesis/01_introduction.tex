@@ -1,0 +1,54 @@
+Machine Learning (ML) has revolutionized the way we use and work with data, opening ways to new techniques and explorations. ML models can be powerful tools to predict things that would otherwise require high amounts of human effort. For example, an image recognition model may be created to help medical professionals diagnose diseases. Similarly, a model may be created to detect abnormal heart rate or walking patterns based on smart watch sensor data. Even though models such as these can be very helpful, they have to be trained with high amounts of good quality data in order for the model to perform accurately \cite{10.1145/3394486.3406477}. To address this issues, there are techniques that allow multiple parties to collaboratively train the same models.
+
+In 2016, Google researchers attempted to build communication-efficient deep neural networks in decentralized settings \cite{10.48550/arxiv.1602.05629}. The result of this work was the introduction of a new way of collaboratively training Machine Learning models, which they termed Federated Learning. Federated Learning (FL) allows multiple clients, in different locations, to collaborate on the training of a global Machine Learning model without sharing their own data with each other. Instead of sharing the raw data, clients only share model parameters, such as weights. This brings some benefits. The first benefit is that, by not sharing raw data, models can preserve data privacy, allowing them to be trained on sensitive data. In addition, since model parameters are usually much smaller than the raw data, this leads to less data being transported over the networks. Finally, since the data is distributed among different clients, a single powerful server is not required to train the model, as usually training models with smaller amounts of data is less computationally expensive.
+
+\section{Motivation}\label{intro:motivation}
+
+Currently, most FL networks include a central server that coordinates the federated training process and aggregates the model weights from each of the clients into a single model. This central coordinator is a single point of failure in the network, since it is always required to be online and behave correctly \cite{li_blockchain_2021, 10.48550/arxiv.2110.02182}. To address this, Blockchain-based Federated Learning (BFL) techniques have been proposed.
+
+By combining Blockchain to Federated Learning, not only can the central orchestrator be eliminated, but also the federated training process can be made more transparent. In the blockchain, each transaction is recorded in the distributed ledger. These transactions record information such as local updates, scores, aggregations, among others. Having this information in a public ledger allows for a transparent training process and reward distribution \cite{li_blockchain_2021}. The following are some aspects that Blockchain can bring to Federated Learning when combined:
+
+\begin{itemize}
+    \item \textit{Traceability and Auditability}. Due to the structure of the blockchain, it is possible to trace transactions to their original source, which can be useful for auditability purposes \cite{10.48550/arxiv.1902.01046, 10.48550/arxiv.2110.02182}.
+    
+    \item \textit{Data Immutability and Persistency}. Once transactions are added to the distributed ledger, it is nearly impossible to revert them or change their information \cite{10.48550/arxiv.1902.01046, qu_blockchain-enabled_2022}. This ensures that data is not changed and it can be retrieved after the fact.
+    
+    \item \textit{Decentralization}. The involvement of a central orchestrator is eliminated and the processing of the aggregation is replaced by multiple servers \cite{10.48550/arxiv.2009.09338, 9403374, 10.48550/arxiv.2110.02182, qu_blockchain-enabled_2022}. This improves the resilience and availability of the system.
+    
+    \item \textit{Authentication}. Blockchain ensures the authentication of data and messages due to the verification mechanisms in place, such as the usage of private keys to sign transactions \cite{qu_blockchain-enabled_2022}.
+\end{itemize}
+
+Blockchain platforms can implement different consensus algorithms, which can lead to very different resource consumption \cite{ccaf}, as well as different degrees of latency \cite{Alqahtani_2021}. Two other important aspects in BFL systems are the participant selection and the scoring algorithms. While the former indicates how the participants are chosen to submit their updates in each round, the latter aids on scoring each client's model update in order to identify which ones are the best and should be included in the final aggregation. All this algorithms influence the accuracy, convergence, and resource consumption. At the same time, each algorithm performs differently with different amounts of devices, as well as with different degrees of privacy, leading to different accuracy results, as well as resource consumption.
+
+\section{Problem Statement}\label{intro:problem}
+
+To the best of our knowledge, there is very little literature on the impact of different algorithms of BFL systems, namely consensus, participant selection and scoring algorithms, on the execution time, accuracy, convergence, communication and computation costs of the system. In addition, there is no research on how different scoring algorithms are impacted in terms of the aforementioned aspects when different amounts of clients and privacy degrees are used. With BFL being increasingly adopted in IoT networks, where low powered devices with low resources are the norm, it is important to ensure the system consumes the least amount of resources, especially regarding the clients.
+
+Additionally, even though there is literature on designing BFL frameworks, none of them are open source, or modular enough to support different algorithms. Such framework could be used to empower future research on new algorithms, as well as help those who want to implement their own BFL system.
+
+\section{Research Questions}\label{intro:questions}
+
+Taking into account the motivation and problem statement, this work will focus on answering the following main research question:
+
+\begin{center}
+    \textit{What is the impact of different consensus, participant selection and scoring algorithms in a Blockchain-based Federated Learning system on execution time, convergence and accuracy, as well as communication and computation costs?}
+\end{center}
+
+This research question can be further sub-divided into four sub-questions:
+
+\begin{enumerate}
+    \item \textit{How to design a modular framework that allows easy customization of different algorithms related to different parts of the Blockchain-based Federated Learning system?}
+    
+    \item \textit{How do consensus, participant selection, and scoring algorithms influence execution time, convergence, accuracy, and communication and computation costs of the system?}
+    
+    \item \textit{How does the number of clients, as well as degrees of privacy impact the different scoring algorithms?}
+    
+    \item \textit{How can we build a Blockchain-based Federated Learning framework that supports different data partition formats, such as vertical and horizontal?}
+\end{enumerate}
+
+\section{Contributions and Outline}\label{intro:outline}
+
+The contributions of this thesis are as follows: (i) design and implementation of the first open-source modular framework for BFL that can be easily adapted to support new scoring, aggregation, and privacy algorithms. This framework can be used to empower future research; (ii) the first comparative study of how different algorithms of BFL, namely consensus, participant selection, and scoring algorithms, impact the execution time, transaction costs, transaction latency, model accuracy and convergence, communication costs, and computation costs of the system; (iii) the first comparative study of how the number of clients and different degrees of privacy impact the accuracy, execution time and communication and computation costs of different scoring algorithms; and (iv) a proof-of-concept of a Blockchain-based Vertical Federated Learning.
+
+The remainder of the thesis is structured as follows. \Cref{chapter:background} provides definitions and fundamental concepts about BFL, as well as background information of the algorithms and mechanisms that will be explored. \Cref{chapter:related_work} reviews the existing work regarding algorithms and mechanisms used in BFL systems. \Cref{chapter:framework} explains the design and implementation of the framework. \Cref{chapter:evaluation} provides information regarding the experimental setup of the experiments. \Cref{chapter:analysis:consensus_algorithms} provides the impact analysis of using different consensus algorithms. \Cref{chapter:horizontal} provides the impact analysis of using different scoring algorithms, as well as how they behave with different number of clients and privacy degrees. \Cref{chapter:vertical} provides analysis of the proof of concept of Vertical Federated Learning applied in a BFL system. Finally, \Cref{chapter:conclusion} discusses the results, contributions and provides directions for future works.
+

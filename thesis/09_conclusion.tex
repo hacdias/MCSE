@@ -1,0 +1,35 @@
+Blockchain-based Federated Learning (BFL) was initially introduced to bring some desirable properties of the blockchain, such as immutability, persistency, authentication, and decentralization, to the Federated Learning. In this thesis, we explored how different types of algorithms, namely consensus, participant selection, and scoring algorithms, impact the execution time, transaction costs, transaction latency, model accuracy and convergence, communication costs, and computation costs of the BFL system.
+
+Our literature review revealed that there is a lack of publicly accessible and modular BFL framework. To fill this gap, we designed and implemented the first open-source modular BFL framework, which allows others to customize the system, in terms of architecture, algorithms and execution flow. By making it available to the public, it has the potential to empower future research on new BFL-related algorithms and architectures, without requiring the researchers to write the whole system from scratch.
+
+\section{Looking Back at the Main Research Question}
+
+We aimed to answer the question on \textit{what is the impact of different consensus, participant selection and scoring algorithms in a BFL system on execution time, convergence and accuracy, as well as communication and computation costs}. For doing so, we executed all the experiments summarized in \autoref{tab:experiments}. The main findings of our experiments regarding each type of algorithms are:
+
+\begin{itemize}
+    \item \textit{Consensus Algorithms}: On the one hand, PoW presented the highest computation costs and is the slowest. On the other hand, QBFT and PoA presented the lowest computation costs and are the fastest. Moreover, QBFT has a three times higher communication costs compared to PoW and PoA. Consequently, we concluded that PoA is the most cost-efficient consensus algorithm analyzed. % Trade-off between the degree of decentralization and the energy costs of the consensus algorithm.
+    
+    \item \textit{Participant Selection Algorithms}: Both random selection and first-come first-served presented similar computation and communication costs. Random selection revealed to be more fair, providing more stable accuracy convergence, as it gives each client an equal chance of participating in a round.
+    
+    \item \textit{Scoring Algorithms}: Adding a scoring algorithm to the BFS system increased the execution time up to twice as much, depending on whether the algorithm is executed by the servers of the clients. Out of the three scoring algorithms analyzed, Marginal Gain provided the highest accuracy with increasing number of clients and increasing privacy degree. At the same time, it also had the highest computation costs for the clients. Moreover, Multi-KRUM revealed to be a good alternative in order to minimize the computation costs for the clients, while retaining high accuracy. Finally, BlockFlow performed the worst in all of the mentioned aspects. % Trade-off between different kinds of scoring algorithms and the execution time and energy consumption, at both clients and servers. Trade-off between accuracy and "resistance" to the number of clients/privacy degree and the resource consumption at the clients.
+\end{itemize}
+
+Overall, our experiments showed that adding a blockchain, namely the Ethereum, to a Federated Learning system, increases the execution time, communication costs, and computation usage in general. After all, by adding a blockchain to a FL system, we are replacing a single centralized server by multiple distributed servers, which have to coordinate between themselves in order to reach a consensus in terms of storage and execution, consuming more time and resources. % Trade-off between the benefits of the blockchain (decentralization, traceability, auditability, immutability, persistency, authentication) and the execution time and overall resource consumption
+
+Finally, we provided a proof of concept on how to extend our BlockLearning framework in order to support Vertical Federated Learning. By doing so, we presented the first implementation of Vertical Federated Learning in the context of BFL, showing that it is possible to have a Blockchain-based Vertical Federated Learning system. In addition, we demonstrated that our framework is flexible and extensible, such that it can be used to develop new algorithms and architectures.
+
+\section{Future Work}\label{conclusions:future_work}
+
+Below is a summary of some future directions that would be interesting pursue in the context of Blockchain-based Federated Learning systems:
+
+\begin{itemize}
+    \item \textit{Consensus Algorithms}: to investigate if it is feasible to extend the Ethereum blockchain with the custom resource-efficient algorithms presented in \Cref{related_work:consensus_algorithms}.
+    
+    \item \textit{Scoring Algorithms}: to investigate and develop new scoring algorithms that do not require model evaluation at the clients side in order to reduce the resource usage. An example of this type of algorithm is Multi-KRUM, which is executed by the servers. All analyzed scoring algorithms executed by clients involve model evaluation, which leads to longer execution times and higher resource usage.
+    
+    \item \textit{Blockchain-based Vertical Federated Learning}: to extend the BlockLearning framework in order to support the Private Set Intersection phase, such that it becomes more flexible to develop new Vertical Federated Learning algorithms.
+    
+    \item \textit{BlockLearning GUI}: to develop a graphical interface for BlockFlow in order to allow users to submit training requests through an easy to use interface, as well as visualize the training process and download the weights directly without the need for command line tools.
+\end{itemize}
+
+\input{tables/experiments}
