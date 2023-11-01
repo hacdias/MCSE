@@ -1,0 +1,417 @@
+\documentclass[journal]{vgtc}                % final (journal style)
+%\documentclass[review,journal]{vgtc}         % review (journal style)
+%\documentclass[widereview]{vgtc}             % wide-spaced review
+%\documentclass[preprint,journal]{vgtc}       % preprint (journal style)
+
+%% Uncomment one of the lines above depending on where your paper is
+%% in the conference process. ``review'' and ``widereview'' are for review
+%% submission, ``preprint'' is for pre-publication, and the final version
+%% doesn't use a specific qualifier.
+
+%% Please use one of the ``review'' options in combination with the
+%% assigned online id (see below) ONLY if your paper uses a double blind
+%% review process. Some conferences, like IEEE Vis and InfoVis, have NOT
+%% in the past.
+
+%% Please note that the use of figures other than the optional teaser is not permitted on the first page
+%% of the journal version.  Figures should begin on the second page and be
+%% in CMYK or Grey scale format, otherwise, colour shifting may occur
+%% during the printing process.  Papers submitted with figures other than the optional teaser on the
+%% first page will be refused. Also, the teaser figure should only have the
+%% width of the abstract as the template enforces it.
+
+%% These few lines make a distinction between latex and pdflatex calls and they
+%% bring in essential packages for graphics and font handling.
+%% Note that due to the \DeclareGraphicsExtensions{} call it is no longer necessary
+%% to provide the the path and extension of a graphics file:
+%% \includegraphics{diamondrule} is completely sufficient.
+%%
+\ifpdf%                                % if we use pdflatex
+  \pdfoutput=1\relax                   % create PDFs from pdfLaTeX
+  \pdfcompresslevel=9                  % PDF Compression
+  \pdfoptionpdfminorversion=7          % create PDF 1.7
+  \ExecuteOptions{pdftex}
+  \usepackage{graphicx}                % allow us to embed graphics files
+  \DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg} % for pdflatex we expect .pdf, .png, or .jpg files
+\else%                                 % else we use pure latex
+  \ExecuteOptions{dvips}
+  \usepackage{graphicx}                % allow us to embed graphics files
+  \DeclareGraphicsExtensions{.eps}     % for pure latex we expect eps files
+\fi%
+
+%% it is recommended to use ``\autoref{sec:bla}'' instead of ``Fig.~\ref{sec:bla}''
+\graphicspath{{figures/}{pictures/}{images/}{./}} % where to search for the images
+
+\usepackage{microtype}                 % use micro-typography (slightly more compact, better to read)
+\PassOptionsToPackage{warn}{textcomp}  % to address font issues with \textrightarrow
+\usepackage{textcomp}                  % use better special symbols
+\usepackage{mathptmx}                  % use matching math font
+\usepackage{times}                     % we use Times as the main font
+\renewcommand*\ttdefault{txtt}         % a nicer typewriter font
+\usepackage{cite}                      % needed to automatically sort the references
+\usepackage{tabu}                      % only used for the table example
+\usepackage{booktabs}                  % only used for the table example
+%% We encourage the use of mathptmx for consistent usage of times font
+%% throughout the proceedings. However, if you encounter conflicts
+%% with other math-related packages, you may want to disable it.
+
+%% In preprint mode you may define your own headline.
+%\preprinttext{To appear in IEEE Transactions on Visualization and Computer Graphics.}
+
+%% If you are submitting a paper to a conference for review with a double
+%% blind reviewing process, please replace the value ``0'' below with your
+%% OnlineID. Otherwise, you may safely leave it at ``0''.
+\onlineid{0}
+
+%% declare the category of your paper, only shown in review mode
+\vgtccategory{Research}
+%% please declare the paper type of your paper to help reviewers, only shown in review mode
+%% choices:
+%% * algorithm/technique
+%% * application/design study
+%% * evaluation
+%% * system
+%% * theory/model
+\vgtcpapertype{application/design study}
+
+%% Paper title.
+\title{BirdVis: visualizing the effects of climate change on bird migration}
+
+%% This is how authors are specified in the journal style
+
+%% indicate IEEE Member or Student Member in form indicated below
+\author{Gabriela Slavova, Henrique Dias, Nimo Beeren}
+\authorfooter{
+%% insert punctuation at end of each item
+\item
+Gabriela Slavova, Henrique Dias and Nimo Beeren are with Eindhoven University of
+Technology. E-mail: \{g.slavova, h.a.coelho.dias, n.beeren\}@student.tue.nl.
+}
+
+%other entries to be set up for journal
+%\shortauthortitle{Biv \MakeLowercase{\textit{et al.}}: Global Illumination for Fun and Profit}
+%\shortauthortitle{Firstauthor \MakeLowercase{\textit{et al.}}: Paper Title}
+
+%% Keywords that describe your work. Will show as 'Index Terms' in journal
+%% please capitalize first letter and insert punctuation after last keyword
+\keywords{Bird migration, climate change, visualization, information visualization.}
+
+%% ACM Computing Classification System (CCS). 
+%% See <http://www.acm.org/class/1998/> for details.
+%% The ``\CCScat'' command takes four arguments.
+
+%\CCScatlist{ % not used in journal version
+% \CCScat{K.6.1}{Management of Computing and Information Systems}%
+%{Project and People Management}{Life Cycle};
+% \CCScat{K.7.m}{The Computing Profession}{Miscellaneous}{Ethics}
+%}
+
+%% Uncomment below to include a teaser figure.
+%\teaser{
+%  \centering
+%  \includegraphics[width=\linewidth]{CypressView}
+%  \caption{In the Clouds: Vancouver from Cypress Mountain. Note that the teaser may not be wider than the abstract block.}
+%	\label{fig:teaser}
+%}
+
+%% Uncomment below to disable the manuscript note
+\renewcommand{\manuscriptnotetxt}{}
+
+%% Copyright space is enabled by default as required by guidelines.
+%% It is disabled by the 'review' option or via the following command:
+% \nocopyrightspace
+
+\vgtcinsertpkg
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% START OF THE PAPER %%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%% The ``\maketitle'' command must be the first command after the
+%% ``\begin{document}'' command. It prepares and prints the title block.
+
+%% the only exception to this rule is the \firstsection command
+\firstsection{Introduction}
+
+\maketitle
+
+In recent times, it has become increasingly clear to most people that climate change is affecting life on Earth. As temperatures rise globally, many animals are forced to adapt to their environment \cite{parmesan2007pheno,root2003fingerprints}. Among the best-documented instances of such adaptation are changes in bird migration \cite{miller2008bird,cotton2003avian,jenni2003timing}. This paper presents \emph{BirdVis}: an interactive visualization with the goal to analyze and communicate how the migratory behavior of birds is related to temperature over the years.
+
+\subsection{Problem Description}
+
+Despite evidence presented in numerous studies \cite{solomon2007climate,parry2007climate}, it has proved to be difficult to communicate the effects of climate change to people \cite{moser2011communicating}. We believe that visualizing effects that can be observed in everyday life is an important way of fostering public engagement. One such effect is the change in the time of the year during which migratory birds can be observed in their breeding habitat. As global temperatures increased, birds have been migrating to their breeding habitats earlier in the year \cite{jenni2003timing}. Using a visual approach, we intend to show this effect in a way that is interpretable to experts and non-experts alike.
+
+Both bird migration and surface temperature changes are cyclic processes with an annual period. In order to recognize trends in these processes, we should consider data from multiple years, or even decades. However, because of the cyclic nature, it is difficult to directly compare one year to another. One of the challenges of this problem is to visualize trends over the long term, without obscuring the patterns that occur every year.
+
+Another attribute that these processes have in common is that they are both geographic. That is, both produce data that is associated with a particular place on Earth \cite{iso2014geo}. It is essential to visualize both in such a way that one does not obscure the other, while their correlation is still visible.
+
+\section{Data Analysis}
+
+\subsection{Domain Data Specification}
+
+In order to visualize the problem, we need two different datasets: one that includes information about bird migration and one including temperature changes over the years.
+
+For the first needed dataset we have chosen the eBird Basic Dataset \cite{ebird2020data}. The eBird citizen science project is unmatched in scale, containing over 600 million observations, including nearly every bird species on Earth \cite{strimas2020ebird}. Submissions are individually reviewed to ensure accuracy of information. As people are contributing to this dataset continuously, the information inside is up-to-date, but the record also goes many years back.
+
+For the second, we have chosen the GISTEMP dataset \cite{gistemp}, which provides the temperature data from 1880 up to 2020 in a regular 2° by 2° grid. The main advantage of this dataset compared to other temperature datasets we found is that this one uses the temperature anomalies. These anomalies are relative to a 30-year period between 1951 and 1980. By using anomalies instead of absolute values \cite{gistempanomalies}, it is easier to see how much colder or warmer a certain place is compared to the base period.
+
+\subsection{Data Abstraction: What}
+\label{subsec:data-abs-what}
+
+The eBird Basic Dataset \cite{ebird2020data} consists of a static table containing items that each correspond to a particular observation of a bird or a group of birds. For each observation, a number of attributes are provided, though we are only interested in the following subset:
+
+\paragraph{Species} A categorical attribute represented by the scientific name, e.g. \textit{Anas platyrhynchos}. The eBird taxonomy\cite{ebird2019taxonomy} specifies exactly what is meant with these names.
+
+\paragraph{Date} An ordered, quantitative and diverging attribute in year-month-day format (yyyy-mm-dd).
+
+\paragraph{Latitude} An ordered, quantitative cyclic attribute represented as decimal degrees, varying from -90° (south) to 90° (north).
+
+\paragraph{Longitude} An ordered, quantitative cyclic attribute represented as decimal degrees, varying from -180° (west) to 180° (east).
+
+\paragraph{Count} An ordered, quantitative and diverging attribute represented as an integer. Since participants are allowed to group multiple birds in a single observation, the value can be 1 or greater.
+
+\vspace{2mm}
+
+The precision of latitude and longitude varies between observations, but is typically 0.001 degrees or more precise (which is less than 1 km on Earth's surface)
+
+We perform a number of transformations on the original dataset for the purpose of our visualization. First, we limit ourselves to a subset of species, since the dataset is too large to practically work with. We selected a set of common migratory birds that breed in Europe, but differ in migration distance, wintering area, and time of migration \cite{turner1989swallow,jenni2003timing}. Our selection consists of the Barn Swallow (\emph{Hirundo rustica}), the Eurasian Blackbird (\emph{Turdus merula}), and the White Stork (\emph{Ciconia ciconia}). Next, we restrict the dataset geographically to Europe and Africa. We exclude observations outside the years 1980--2019, since observations before 1980 are scarce and irregular. In addition, we exclude any single observation with a bird count of 1000 or greater, since these outliers make the data more difficult to work with, and excluding them should not change the distribution of birds.
+
+The number of bird observations does not remain constant over time. In fact, we found an exponential growth in the cumulative observation counts, as can be observed in \autoref{fig:observations-over-time}. Since we are most interested in the spatial distribution of birds at a given point in time, we transform the absolute counts to a relative measure. First, we sum the counts $c$ of all observations $O$ in a particular month $m$ to obtain a monthly total:
+
+\begin{equation}
+  T(m) = \sum_{O_m = m} O_c
+\end{equation}
+
+We then represent the count of each observation as a fraction of the total monthly count:
+
+\begin{equation}
+  p(O) = O_c \;/\; T(O_m)
+\end{equation}
+
+Finally, this fraction is scaled to a $[0, 1]$ range for each month, which we call \emph{frequency}:
+
+\begin{equation}
+  f(O) = p(O) \;/ \max_{O'_m = O_m} p(O')
+\end{equation}
+
+By using this relative frequency rather than the absolute count, we control for the change in observation effort over time. We do assume that the total population size for each species is approximately constant.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{observations-over-time}
+  \caption{Observation count of the Barn Swallow over time (cumulative, log scale).}
+  \label{fig:observations-over-time}
+\end{figure}
+
+\vspace{2mm}
+
+The GISTEMP dataset \cite{gistemp} consists of a multidimensional scalar field, whose dimensions are the latitude, the longitude and the date. For each point in space-time, a temperature anomaly value is available. The description of each dimension and the value:
+
+\paragraph{Latitude} An ordered, quantitative cyclic attribute represented as decimal degrees, varying from -90° (south) to 90° (north).
+
+\paragraph{Longitude} An ordered, quantitative cyclic attribute represented as decimal degrees, varying from -180° (west) to 180° (east).
+
+\paragraph{Temperature anomaly} An ordered, quantitative attribute represented in degrees Celcius.
+
+\paragraph{Date} An ordered, quantitative and diverging attribute in year-month format (yyyy-mm).
+
+\section{Task Analysis}
+\label{tasks}
+
+\subsection{Domain Specific Tasks}
+
+This visualization is designed to be used by a large variety of specialists and non-specialists alike. An ornithologist could study the migration of the Barn Swallow using the provided visualization. It is also suitable for the needs of climate  change activists who wants to prove a point about a real problem or a curious person without specific domain knowledge who wants to see the effects of climate change on the nature. The tasks that  these people could undertake are described below.
+
+\paragraph{Task 1: Analyze correlation between temperature change and the timing of bird migration} One of the observations that can be achieved with this visualization is showing the migration of birds in relation to the change in temperature over time. This can be done by choosing a bird species and comparing timing of their migration with respect to the temperatures for the specific time and the same migration in a different time span before or after the chosen one.  The question that would be answered by this task is: how are temperature and the timing of bird migration correlated?
+
+\paragraph{Task 2: Characterize the migration behavior of a species} Another thing that is possible to be visualized is the migration pattern of a specific type of bird over the course of a year. This can be done be choosing a bird species and following its migration behavior through a chosen year. The question that would be answered by this task is: what is the general migration behavior pattern for a particular bird species?
+
+\paragraph{Task 3: Identify species that respond most to temperature change} Different types of birds respond differently to a change in temperature. The tool can help visualize which types of birds are affected by the rising temperatures more than others. This can be done by comparing the migration behavior in relation to the temperature over time, for a set of species. The question that would be answered by this task is: which bird species respond to temperature change the most?
+
+\subsection{Task Abstraction: Why}
+
+\paragraph{Task 1: Analyze correlation between temperature change and the timing of bird migration} The high-level analyze action that this task performs is consume and more precisely discover. This is because discover is related to the act of verifying or disproving of a hypothesis which is exactly the intention behind this task. The mid-level search action is explore as the user doesn't know the location of the target or what the target itself is. The low-level query action is compare as the user will compare different data. The target of this task is a correlation.
+
+\paragraph{Task 2: Characterize the migration behavior of a species} The high-level analyze action in this task is discover, because discover is also generally related to the act of observing without knowing specifically the end result. The mid-level search action is explore as the location of the target and the target itself are unknown. The low-level query action is summarize because this task aims to return general overview of the patterns in the data. The target of this task is also a trend.
+
+\paragraph{Task 3: Identify species that respond most to temperature change} The high-level analyze action performed in this task is also discover. The mid-level search action is explore. The low-level query action is identify. The target of this task is outliers.
+
+\section{Visualization and Interaction Design: How}
+
+% Describe and motivate your choices for the visual encodings and interaction design (\emph{How}). You should not think about implementation yet, but rather what visual encodings fit best to address the task/data results presented earlier. You must justify your choices based on the design principles described in the course. Here is where you explicitly link your tasks, questions and data to the design, and argue why the chosen design will enable users to perform the tasks and answer their questions. Explain the main interactions provided in your solution.
+
+All identified visualization tasks revolve around the analysis of patterns over time in geospatial data. It is therefore critical that our visualization encodes the spatial as well as the temporal dimension in an effective way.
+
+One of the most common encodings of geospatial data is the map. Maps are unique in their ability to provide an overview of an area, while preserving attributes such as distance, area, and distribution \cite{kraak2020cartography}. Another powerful communicative aspect of maps is that they are recognizable. Given a map of the world, most people are able to pick out the place where they live, and thereby select data that is most relevant to them.
+
+We chose to visually encode the bird observations as a heatmap \cite{munzner2014visualization} made up of a grid of equal-sized cells, where the color of each cell corresponds to sum of bird frequencies within the bounds of that cell. An alternative encoding for bird observations is the scatterplot, where individual observations are represented by a \emph{glyph}. However, a common problem with scatterplots is \emph{overplotting} \cite{micallef2017scatter}, making it difficult to distinguish observations from each other in dense areas. Another issue with this approach is that it suggests high spatial precision of observations, while this may not always be the case.
+
+Considering that the \emph{count} attribute of the bird data is quantitative and sequential, we chose a sequential color map, using only the luminance channel. We use a fixed green hue, since the human eye can most easily distinguish shades of green \cite{robinson1984fluorescent}. The saturation channel is used to indicate missing data, by means of a gray color.
+
+For the temperature data, we apply a similar approach as we did for the birds. The key difference is that, conceptually, temperature is a continuous field. Hence, there is no need to discretize the spatial attributes to form a grid. Instead, we draw a scalar field, which could be considered as a heatmap with infinitely small cells. Now, we use the temperature anomaly value to determine the color of each point.
+
+To choose a color map for temperature, it is important to see that the temperature anomaly is a relative measurement and therefore is ordered in diverging directions. The scale ranges from cold to warm, and there is a natural midpoint of 0 °C. As blue is often associated with cold and red with warm, we use these two hues for the respective endpoints of the scale. Again, gray is used to indicate areas of missing data. Another commonly used color map for temperature is the rainbow map. The main problems for us are that this color map does not have a natural midpoint, and that it produces \emph{bands} that do not exist in the data \cite{borland2007rainbow}.
+
+Another decision to be made is what map projection to use. The stereotypical candidate is the Mercator projection \cite{monmonier2010mercator}. A useful property of this projection is that any straight line represents an actual compass bearing, for example up is always north \cite{kennedy2000projections}. However, it also significantly distorts areas further from the equator. This would make some of our grid cells appear larger than others, even though they are of equal area. To combat these issues, we use the Equirectangular projection \cite{miller1949equi}. This projection preserves distance as well as north/east/south/west directions \cite{kennedy2000projections}. Finally, we also draw the coastlines to provide context to the map.
+
+Since the bird and temperature data cover the same spatial and temporal domain, we could consider displaying both in a single map. One way to achieve this is to use a bivariate color map \cite{brewer99color,rheingans2000task}. However, to judge correlation between the two variables, the color must be decomposed into two components, which can be challenging \cite{rheingans2000task}. For this reason, we choose to apply the \emph{small multiples} principle \cite{munzner2014visualization} by drawing two separate maps.
+
+A dimension that we have not yet discussed is time. A traditional method of visualizing change in a map over time is to draw multiple small maps, each representing a different point in time \cite{bertin1983semiology}. This approach is most suitable when only a few points in time need to be visualized. However, the process we are studying spans multiple decades, and we would like to move through this process in small steps in order to analyze correlation. Drawing a static map for each of these steps would would take up too much space to be practical. An alternative that is particularly suited to showing change over time is animation \cite{peterson1995interactive}. In particular, we use an interactive approach that lets the user play and pause the animation, as well as manipulate time manually.
+
+The choice of time scale depends on the task at hand. We therefore allow the time scale to be set to either an annual or monthly mode. When we want to analyze the response of birds to climate change, we need to consider multiple years, if not decades. In this context, the annual patterns that occur in the data are only noise. For this reason, we show a single month for each year. Since a change in the onset of breading season is best supported \cite{cotton2003avian,jenni2003timing}, we choose March as the default month, although this can be configured. Because the timing of migration differs between bird species \cite{jenni2003timing}, this choice can be significant. The availability of data should also be considered. When we instead want to characterize the patterns in bird migration and temperature change within a single year, we can change to a monthly mode. Now, the animation loops over the months, while the year is fixed (although it can be changed manually).
+
+The maps provide a detailed view of the distribution of birds and temperature at a particular moment in time. Using animation, we start to get an idea of the change over time. However, comparing two points in time requires the user to remember an old state and compare it to the new one. Following the principle of \emph{eyes beat memory} \cite{munzner2014visualization}, we would prefer to show the entire timespan at once. In other words, we want to visually encode the dimension of time, without relying on animation. This increases the total amount of dimensions to four: latitude, longitude, time, and the dependent variable (bird frequency or surface temperature). To make the visualization interpretable, we need to reduce the number of dimensions.
+
+The phenomenon of bird migration can be summarized as a population of birds that move from their southern wintering areas to the northern breeding grounds and back again. The dimension of longitude is less important, because most birds move less along the east-west axis \cite{alerstam1993bird}. In addition, we are less interested in the distribution of the entire population, but rather in their average position. This reduces the number of dimensions to just two: mean latitude and time. To get a general idea of the change in temperature over time, we take the mean of all temperature anomalies in the area under investigation. Again, we are left with two dimensions: mean temperature anomaly and time.
+
+Because we have just two dimensions for each attribute, we have a multitude of options for our visual encoding. We found the line chart to be the most suitable for our use case. In particular, we choose to draw both attributes in a single chart, using a double y-axis. While this makes it more difficult to read individual values from the chart, we can more easily analyze the similarity of the two lines, which is our main goal. If we were to drop the temporal dimension as well, we could have used a scatterplot. This encoding is particularly suited to analyzing the correlation between two variables such as temperature and bird position. However, by ignoring time, we lose sight of any trends in the data, and limits our ability to predict the future. Considering that our goal is to show where the our current path of climate change may lead to, the scatterplot seems less than ideal.
+
+By default, the visualization shows data from Europe and most of Africa. At this scale, we can analyze the general movement patterns of migratory birds that breed in Europe and winter in Africa. Some birds do not migrate over such large distances, however. When studying those species, it may be more relevant to focus on a smaller area. To achieve this, we allow for geometric zooming as well as panning on either of the two maps. Typically, when we are interested in the frequency of birds a particular region, we consider the temperatures of that same region. Therefore, when the view of one of the maps is manipulated, the view is mirrored in the other map. In addition, the line chart is adjusted to only take into account the data from the visible area.
+
+\section{Realization}
+
+All of the idealized visualizations were implemented. With that being said, we implemented the temperature anomaly map, the bird frequency map, as well as a line chart showing the average temperature anomaly and bird latitude. A complete view of the application is shown in \autoref{fig:app-example}.
+
+We implemented a web application. Thus, the main technologies in use are HTML, CSS and JavaScript. To manage the application state, we decided to use Svelte\cite{svelte}, a relatively young framework designed to build web apps easily. Despite the existence of more mature frameworks, such as React, Vue.js and Angular, we decided to use Svelte as it is simple to use and enables us to do the implementation in a short amount of time leaving more time for designing the application.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{app-example.png}
+  \caption{An overview of the \emph{BirdVis} application.}
+  \label{fig:app-example}
+\end{figure}
+
+\subsection{Controls}
+
+The main point of interaction of the user with the application is the controls. The controls section is a set of dropdown menus, buttons and other types of input. These allow the user to change between different species and view types. According to the selected view type, different options become available.
+
+For the yearly view, the user can select the start and end years, the month, as well as the number of years per second - also known as the speed of the animation. These options affect: (1) the animation over the years, which can be started by pressing ``Start"; and (2) the base data used in the visualization. In addition, while the animation is stopped, the user can choose a specific year to show in the maps.
+
+For the monthly view, the user can choose the month, the number of months per second and the year to view. Similarly to what happens with the yearly view, these options will affect the map animation, as well as the data used in the graph.
+
+Disregarding both views, there is also an option to choose to infinitely repeat the animation by checking the box ``Loop".
+
+\subsection{Maps}
+
+The implementation of the maps resorts to Leaflet \cite{leaflet}, an open-source JavaScript library for interactive maps. With this library, we were able to show two maps side by side, which can be zoomed in and panned. In addition, we also show the latitude on the right side of the maps.
+
+By hovering the cursor over a certain point in the temperature anomalies map, the user is able to see the precise temperature anomaly in that point. The same applies for the bird frequency map.
+
+Both maps are synchronized such that they always show the same area at the same time. Thus, if the user zooms in/out or moves one map, the other one is zoomed in automatically.
+
+Below each map, there is also a scale. This scale, as well as the mapping between a numeric value and a color in the map, were partially implemented by the library D3 \cite{bostock2011d3}. Because the majority of bird observations often came from a few small areas, we used a logarithmic scale for bird frequency.
+
+An example of the mentioned features can be seen in \autoref{fig:map-example}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{map-example}
+  \caption{Maps of temperature anomaly and mean latitude of the Barn Swallow for March 2016. The tooltip feature is also visible.}
+  \label{fig:map-example}
+\end{figure}
+
+\subsection{Line Chart}
+
+The line chart implementation mainly relies on D3 \cite{bostock2011d3}, a JavaScript library that allows for data manipulation and its visualization using Scalable Vector Graphics images (SVGs). The graph can show two views: either month by month, or year by year. The visualization depends on the chosen options. You can see an example of a monthly graph on \autoref{fig:monthly-graph16} and a yearly graph on \autoref{fig:march86-16-graph}.
+
+In addition, the graph view is regional, meaning that the data on the graph is intrinsically related to the map view. The graph only shows the data from the visible area of the map. Thus, if the user zooms in or out in the map, the graph will change to show the information regarding a different map area.
+
+\subsection{Data Processing}
+
+During the development of the application, we had to apply some transformations to the initial data as mentioned in \autoref{subsec:data-abs-what}. To do so, we used the programming languages Python \cite{rossum1995python} and R \cite{rproject}, as they are both languages suitable for data processing and analytics.
+
+% write about how (and why) percentage is derived from absolute bird count
+
+\section{Use Cases}
+
+In this section, we demonstrate how the application can be used to perform the tasks and answer the questions described in \autoref{tasks}.
+
+\paragraph{How are temperature changes and the timing of bird migration correlated?}
+
+One of the main goals of the application is to analyze possible correlations between the temperature changes and the timing of bird migration. To do so, it is recommended to use the yearly view. The user can select a specific bird species to visualize. However, the default one - Barn Swallow - provides the most clear correlation.
+
+An important choice the user has to make is to pick which month they want to visualize. Some of the months of the year are better to showcase the movement of birds because their migration depends on certain weather conditions and other natural factors. For instance, March is associated with the migrations of most birds to the northern hemisphere.
+
+After choosing a specific month, the user can navigate through the years. This allows the user to compare how the bird movement has changed over the span of several years, while being able to see the changes in temperatures for the same span of time.
+
+Instead of manually navigating through the years, a user can select a month, a start and an end year, and press the ``Start" button. This will start an animation showing the chosen month for each year between the start and the end year, inclusively. The speed of the animation can also be customized. There is also a choice of looping the animation, so the user can watch it continuously and spot even the smallest differences.
+
+In some cases the map does not showcase clearly enough the correlation the user is looking for. For these cases there is a line chart that shows the changes of the temperature anomaly and the overall position of the birds on the latitude for a given month and year. The specifications of the graph can be changed by choosing a start year, end year and month. \autoref{fig:march86-16-graph} shows an example for a line chart generated for the month of March between the years 1986 and 2016.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{march86-16-graph-barnswallow}
+  \caption{Line chart showing the temperature anomaly and mean latitude of the Barn Swallow for March 1986 to 2016.}
+  \label{fig:march86-16-graph}
+\end{figure}
+
+\paragraph{What is the general migration behavior pattern for a particular bird species?}
+
+Typically, the migration of birds has a repeated pattern of annual cycles. In order for a user to observe the general migration behavior of a bird species, they have to follow its movement over the course of a year and note the overall pattern. In this case, the monthly view is the most convenient choice. With it, a user can choose the specific bird species that they are interested in, as well as choosing a specific year. Then, by pressing ``Start", the user can visualize an animation, from January to December in the selected year, that shows the position changes over the year. Similarly to the yearly view, there is also an option to change the speed and to infinitely repeat the animation until the user decides to stop.
+
+In conjunction to the map view, there is a line chart showing the general latitude position of the species for each month of the selected year. The line graph can be used to easily spot patterns in different parts of the annual migration cycle. \autoref{fig:monthly-graph16} shows a monthly line graph for the year of 2016 for the Barn Swallow.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{monthly-graph16-barnswallow}
+    \caption{Line chart showing the temperature anomaly and mean latitude of the Barn Swallow in 2016.}
+  \label{fig:monthly-graph16}
+\end{figure}
+
+\paragraph{Which bird species respond to temperature change the most?}
+
+To compare the response to temperature changes of different bird species, we recommend the yearly view. Firstly, the user should choose the parameters of interest such as year(s), month and bird species. Then, the user should observe each species, one by one. At any time, the user can change to a different bird species, thus allowing to view the different species' behavior. This is applicable to both the maps and the line chart. For example we can use \autoref{fig:map-example} and \autoref{fig:march16-map-blackbird} to compare the behavior of the Barn Swallow and the Eurasian Blackbird during March 2016.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{march16-map-blackbird}
+  \caption{Maps of temperature anomaly and mean latitude of the Eurasian Blackbird for March 2016.}
+  \label{fig:march16-map-blackbird}
+\end{figure}
+
+\section{Discussion and Conclusion}
+
+% Finally, you will reflect on what you have achieved. For instance, this section should discuss whether you managed to do what you initially planned, whether your initial choices worked well or not, things that you discovered that were not correct, etc. Conclusions about your whole work would be provided.
+
+After implementing the designed visualization and using it to perform the defined tasks, we can assess how well our chosen visual encoding was suited to the problem, and whether the patterns found in our dataset fit with the results from literature. Considering that most studies found a shift in bird migration times of no more than a few days per decade \cite{cotton2003avian}, it was not immediately clear that this shift would be observable using a visual method. We made the assumption that even small changes would be visible when inspecting monthly averages.
+
+As we have seen in \autoref{fig:march86-16-graph}, there seems to be some correlation between temperature anomaly and mean latitude for the Barn Swallow in March. However, this is not the case for all studied species. For example, \autoref{fig:march86-16-graph-eurbla} shows the development of the Eurasian Blackbird, which exhibits a downward trend in mean latitude during the same period. Whether this is due to a real effect, a violation of our assumptions, or an artefact of our data is hard to judge by our visualization. Indeed, our visual approach can be used to discover areas of interest for potential future research, but it should not be relied upon to prove or disprove a hypothesis.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{march86-16-graph-eurbla}
+  \caption{Line chart showing the variation of the temperature anomalies and mean latitude of the Eurasian Blackbird for March 1986 to 2016.}
+  \label{fig:march86-16-graph-eurbla}
+\end{figure}
+
+A significant challenge that came with the eBird dataset is the change in observation effort over time. Over the years, the number of observations has grown exponentially, which we have seen in \autoref{fig:observations-over-time}. Although we attempted to control for this change by using a relative measure of bird frequency, the comparison in \autoref{fig:birds-comparison} shows that in recent years, birds were observed in a much wider area than before, particularly in Europe. While the observed bird frequency in most places is small (the color is close to white), the increase in size of the colored area may be misinterpreted as a change in bird distribution. In addition, it is not clear whether this growth in observation effort is equally distributed over the Earth. This could introduce another form of bias in our measurements. Other studies have combatted these issues by means of complex mathematical models, including machine learning techniques \cite{johnston2019best,johnston2020analytical}. However, they studied a smaller area and timespan, which might make it more practical to fit such a model.
+
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=0.48\linewidth]{bird-map-barswa-1984-03.png}
+    \hfill
+    \includegraphics[width=0.48\linewidth]{bird-map-barswa-2019-03.png}
+    \caption{Frequency of Barn Swallow in 1984 (left) and 2019 (right).}
+    \label{fig:birds-comparison}
+\end{figure}
+
+When analyzing the migration behavior of the Barn Swallow, we did find an increased mean latitude during spring and summer months, compared to late autumn and winter, as seen in \autoref{fig:monthly-graph16}. However, such a clear pattern was not found for all species, for example \autoref{fig:monthly-graph16-eurbla} shows a much more erratic pattern for the Eurasian Blackbird. A limitation of our visualization is that we can only see this annual pattern for one year at a time, and the view must be manipulated manually to compare multiple years. Furthermore, it may have been useful to plot the absolute temperature rather than temperature anomaly when looking at a single year, as that would more clearly show the seasonal changes.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{monthly-graph16-eurbla.png}
+  \caption{Line chart showing  the temperature anomaly and mean latitude of the Eurasian Blackbird in 2019.}
+  \label{fig:monthly-graph16-eurbla}
+\end{figure}
+
+While manipulating time is essential to explore the full potential of the visualization, the manipulation of the map view has a less prominent role in a typical use case. For some species, the default map area is larger than the typical habitat, so the zoom functionality may be used to get a more detailed view. However, the shape of the map windows cannot be changed, and as such it may not be possible to adjust the bounds very precisely. In future work, a freeform drawing tool could be implemented to allow for more control.
+
+We have presented \emph{BirdVis} and applied it to analyze the relation between temperature and the migration behavior of birds in Europe and Africa. The visualization excels in the visualization of annual migration patterns, as well as the development of temperature over a timespan of multiple decades. Long-term change in migration behavior was more difficult to recognize on a map, in part because of the increase in observation effort over time. However, when reducing the dimensionality of the data and presenting it in a line chart, long-term effects became more apparent. We have also seen significant differences between bird species. Some species showed behavior that aligned with the expectations from literature, while others did not.
+
+To conclude, we see \emph{BirdVis} as an interesting communicative and explorative tool that presents the effects of climate change in a visual way. While it should not be used on its own to infer causal relationships, the visualization can help present scientific information and discover areas of interest for future research.
+
+\bibliographystyle{abbrv}
+\bibliography{main}
+\end{document}

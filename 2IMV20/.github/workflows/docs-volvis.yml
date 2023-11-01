@@ -1,0 +1,21 @@
+name: Build VolVis docs
+on: 
+  pull_request:
+    paths:
+      - 'VolVis/docs/**'
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out latest changes
+        uses: actions/checkout@v2
+      - name: Build LaTeX
+        uses: xu-cheng/latex-action@v2
+        with:
+          working_directory: VolVis/docs
+          root_file: main.tex
+      - name: Upload document
+        uses: actions/upload-artifact@v2
+        with:
+          name: Report PDF
+          path: VolVis/docs/main.pdf

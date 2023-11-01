@@ -1,0 +1,5 @@
+# Datasets
+data/
+
+# Jupyter autosaves
+.ipynb_checkpoints/
